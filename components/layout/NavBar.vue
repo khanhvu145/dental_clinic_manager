@@ -26,7 +26,7 @@
                         <span class="el-dropdown-link">
                             <!-- Dropdown List<i class="el-icon-arrow-down el-icon--right"></i> -->
                             <div class="navbar__nav">
-                                <div class="navbar__name">Admin</div>
+                                <div class="navbar__name">{{ formData.name }}</div>
                                 <div class="navbar__img">
                                     <img src="" alt="">
                                 </div>
@@ -53,10 +53,23 @@
 </template>
 
 <script>
+import User from '@/models/Employee';
 export default {
     props: { 
         isCollapse: Boolean,
     },
+    data() {
+      return {
+          formData: new User(),
+      };
+    },
+    async created() {
+		const _this = this;
+		setTimeout(async () => {
+			const userResponse = await _this.$axios.$get('api/account/info');
+			_this.formData = userResponse.data || {};
+		}, 500);
+	},
     methods: {
         collapseSidebar(){
             // document.getElementsByTagName('body')[0].classList.toggle('sidebar-expand');
