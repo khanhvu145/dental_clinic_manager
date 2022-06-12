@@ -83,8 +83,8 @@
                     <span slot="title">Lịch làm việc</span>
                 </el-menu-item>
             </nuxt-link>
-            <nuxt-link to="/patient" class="sidebar-nav-link">
-                <el-menu-item index="patient">
+            <nuxt-link to="/customer" class="sidebar-nav-link">
+                <el-menu-item index="customer">
                     <i class='bx bxs-group'></i>
                     <span slot="title">Khách hàng</span>
                 </el-menu-item>

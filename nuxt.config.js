@@ -37,12 +37,22 @@ export default {
 		'@/plugins/element-ui',
   ],
 
+  router: {
+		middleware: ['auth'],
+	},
+
   // Auto import components: https://go.nuxtjs.dev/config-components
   // components: true,
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
+    '@nuxtjs/dotenv',
+		'@nuxtjs/moment',
   ],
+
+  moment: {
+		locales: ['vi'],
+	},
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
@@ -50,6 +60,7 @@ export default {
     'bootstrap-vue/nuxt',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/auth-next',
   ],
 
   bootstrapVue: {
@@ -59,7 +70,27 @@ export default {
 	},
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+    baseURL: process.env.API_ENDPOINT,
+  },
+
+  auth: {
+		strategies: {
+			local: {
+				token: {
+					property: 'data.token',
+				},
+				user: {
+					property: 'data',
+				},
+				endpoints: {
+					login: { url: 'api/account/login', method: 'post' },
+					logout: false,
+					user: { url: 'api/account/info', method: 'get' },
+				},
+			},
+		},
+	},
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
