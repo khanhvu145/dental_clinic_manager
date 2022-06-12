@@ -22,7 +22,7 @@
                             <img src="/images/chulogo.png" alt="" class="title-logo">
                         </li>
                     </ul>
-                    <el-dropdown trigger="click">
+                    <el-dropdown trigger="click" @command="handleCommand">
                         <span class="el-dropdown-link">
                             <!-- Dropdown List<i class="el-icon-arrow-down el-icon--right"></i> -->
                             <div class="navbar__nav">
@@ -33,15 +33,15 @@
                             </div>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item>
+                            <el-dropdown-item command="account">
                                 <i class='bx bxs-user-account' ></i>
                                 Tài khoản
                             </el-dropdown-item>
-                            <el-dropdown-item>
+                            <el-dropdown-item command="manager">
                                 <i class='bx bx-book-content'></i>
                                 Quản lý
                             </el-dropdown-item>
-                            <el-dropdown-item>
+                            <el-dropdown-item command="logout">
                                 <i class='bx bx-log-out'></i>
                                 Đăng xuất
                             </el-dropdown-item>
@@ -71,6 +71,12 @@ export default {
 		}, 500);
 	},
     methods: {
+        async handleCommand(command) {
+            if(command == 'logout') {
+                await this.$auth.logout();
+			    await this.$router.push('/login');
+            }
+        },
         collapseSidebar(){
             // document.getElementsByTagName('body')[0].classList.toggle('sidebar-expand');
             var keyChange = !this.isCollapse;
