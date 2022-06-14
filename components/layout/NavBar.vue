@@ -37,7 +37,7 @@
                                 <i class='bx bxs-user-account' ></i>
                                 Tài khoản
                             </el-dropdown-item>
-                            <el-dropdown-item command="manager">
+                            <el-dropdown-item command="manager" v-if="checkRole">
                                 <i class='bx bx-book-content'></i>
                                 Quản lý
                             </el-dropdown-item>
@@ -61,6 +61,7 @@ export default {
     data() {
       return {
           formData: new User(),
+          checkRole: false,
       };
     },
     async created() {
@@ -68,6 +69,9 @@ export default {
 		setTimeout(async () => {
 			const userResponse = await _this.$axios.$get('api/account/info');
 			_this.formData = userResponse.data || {};
+            await _this.$store.commit('role/SET_ROLE_USER', userResponse.role);
+            if(this.$store.state.role.role == 'administration') _this.checkRole = true;
+            else _this.checkRole = false;
 		}, 500);
 	},
     methods: {
@@ -78,7 +82,6 @@ export default {
             }
         },
         collapseSidebar(){
-            // document.getElementsByTagName('body')[0].classList.toggle('sidebar-expand');
             var keyChange = !this.isCollapse;
             this.$emit('changeSidebar', keyChange);
         }

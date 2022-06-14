@@ -58,7 +58,7 @@ export default {
 			try {
 				const response = await this.$auth.loginWith('local', { data: this.login });
 				if (response.data.success) {
-					await _this.$store.commit('calendar/SET_USERID', this.login.username);
+					await _this.$store.commit('role/SET_USERID', this.login.username);
                     _this.$message({
 						showClose: true,
 						message: 'Đăng nhập thành công',

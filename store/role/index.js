@@ -4,8 +4,8 @@ import getters from './getters';
 
 const state = () => {
 	return {
-		layoutCalendarType: 'calendar',
 		userId: null,
+		role: null
 	};
 };
 
