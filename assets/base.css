@@ -71,8 +71,12 @@ body{
 
 .control-btn > i {
 	font-size: 18px;
-	margin-right: 4px;
 }
+
+.control-btn > span {
+	margin-left: 4px;
+}
+
 
 .control-btn.blue{
 	background-color: #0D6EFD;
@@ -121,4 +125,79 @@ body{
 
 a{
     text-decoration: none !important;
+}
+
+.avatar__content{
+	width: 180px;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 50%;
+    border: 1px solid rgba(82, 161, 157, 0.719);
+}
+
+.avatar__content > span:hover{
+    opacity: 1;
+}
+
+.upload__file-img{
+    display: none;
+}
+
+.avatar__content-img{
+    width: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.avatar__btn{
+	background-color: #198754;
+    border: 2px solid #198754;
+    margin-top: 16px;
+	display: flex;
+    text-align: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: all ease 0.5s;
+	padding: 8px 12px;
+	cursor: pointer;
+	line-height: 1.3;
+}
+
+.avatar__btn > i {
+	font-size: 18px;
+	margin-right: 8px;
+}
+
+.avatar__btn:hover{
+	background-color: #fff;
+	color: #3b3b3b;
+}
+
+.avatar__btn-clear{
+	background-color: #909399;
+    border: 2px solid #909399;
+    margin-top: 8px;
+	display: flex;
+    text-align: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: all ease 0.5s;
+	padding: 4px 8px;
+	cursor: pointer;
+	line-height: 1.3;
+}
+
+.avatar__btn-clear:hover{
+	background-color: #fff;
+	color: #3b3b3b;
 }
