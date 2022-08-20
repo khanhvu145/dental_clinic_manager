@@ -67,8 +67,17 @@
                                         <el-input 
                                             name="password"
                                             placeholder="Mật khẩu"
+                                            value="**********"
+                                            show-password
+                                            :disabled="true"
+                                            v-if="titleType == 'Sửa'"
+                                        ></el-input>
+                                        <el-input 
+                                            name="password"
+                                            placeholder="Mật khẩu"
                                             v-model="accountData.password"
                                             show-password
+                                            v-else
                                         ></el-input>
                                     </div>
                                 </div>
@@ -186,7 +195,7 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-md-4">
+                                    <!-- <div class="col-md-4">
                                         <div class="col-form-label">Chức vụ *</div>
                                         <el-select v-model="employeeData.position" placeholder="Chức vụ" name="position">
                                             <el-option
@@ -196,8 +205,8 @@
                                                 :value="item.value"
                                             ></el-option>
                                         </el-select>
-                                    </div>
-                                    <div class="col-md-4">
+                                    </div> -->
+                                    <div class="col-md-6">
                                         <div class="col-form-label">Quyền tài khoản *</div>
                                         <el-select v-model="accountData.roleId" placeholder="Quyền tài khoản" name="roleId">
                                             <el-option
@@ -208,7 +217,7 @@
                                             ></el-option>
                                         </el-select>
                                     </div>
-                                    <div class="col-md-4" style="display: flex; align-items: center;">
+                                    <div class="col-md-6" style="display: flex; align-items: center;">
                                         <div class="mt-4">
                                             <el-switch v-model="employeeData.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                                             Hoạt động
@@ -234,8 +243,6 @@ import Account from '@/models/Account';
 import buildFormData from '@/utils/buildFormData';
 
 export default {
-    layout: 'admin',
-    name: 'EmployeeCreateUpdate',
     components: { ImageUpload },
     computed: {
 		...mapState({
@@ -265,6 +272,23 @@ export default {
         _this.wardMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'wardMasterData' })) || [];
         _this.roleMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'roleMasterData' })) || [];
         _this.positionMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'positionMasterData' })) || [];
+        if (_this.$route.params.id && _this.$route.params.id != 'create') {
+			await _this.$axios.$get(`/api/employee/getById/${_this.$route.params.id}`).then(
+				(response) => {
+                    _this.accountData = response.account || new Account();
+                    _this.employeeData = response.employee || new Employee();
+				},
+				(error) => {
+					console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+					_this.accountData = new Account();
+                    _this.employeeData = new Employee();
+				}
+			);
+		}
     },
     mounted() {
         if(this.$nuxt.$route.params.id == 'create') this.titleType = 'Thêm';
@@ -282,48 +306,8 @@ export default {
             _this.employeeData.address.wardId = null;
             _this.wardByDistrict = _.filter([..._this.wardMasterData] || [], {'district_code': value});
 		},
-        // submitForm: debounce(async function () {
-		// 	const _this = this;
-        //     var formData = {
-        //         code: _this.employeeData.code,
-        //         name: _this.employeeData.name,
-        //         physicalId: _this.employeeData.physicalId,
-        //         dateOfIssue: _this.employeeData.dateOfIssue,
-        //         placeOfIssue: _this.employeeData.placeOfIssue,
-        //         email: _this.employeeData.email,
-        //         phone: _this.employeeData.phone,
-        //         birthday: _this.employeeData.birthday,
-        //         gender: _this.employeeData.gender,
-        //         address: {
-        //             building: _this.employeeData.address.building,
-        //             wardId: _this.employeeData.address.wardId,
-        //             districtId: _this.employeeData.address.districtId,
-        //             provinceId: _this.employeeData.address.provinceId,
-        //         },
-        //         position: _this.employeeData.position,
-        //         isActive: _this.employeeData.isActive,
-        //         img: _this.employeeData.img,
-        //         imageFile: _this.employeeData.imageFile,
-        //         username: _this.accountData.username,
-        //         password: _this.accountData.password,
-        //         employeeId: _this.accountData.employeeId,
-        //         roleId: _this.accountData.roleId
-        //     }
-        //     const data = await _this.$axios.$post('/api/employee/createEmployee', formData, {
-        //         headers: { 'Content-Type': 'multipart/form-data' },
-        //     });
-        //     if (data.success) {
-        //         _this.$message({
-        //             message: 'Lưu thành công',
-        //             type: 'success',
-        //         });
-        //         console.log(data)
-        //     } else {
-        //         _this.$message.error('Lưu thất bại');
-        //     }
-		// }, 500),
-        submitForm: async function () {
-            const _this = this;
+        submitForm: debounce(async function () {
+			const _this = this;
             var formData = {
                 code: _this.employeeData.code,
                 name: _this.employeeData.name,
@@ -348,30 +332,28 @@ export default {
                 password: _this.accountData.password,
                 employeeId: _this.accountData.employeeId,
                 roleId: _this.accountData.roleId
-            };
-            var newData = cloneDeep(formData);
-            try{
-                var formD = new FormData();
-                buildFormData(formD, newData);
-                console.log(formD)
-                // const data = await _this.$axios.$post(`/api/employee/createEmployee`, formData, {
-                //     headers: { 'Content-Type': 'application/json' },
-                // });
-                // if (data.success) {
-                //     console.log(data);
-                //     _this.$message({
-                //         message: 'Cập nhật thành công',
-                //         type: 'success',
-                //     });
-                // } else {
-                //     _this.$message.error("Lưu thất bại");
-                // }
             }
-            catch (error) {
-                console.log(error);
-                _this.$message.error('Có lỗi xảy ra');
+            var oldData = cloneDeep(formData);
+            var newData = new FormData();
+            buildFormData(newData, oldData);
+            const data = await _this.$axios.$post('/api/employee/createEmployee', newData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (data.success) {
+                _this.accountData = data.account;
+                _this.employeeData = data.employee;
+                _this.$message({
+                    message: 'Lưu thành công',
+                    type: 'success',
+                });
+                _this.$router.push(`/employee/${data.employee._id}`);
+                console.log(data)
+                console.log(_this.accountData)
+                console.log(_this.employeeData)
+            } else {
+                _this.$message.error(data.error);
             }
-        }
+		}, 500),
 	}
 }
 </script>

@@ -135,7 +135,8 @@ export default {
 .navbar-link i{
     font-size: 28px;
     color: #fff;
-    padding: 8px 16px;
+    padding: 8px 0;
+    padding-right: 16px;
 }
 .navbar__img{
     width: 40px;

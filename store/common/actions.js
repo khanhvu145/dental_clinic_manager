@@ -41,15 +41,15 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                         label: item.name,
                     }
                 })
-            case 'positionMasterData':
-                const positionData = await this.$axios.$get('/api/employee/listposition');
-                var positions = positionData.data;
-                return positions.map(item => {
-                    return {
-                        value: item._id,
-                        label: item.name,
-                    }
-                })
+            // case 'positionMasterData':
+            //     const positionData = await this.$axios.$get('/api/employee/listposition');
+            //     var positions = positionData.data;
+            //     return positions.map(item => {
+            //         return {
+            //             value: item._id,
+            //             label: item.name,
+            //         }
+            //     })
     }
     return [];
 }

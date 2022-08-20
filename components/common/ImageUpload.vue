@@ -2,7 +2,6 @@
 	<div class="row">
         <div class="col-md-12" style="display: flex; justify-content: center;">
             <el-upload
-                :ref="imgUpload"
                 :class="imageUrl || value ? '' : 'avatar-uploader'"
                 :auto-upload="false"
                 :multiple="false"
@@ -37,6 +36,7 @@ export default {
     },
     watch: {
       value() {
+        console.log("test")
         this.$emit('input', this.value);
       },
     },

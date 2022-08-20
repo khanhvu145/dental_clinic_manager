@@ -25,6 +25,23 @@
                     <span slot="title">Khách hàng</span>
                 </el-menu-item>
             </nuxt-link>
+            <nuxt-link to="/employee" class="sidebar-nav-link">
+                <el-menu-item index="employee">
+                    <i class='bx bx-injection'></i>
+                    <span slot="title">Nhân viên</span>
+                </el-menu-item>
+            </nuxt-link>
+            <el-submenu index="generalconfig">
+                <template slot="title">
+                    <i class='bx bxs-cog'></i>
+                    <span slot="title">Cấu hình chung</span>
+                </template>
+                <nuxt-link to="/groupUser" class="sidebar-nav-link">
+                    <el-menu-item index="groupUser">
+                        <span slot="title">Nhóm người dùng</span>
+                    </el-menu-item>
+                </nuxt-link>
+            </el-submenu>
         </el-menu>
     </div>
 </template>
@@ -68,7 +85,7 @@ export default {
     min-height: 100vh;
 }
 .sidebar .el-menu{
-    box-shadow: rgba(0,0,0,0.12) 0px 1px 4px 1px;
+    /* box-shadow: rgba(0,0,0,0.12) 0px 1px 4px 1px; */
 }
 .sidebar-nav-link {
 	text-decoration: none !important;

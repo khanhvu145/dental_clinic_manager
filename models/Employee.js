@@ -14,7 +14,8 @@ export default function() {
 		districtId: null,
 		provinceId: null,
 	};
-	this.gender = '';
-	this.position = '';
+	// this.position = '';
 	this.isActive = true;
+	this.img = '';
+	this.imageFile = null;
 }
