@@ -17,9 +17,13 @@ export default {
 		NavBar,
 		SideBar,
 	},
+  async created() {
+		const _this = this;
+		await _this.$store.dispatch('getAccesses');
+	},
   data() {
     return { 
-      isCollapse: true
+      isCollapse: true,
     }
   },
   methods: {

@@ -1,24 +1,16 @@
 <template>
     <div class="wrapper">
-        <div class="content">
+        <div class="content" v-if="checkRight('view')">
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <div class="title titleAfter mb-0">Quản lý khách hàng</div>
+                        <div class="title titleAfter mb-0">Quản lý nhóm người dùng</div>
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
-                    <div class="col-md-2">
-                        <div class="col-form-label">Mã</div>
-                        <el-input placeholder="Mã..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-form-label">Tên</div>
-                        <el-input placeholder="Tên..." v-model="searchQuery.filters.nameF" name="nameF"></el-input>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-form-label">Số điện thoại</div>
-                        <el-input placeholder="Số điện thoại..." v-model="searchQuery.filters.phoneF" name="phoneF"></el-input>
+                    <div class="col-md-3">
+                        <div class="col-form-label">Tên nhóm</div>
+                        <el-input placeholder="Nhóm..." v-model="searchQuery.filters.nameF" name="nameF"></el-input>
                     </div>
                     <div class="col-md-2">
                         <div class="col-form-label">Trạng thái</div>
@@ -60,7 +52,7 @@
                     <div class="col-md-7 mt-2"></div>
                     <div class="col-md-2">
                         <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                            <button class="control-btn blue" @click="$router.push('/customer/create')">
+                            <button class="control-btn blue" @click="$router.push('/accessgroup/create')">
                                 <i class='bx bx-plus' ></i>
                                 Thêm
                             </button>
@@ -70,24 +62,14 @@
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" style="width: 100%" stripe>
-                            <el-table-column label="Thông tin khách hàng" min-width="150">
+                            <el-table-column label="Tên" min-width="120">
                                 <template slot-scope="scope">
-                                    <div>
-                                        <i class='bx bx-user'></i>
-                                        {{ scope.row.name || '' }}
-                                    </div>
-                                    <div>
-                                        <i class='bx bx-id-card'></i>
-                                        {{ scope.row.physicalId || '' }}
-                                    </div>
-                                    <div>
-                                        <i class='bx bx-calendar-event'></i>
-                                        {{ $moment(scope.row.birthday).format('DD/MM/YYYY') }}
-                                    </div>
-                                    <div>
-                                        <i class='bx bx-phone' ></i>
-                                        {{ scope.row.phone || '' }}
-                                    </div>
+                                    <div>{{ scope.row.name || '' }}</div>
+								</template>
+                            </el-table-column>
+                            <el-table-column label="Ghi chú" min-width="150">
+                                <template slot-scope="scope">
+                                    <div>{{ scope.row.note || '' }}</div>
 								</template>
                             </el-table-column>
                             <el-table-column label="Trạng thái" min-width="80">
@@ -99,7 +81,7 @@
                             </el-table-column>
                             <el-table-column label="Thao tác" min-width="80">
                                 <template slot-scope="scope">
-									<nuxt-link :to="`/users/${scope.row._id}`"
+									<nuxt-link :to="`/accessgroup/${scope.row._id}`"
 										><i class="el-icon-edit-outline font-20 text-center"></i
 									></nuxt-link>
 								</template>
@@ -134,13 +116,18 @@
                 </div>
             </div>
         </div>
+        <div v-else style="height: 100%; position: relative;">
+            <div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); text-align: center; font-weight: bold; opacity: 0.6;">
+                <i class='bx bx-x-circle' style="font-size: 80px;"></i>
+                <div class="mt-3" style="font-size: 20px;">BẠN KHÔNG CÓ QUYỀN !!</div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import { statusData } from '@/utils/masterData';
-import { genderData } from '@/utils/masterData';
 import { intersection } from 'lodash';
 export default {
     computed: {
@@ -152,8 +139,6 @@ export default {
         return {
             data: {},
             statusData: statusData,
-            genderData: genderData,
-            searchQuery: {},
             sortData: [
                 {
                     label: 'Thời gian tạo giảm dần',
@@ -174,9 +159,7 @@ export default {
             ],
             searchQuery: {
                 filters: {
-                    codeF: '',
                     nameF: '',
-                    phoneF: '',
                     statusF: true
                 },
                 sorts: 'createdAt&&-1',
@@ -185,17 +168,18 @@ export default {
                     size: 10
                 }
             },
-            currentPage: 1
+            currentPage: 1,
         }
     },
     async created() {
         const _this = this;
+        _this.getData(_this.searchQuery);
     },
     methods: {
         checkRight(right) {
 			const _this = this;
 			// If user have permission below
-			const values = ['customer.all', 'customer.' + right];
+			const values = ['accessgroup.all', 'accessgroup.' + right];
 			return !!(intersection(_this.accesses || [], values).length > 0);
 		},
         handleSizeChange(val) {
@@ -215,13 +199,23 @@ export default {
         },
         async getData(searchQuery){
             const _this = this;
+            await _this.$axios.$post('/api/accessgroup/getByQuery', searchQuery).then(
+                (response) => {
+					_this.data = response;
+				},
+				(error) => {
+					console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+				}
+            );
         },
         refreshData(){
             const _this = this;
             _this.searchQuery.filters = {
-                codeF: '',
                 nameF: '',
-                phoneF: '',
                 statusF: true
             }
             _this.getData(_this.searchQuery);

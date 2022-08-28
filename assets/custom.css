@@ -76,7 +76,7 @@
 .el-submenu__icon-arrow.el-icon-arrow-down{
     font-size: 1rem;
 }
-.el-input.is-active .el-input__inner, .el-input__inner:focus {
+.el-input.is-active .el-input__inner, .el-input__inner:focus, .el-textarea__inner:focus {
     border-color: rgba(82, 161, 157, 0.719) !important;
     outline: 0;
 }
@@ -145,4 +145,69 @@
 }
 .fc .fc-col-header-cell-cushion{
     font-weight: 500;
+}
+
+#custome-el-colapse .el-collapse-item__header {
+    background: #339b19;
+    color: #ffffff;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+  }
+  
+  #custome-el-colapse .el-collapse-item__wrap {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+  
+  #custome-el-colapse .el-collapse-item__content {
+    padding-bottom: 0px;
+  }
+  
+  #custome-el-colapse .el-collapse-item__arrow {
+    font-size: 20px;
+  }
+  .el-checkbox__input.is-checked .el-checkbox__inner {
+	background-color: #74bc20;
+	border-color: #74bc20;
+}
+
+.el-checkbox__input.is-focus .el-checkbox__inner {
+	border-color: #74bc20;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+	color: #74bc20;
+}
+.el-checkbox__inner:hover {
+	border-color: #74bc20;
+}
+
+.el-pager li.active {
+    color: #74bc20;
+    cursor: default;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+    background-color: #74bc20;
+    color: #FFF;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled):hover {
+    color: #74bc20;
+}
+
+.el-pagination__sizes .el-input .el-input__inner:hover {
+    border-color: #74bc20;
+}
+
+.el-select-dropdown__item.selected {
+    color: #74bc20;
+    font-weight: 700;
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: #74bc20 !important;
+}
+
+.el-table .el-table__cell{
+    vertical-align: top;
 }

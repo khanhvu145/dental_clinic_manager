@@ -36,13 +36,13 @@ export default {
     },
     watch: {
       value() {
-        console.log("test")
         this.$emit('input', this.value);
       },
     },
     created() {
       const _this = this;
       _this.imageUrl = cloneDeep(_this.value);
+      _this.isImage = _this.imageUrl ? true : false;
     },
     methods: {
       handleChange(file, fileList) {

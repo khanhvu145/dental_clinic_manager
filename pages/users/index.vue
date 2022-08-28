@@ -1,10 +1,10 @@
 <template>
     <div class="wrapper">
-        <div class="content">
+        <div class="content" v-if="checkRight('view')">
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <div class="title titleAfter mb-0">Quản lý khách hàng</div>
+                        <div class="title titleAfter mb-0">Quản lý người dùng</div>
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
@@ -17,8 +17,8 @@
                         <el-input placeholder="Tên..." v-model="searchQuery.filters.nameF" name="nameF"></el-input>
                     </div>
                     <div class="col-md-2">
-                        <div class="col-form-label">Số điện thoại</div>
-                        <el-input placeholder="Số điện thoại..." v-model="searchQuery.filters.phoneF" name="phoneF"></el-input>
+                        <div class="col-form-label">Tài khoản</div>
+                        <el-input placeholder="Tài khoản..." v-model="searchQuery.filters.usernameF" name="usernameF"></el-input>
                     </div>
                     <div class="col-md-2">
                         <div class="col-form-label">Trạng thái</div>
@@ -60,7 +60,7 @@
                     <div class="col-md-7 mt-2"></div>
                     <div class="col-md-2">
                         <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                            <button class="control-btn blue" @click="$router.push('/customer/create')">
+                            <button class="control-btn blue" @click="$router.push('/users/create')">
                                 <i class='bx bx-plus' ></i>
                                 Thêm
                             </button>
@@ -70,7 +70,19 @@
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" style="width: 100%" stripe>
-                            <el-table-column label="Thông tin khách hàng" min-width="150">
+                            <el-table-column label="Tài khoản" min-width="150">
+                                <template slot-scope="scope">
+                                    <div style="font-weight: bold;">
+                                        <i class='bx bxs-user-account'></i>
+                                        {{ scope.row.username || '' }}
+                                    </div>
+                                    <div>
+                                        <i class='bx bx-group' ></i>
+                                        {{ accessMasterData.find(e => e.value == scope.row.accessId).label || '' }}
+                                    </div>
+								</template>
+                            </el-table-column>
+                            <el-table-column label="Thông tin" min-width="150">
                                 <template slot-scope="scope">
                                     <div>
                                         <i class='bx bx-user'></i>
@@ -134,6 +146,12 @@
                 </div>
             </div>
         </div>
+        <div v-else style="height: 100%; position: relative;">
+            <div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); text-align: center; font-weight: bold; opacity: 0.6;">
+                <i class='bx bx-x-circle' style="font-size: 80px;"></i>
+                <div class="mt-3" style="font-size: 20px;">BẠN KHÔNG CÓ QUYỀN !!</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -152,7 +170,6 @@ export default {
         return {
             data: {},
             statusData: statusData,
-            genderData: genderData,
             searchQuery: {},
             sortData: [
                 {
@@ -176,7 +193,7 @@ export default {
                 filters: {
                     codeF: '',
                     nameF: '',
-                    phoneF: '',
+                    usernameF: '',
                     statusF: true
                 },
                 sorts: 'createdAt&&-1',
@@ -185,17 +202,21 @@ export default {
                     size: 10
                 }
             },
-            currentPage: 1
+            currentPage: 1,
+            accessMasterData: [],
+            genderData: genderData
         }
     },
     async created() {
         const _this = this;
+        _this.accessMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'accessMasterData' })) || [];
+        _this.getData(_this.searchQuery);
     },
     methods: {
         checkRight(right) {
 			const _this = this;
 			// If user have permission below
-			const values = ['customer.all', 'customer.' + right];
+			const values = ['users.all', 'users.' + right];
 			return !!(intersection(_this.accesses || [], values).length > 0);
 		},
         handleSizeChange(val) {
@@ -215,13 +236,25 @@ export default {
         },
         async getData(searchQuery){
             const _this = this;
+            await _this.$axios.$post('/api/user/getByQuery', searchQuery).then(
+                (response) => {
+					_this.data = response;
+				},
+				(error) => {
+					console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+				}
+            );
         },
         refreshData(){
             const _this = this;
             _this.searchQuery.filters = {
                 codeF: '',
                 nameF: '',
-                phoneF: '',
+                usernameF: '',
                 statusF: true
             }
             _this.getData(_this.searchQuery);

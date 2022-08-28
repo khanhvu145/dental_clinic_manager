@@ -125,6 +125,11 @@ body{
 
 a{
     text-decoration: none !important;
+    color: var(--font-color);
+}
+
+a:hover {
+    color: #57c115;
 }
 
 .avatar__content{

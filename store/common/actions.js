@@ -32,24 +32,26 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                         district_code: item.district_code
                     }
                 })
-            case 'roleMasterData':
-                const roleData = await this.$axios.$get('/api/account/listRole');
-                var roles = roleData.data;
-                return roles.map(item => {
+            case 'accessMasterData':
+                var searchQuery = {
+                    filters: {
+                        nameF: '',
+                        statusF: true
+                    },
+                    sorts: 'name&&1',
+                    pages:{
+                        from: 0,
+                        size: 1000
+                    }
+                };
+                const accessData = await this.$axios.$post('/api/accessgroup/getByQuery', searchQuery);
+                var accesses = accessData.data;
+                return accesses.map(item => {
                     return {
                         value: item._id,
                         label: item.name,
                     }
                 })
-            // case 'positionMasterData':
-            //     const positionData = await this.$axios.$get('/api/employee/listposition');
-            //     var positions = positionData.data;
-            //     return positions.map(item => {
-            //         return {
-            //             value: item._id,
-            //             label: item.name,
-            //         }
-            //     })
     }
     return [];
 }

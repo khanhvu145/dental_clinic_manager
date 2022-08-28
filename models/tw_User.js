@@ -1,5 +1,7 @@
 export default function() {
-	this.code = '';
+    this.code = '';
+    this.username = '';
+	this.password = '';
 	this.name = '';
 	this.physicalId = '';
 	this.dateOfIssue = null;
@@ -14,8 +16,8 @@ export default function() {
 		districtId: null,
 		provinceId: null,
 	};
-	// this.position = '';
 	this.isActive = true;
 	this.img = '';
 	this.imageFile = null;
+    this.accessId = '';
 }

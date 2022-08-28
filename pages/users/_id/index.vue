@@ -1,28 +1,36 @@
 <template>
     <div class="wrapper">
         <div class="content">
-            <div class="container-fluid">
+            <div class="container-fluid" v-if="!dataLoading">
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="title titleAfter mb-0">
-                            <nuxt-link to="/administration/employee" class="sidebar-nav-link" style="color:#364d67">Nhân viên</nuxt-link>
+                            <nuxt-link to="/users" class="sidebar-nav-link" style="color:#364d67">Quản lý người dùng</nuxt-link>
                             <span> / </span> <span>{{titleType}}</span>
                         </div>
                     </div>
                 </div>
                 <form class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
                     <div class="col-md-12" style="text-align: right;">
-                        <button type="button" class="control-btn gray" @click="$router.go(-1)">
+                        <button type="button" class="control-btn gray" @click="$router.push('/users')">
                             <i class='bx bx-arrow-back'></i>
                             <span>Quay lại</span>
                         </button>
-                        <button type="button" class="control-btn green" @click="submitForm">
+                        <button
+                            v-if="
+                                (checkRight('create') && $route.params.id == 'create') ||
+                                (checkRight('update') && $route.params.id != 'create')
+                            "
+                            type="button" 
+                            class="control-btn green" 
+                            @click="submitForm"
+                        >
                             <i class='bx bx-save' ></i>
                             <span>Lưu</span>
                         </button>
                     </div>
                     <div class="col-md-3 mt-4">
-                        <ImageUpload :value="employeeData.img" @input="(newValue) => {employeeData.imageFile = newValue;}"></ImageUpload>
+                        <ImageUpload v-if="!dataLoading || formData.imageFile" :value="formData.img" @input="(newValue) => {formData.imageFile = newValue;}"></ImageUpload>
                     </div>
                     <div class="col-md-9 mt-4">
                         <div class="row">
@@ -32,7 +40,7 @@
                                         <div class="col-form-label">Mã nhân viên</div>
                                         <el-input 
                                             name="code"
-                                            v-model="employeeData.code"
+                                            v-model="formData.code"
                                             :disabled="true"
                                         ></el-input>
                                     </div>
@@ -41,7 +49,7 @@
                                         <el-input 
                                             name="name"
                                             placeholder="Họ và tên"
-                                            v-model="employeeData.name"
+                                            v-model="formData.name"
                                         ></el-input>
                                     </div>
                                 </div>
@@ -51,14 +59,14 @@
                                         <el-input 
                                             name="username"
                                             placeholder="Tài khoản"
-                                            v-model="accountData.username"
+                                            v-model="formData.username"
                                             :disabled="true"
                                             v-if="titleType == 'Sửa'"
                                         ></el-input>
                                         <el-input 
                                             name="username"
                                             placeholder="Tài khoản"
-                                            v-model="accountData.username"
+                                            v-model="formData.username"
                                             v-else
                                         ></el-input>
                                     </div>
@@ -67,8 +75,17 @@
                                         <el-input 
                                             name="password"
                                             placeholder="Mật khẩu"
-                                            v-model="accountData.password"
+                                            value="**********"
                                             show-password
+                                            :disabled="true"
+                                            v-if="titleType == 'Sửa'"
+                                        ></el-input>
+                                        <el-input 
+                                            name="password"
+                                            placeholder="Mật khẩu"
+                                            v-model="formData.password"
+                                            show-password
+                                            v-else
                                         ></el-input>
                                     </div>
                                 </div>
@@ -78,17 +95,16 @@
                                         <el-input 
                                             name="physicalId"
                                             placeholder="CMND/CCCD"
-                                            v-model="employeeData.physicalId"
+                                            v-model="formData.physicalId"
                                         ></el-input>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="col-form-label">Ngày cấp</div>
                                         <el-date-picker
-                                            v-model="employeeData.dateOfIssue"
+                                            v-model="formData.dateOfIssue"
                                             type="date"
                                             name="dateOfIssue"
                                             format="dd/MM/yyyy"
-                                            value-format="dd/MM/yyyy"
                                             placeholder="Ngày/tháng/năm"
                                         ></el-date-picker>
                                     </div>
@@ -97,7 +113,7 @@
                                         <el-input 
                                             name="placeOfIssue"
                                             placeholder="Nơi cấp"
-                                            v-model="employeeData.placeOfIssue"
+                                            v-model="formData.placeOfIssue"
                                         ></el-input>
                                     </div>
                                 </div>
@@ -107,7 +123,7 @@
                                         <el-input
                                             name="phone"
                                             placeholder="Số điện thoại"
-                                            v-model="employeeData.phone"
+                                            v-model="formData.phone"
                                         ></el-input>
                                     </div>
                                     <div class="col-md-6">
@@ -115,7 +131,7 @@
                                         <el-input
                                             name="email"
                                             placeholder="Email"
-                                            v-model="employeeData.email"
+                                            v-model="formData.email"
                                         ></el-input>
                                     </div>
                                 </div>
@@ -123,17 +139,16 @@
                                     <div class="col-md-6">
                                         <div class="col-form-label">Ngày sinh</div>
                                         <el-date-picker
-                                            v-model="employeeData.birthday"
+                                            v-model="formData.birthday"
                                             type="date"
                                             name="birthday"
                                             format="dd/MM/yyyy"
-                                            value-format="dd/MM/yyyy"
                                             placeholder="Ngày/tháng/năm"
                                         ></el-date-picker>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="col-form-label">Giới tính</div>
-                                        <el-select v-model="employeeData.gender" placeholder="Giới tính" name="gender">
+                                        <el-select v-model="formData.gender" placeholder="Giới tính" name="gender">
                                             <el-option
                                                 v-for="item in genderData"
                                                 :key="item.value"
@@ -151,11 +166,11 @@
                                         <el-input
                                             name="building"
                                             placeholder="Số nhà, đường, khu phố"
-                                            v-model="employeeData.address.building"
+                                            v-model="formData.address.building"
                                         ></el-input>
                                     </div>
                                     <div class="col-md-6">
-                                        <el-select v-model="employeeData.address.provinceId" clearable filterable placeholder="Tỉnh/Thành phố" name="provinceId" v-on:change="onSelectProvince($event)">
+                                        <el-select v-model="formData.address.provinceId" filterable clearable placeholder="Tỉnh/Thành phố" name="provinceId" v-on:change="onSelectProvince($event)">
                                             <el-option
                                                 v-for="item in provinceMasterData"
                                                 :key="item.value"
@@ -165,7 +180,7 @@
                                         </el-select>
                                     </div>
                                     <div class="col-md-6 mt-4">
-                                        <el-select v-model="employeeData.address.districtId" clearable filterable placeholder="Quận/Huyện" name="districtId" v-on:change="onSelectDistrict($event)" :disabled="employeeData.address.provinceId ? false : true">
+                                        <el-select v-model="formData.address.districtId" filterable clearable placeholder="Quận/Huyện" name="districtId" v-on:change="onSelectDistrict($event)" :disabled="formData.address.provinceId ? false : true">
                                             <el-option
                                                 v-for="item in districtByProvince"
                                                 :key="item.value"
@@ -175,7 +190,7 @@
                                         </el-select>
                                     </div>
                                     <div class="col-md-6 mt-4">
-                                        <el-select v-model="employeeData.address.wardId" clearable filterable placeholder="Phường/Xã/Ấp" name="wardId" :disabled="employeeData.address.districtId ? false : true">
+                                        <el-select v-model="formData.address.wardId" filterable clearable placeholder="Phường/Xã/Ấp" name="wardId" :disabled="formData.address.districtId ? false : true">
                                             <el-option
                                                 v-for="item in wardByDistrict"
                                                 :key="item.value"
@@ -186,31 +201,20 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-md-4">
-                                        <div class="col-form-label">Chức vụ *</div>
-                                        <el-select v-model="employeeData.position" placeholder="Chức vụ" name="position">
+                                    <div class="col-md-6">
+                                        <div class="col-form-label">Nhóm người dùng *</div>
+                                        <el-select v-model="formData.accessId" placeholder="Quyền tài khoản" name="accessId">
                                             <el-option
-                                                v-for="item in positionMasterData"
+                                                v-for="item in accessMasterData"
                                                 :key="item.value"
                                                 :label="item.label"
                                                 :value="item.value"
                                             ></el-option>
                                         </el-select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="col-form-label">Quyền tài khoản *</div>
-                                        <el-select v-model="accountData.roleId" placeholder="Quyền tài khoản" name="roleId">
-                                            <el-option
-                                                v-for="item in roleMasterData"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value"
-                                            ></el-option>
-                                        </el-select>
-                                    </div>
-                                    <div class="col-md-4" style="display: flex; align-items: center;">
+                                    <div class="col-md-6" style="display: flex; align-items: center;">
                                         <div class="mt-4">
-                                            <el-switch v-model="employeeData.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                            <el-switch v-model="formData.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                                             Hoạt động
                                         </div>
                                     </div>
@@ -226,156 +230,127 @@
 
 <script>
 import { mapState } from 'vuex';
-import { cloneDeep, debounce } from 'lodash';
+import { cloneDeep, debounce, intersection } from 'lodash';
 import { genderData } from '@/utils/masterData';
 import ImageUpload from '@/components/common/ImageUpload.vue';
-import Employee from '@/models/Employee';
-import Account from '@/models/Account';
+import User from '@/models/tw_User';
 import buildFormData from '@/utils/buildFormData';
-
 export default {
-    layout: 'admin',
-    name: 'EmployeeCreateUpdate',
     components: { ImageUpload },
     computed: {
 		...mapState({
 			accesses: (state) => state.accesses,
+            userInfo: (state) => state.auth.user,
 		}),
 	},
     data() {
-      return {
-        isAvatar: false,
-        genderData: genderData,
-        titleType: '',
-        employeeData: new Employee(),
-        accountData: new Account(),
-        positionMasterData: [],
-        roleMasterData: [],
-        provinceMasterData: [],
-        districtMasterData: [],
-        districtByProvince: [],
-        wardMasterData: [],
-        wardByDistrict: [],
-      };
-    },
-    async created() {
-        const _this = this;
-        _this.provinceMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'provinceMasterData' })) || [];
-        _this.districtMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'districtMasterData' })) || [];
-        _this.wardMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'wardMasterData' })) || [];
-        _this.roleMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'roleMasterData' })) || [];
-        _this.positionMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'positionMasterData' })) || [];
+        return {
+            titleType: '',
+            dataLoading: true,
+            genderData: genderData,
+            formData: new User(),
+            accessMasterData: [],
+            provinceMasterData: [],
+            districtMasterData: [],
+            districtByProvince: [],
+            wardMasterData: [],
+            wardByDistrict: [],
+        }
     },
     mounted() {
         if(this.$nuxt.$route.params.id == 'create') this.titleType = 'Thêm';
         else this.titleType = 'Sửa';
     },
-	methods: {
-        onSelectProvince(value) {
+    async created(){
+        const _this = this;
+        _this.provinceMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'provinceMasterData' })) || [];
+        _this.districtMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'districtMasterData' })) || [];
+        _this.wardMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'wardMasterData' })) || [];
+        _this.accessMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'accessMasterData' })) || [];
+
+        if (_this.$route.params.id && _this.$route.params.id != 'create') {
+            await _this.$axios.$get(`/api/user/getById/${_this.$route.params.id}`).then(
+				async (response) => {
+                    _this.formData = response.data || new User();
+                    await _this.onSelectProvince(_this.formData.address.provinceId, false);
+                    await _this.onSelectDistrict(_this.formData.address.districtId, false);
+				},
+				(error) => {
+                    console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+					 _this.formData = new User();
+				}
+			);
+        }
+
+        _this.dataLoading = false;
+    },
+    methods: {
+        checkRight(right) {
+			const _this = this;
+			// If user have permission below
+			const values = ['users.all', 'users.' + right];
+			return !!(intersection(_this.accesses || [], values).length > 0);
+		},
+        onSelectProvince(value, check = true) {
             const _this = this;
-            _this.employeeData.address.districtId = null;
-            _this.employeeData.address.wardId = null;
+            if(check) {
+                _this.formData.address.districtId = null;
+                _this.formData.address.wardId = null;
+            }
             _this.districtByProvince = _.filter([..._this.districtMasterData] || [], {'province_code': value});
 		},
-        onSelectDistrict(value) {
+        onSelectDistrict(value, check = true) {
             const _this = this;
-            _this.employeeData.address.wardId = null;
+            if(check) {
+                _this.formData.address.wardId = null;
+            }
             _this.wardByDistrict = _.filter([..._this.wardMasterData] || [], {'district_code': value});
 		},
-        // submitForm: debounce(async function () {
-		// 	const _this = this;
-        //     var formData = {
-        //         code: _this.employeeData.code,
-        //         name: _this.employeeData.name,
-        //         physicalId: _this.employeeData.physicalId,
-        //         dateOfIssue: _this.employeeData.dateOfIssue,
-        //         placeOfIssue: _this.employeeData.placeOfIssue,
-        //         email: _this.employeeData.email,
-        //         phone: _this.employeeData.phone,
-        //         birthday: _this.employeeData.birthday,
-        //         gender: _this.employeeData.gender,
-        //         address: {
-        //             building: _this.employeeData.address.building,
-        //             wardId: _this.employeeData.address.wardId,
-        //             districtId: _this.employeeData.address.districtId,
-        //             provinceId: _this.employeeData.address.provinceId,
-        //         },
-        //         position: _this.employeeData.position,
-        //         isActive: _this.employeeData.isActive,
-        //         img: _this.employeeData.img,
-        //         imageFile: _this.employeeData.imageFile,
-        //         username: _this.accountData.username,
-        //         password: _this.accountData.password,
-        //         employeeId: _this.accountData.employeeId,
-        //         roleId: _this.accountData.roleId
-        //     }
-        //     const data = await _this.$axios.$post('/api/employee/createEmployee', formData, {
-        //         headers: { 'Content-Type': 'multipart/form-data' },
-        //     });
-        //     if (data.success) {
-        //         _this.$message({
-        //             message: 'Lưu thành công',
-        //             type: 'success',
-        //         });
-        //         console.log(data)
-        //     } else {
-        //         _this.$message.error('Lưu thất bại');
-        //     }
-		// }, 500),
-        submitForm: async function () {
+        submitForm: debounce(async function () {
             const _this = this;
-            var formData = {
-                code: _this.employeeData.code,
-                name: _this.employeeData.name,
-                physicalId: _this.employeeData.physicalId,
-                dateOfIssue: _this.employeeData.dateOfIssue,
-                placeOfIssue: _this.employeeData.placeOfIssue,
-                email: _this.employeeData.email,
-                phone: _this.employeeData.phone,
-                birthday: _this.employeeData.birthday,
-                gender: _this.employeeData.gender,
-                address: {
-                    building: _this.employeeData.address.building,
-                    wardId: _this.employeeData.address.wardId,
-                    districtId: _this.employeeData.address.districtId,
-                    provinceId: _this.employeeData.address.provinceId,
-                },
-                position: _this.employeeData.position,
-                isActive: _this.employeeData.isActive,
-                img: _this.employeeData.img,
-                imageFile: _this.employeeData.imageFile,
-                username: _this.accountData.username,
-                password: _this.accountData.password,
-                employeeId: _this.accountData.employeeId,
-                roleId: _this.accountData.roleId
-            };
-            var newData = cloneDeep(formData);
-            try{
-                var formD = new FormData();
-                buildFormData(formD, newData);
-                console.log(formD)
-                // const data = await _this.$axios.$post(`/api/employee/createEmployee`, formData, {
-                //     headers: { 'Content-Type': 'application/json' },
-                // });
-                // if (data.success) {
-                //     console.log(data);
-                //     _this.$message({
-                //         message: 'Cập nhật thành công',
-                //         type: 'success',
-                //     });
-                // } else {
-                //     _this.$message.error("Lưu thất bại");
-                // }
+            if (_this.$route.params.id != 'create') {
+                _this.formData.updatedBy = _this.userInfo.data.username;
+				var oldData = cloneDeep(_this.formData);
+                var newData = new FormData();
+                buildFormData(newData, oldData);
+                const data = await _this.$axios.$put('/api/user/update', newData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                if (data.success) {
+                    _this.formData = data.data;
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.$router.push(`/users/${data.data._id}`);
+                } else {
+                    _this.$message.error(data.error);
+                }
             }
-            catch (error) {
-                console.log(error);
-                _this.$message.error('Có lỗi xảy ra');
+            else{
+                _this.formData.createdBy = _this.userInfo.data.username;
+                var oldData = cloneDeep(_this.formData);
+                var newData = new FormData();
+                buildFormData(newData, oldData);
+                const data = await _this.$axios.$post('/api/user/create', newData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                if (data.success) {
+                    _this.formData = data.data;
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.$router.push(`/users/${data.data._id}`);
+                } else {
+                    _this.$message.error(data.error);
+                }
             }
-        }
-	}
+        })
+    }
 }
 </script>
-
-<style>
-
-</style>

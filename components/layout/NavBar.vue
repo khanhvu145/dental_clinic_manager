@@ -24,11 +24,10 @@
                     </ul>
                     <el-dropdown trigger="click" @command="handleCommand">
                         <span class="el-dropdown-link">
-                            <!-- Dropdown List<i class="el-icon-arrow-down el-icon--right"></i> -->
                             <div class="navbar__nav">
-                                <div class="navbar__name">{{ formData.name }}</div>
+                                <div class="navbar__name">{{ userInfo.data.name }}</div>
                                 <div class="navbar__img">
-                                    <img src="" alt="">
+                                    <img :src="userInfo.data.img ? userInfo.data.img : '/images/user.png'" alt="">
                                 </div>
                             </div>
                         </span>
@@ -36,10 +35,6 @@
                             <el-dropdown-item command="account">
                                 <i class='bx bxs-user-account' ></i>
                                 Tài khoản
-                            </el-dropdown-item>
-                            <el-dropdown-item command="manager" v-if="checkRole">
-                                <i class='bx bx-book-content'></i>
-                                Quản lý
                             </el-dropdown-item>
                             <el-dropdown-item command="logout">
                                 <i class='bx bx-log-out'></i>
@@ -53,26 +48,23 @@
 </template>
 
 <script>
-import User from '@/models/Employee';
+import { mapState } from 'vuex';
 export default {
     props: { 
         isCollapse: Boolean,
     },
+    computed: {
+		...mapState({
+			userInfo: (state) => state.auth.user,
+		}),
+	},
     data() {
       return {
-          formData: new User(),
-          checkRole: false,
+          
       };
     },
     async created() {
 		const _this = this;
-		setTimeout(async () => {
-			const userResponse = await _this.$axios.$get('api/account/info');
-			_this.formData = userResponse.data || {};
-            await _this.$store.commit('role/SET_ROLE_USER', userResponse.role);
-            if(this.$store.state.role.role == 'administration') _this.checkRole = true;
-            else _this.checkRole = false;
-		}, 500);
 	},
     methods: {
         async handleCommand(command) {

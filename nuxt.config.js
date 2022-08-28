@@ -35,6 +35,8 @@ export default {
   plugins: [
     '@/plugins/axios',
 		'@/plugins/element-ui',
+    '@/plugins/lodash',
+    '@/plugins/async-computed',
   ],
 
   router: {

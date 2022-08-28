@@ -21,27 +21,22 @@
             </nuxt-link>
             <nuxt-link to="/customer" class="sidebar-nav-link">
                 <el-menu-item index="customer">
-                    <i class='bx bxs-group'></i>
+                    <i class='bx bxs-user-badge'></i>
                     <span slot="title">Khách hàng</span>
                 </el-menu-item>
             </nuxt-link>
-            <nuxt-link to="/employee" class="sidebar-nav-link">
-                <el-menu-item index="employee">
-                    <i class='bx bx-injection'></i>
-                    <span slot="title">Nhân viên</span>
+            <nuxt-link to="/users" class="sidebar-nav-link">
+                <el-menu-item index="users">
+                    <i class='bx bxs-user'></i>
+                    <span slot="title">Người dùng</span>
                 </el-menu-item>
             </nuxt-link>
-            <el-submenu index="generalconfig">
-                <template slot="title">
-                    <i class='bx bxs-cog'></i>
-                    <span slot="title">Cấu hình chung</span>
-                </template>
-                <nuxt-link to="/groupUser" class="sidebar-nav-link">
-                    <el-menu-item index="groupUser">
-                        <span slot="title">Nhóm người dùng</span>
-                    </el-menu-item>
-                </nuxt-link>
-            </el-submenu>
+            <nuxt-link to="/accessgroup" class="sidebar-nav-link">
+                <el-menu-item index="accessgroup">
+                    <i class='bx bxs-group'></i>
+                    <span slot="title">Nhóm người dùng</span>
+                </el-menu-item>
+            </nuxt-link>
         </el-menu>
     </div>
 </template>

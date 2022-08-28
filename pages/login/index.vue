@@ -27,6 +27,7 @@
                         id="password"
                         v-model="login.password"
                         class="pass-input"
+                        required=""
                         placeholder="Nhập mật khẩu"
                     />
                 </div>
@@ -58,10 +59,9 @@ export default {
 			try {
 				const response = await this.$auth.loginWith('local', { data: this.login });
 				if (response.data.success) {
-					await _this.$store.commit('role/SET_USERID', this.login.username);
                     _this.$message({
 						showClose: true,
-						message: 'Đăng nhập thành công',
+						message: response.data.message,
 						type: 'success',
 					});
                     _this.$router.push('/');
@@ -69,12 +69,17 @@ export default {
                 else {
                     _this.$message({
 						showClose: true,
-						message: 'Tài khoản hoặc mật khẩu sai!!',
+						message: response.data.error,
 						type: 'error',
 					});
                 }
 			} catch (err) {
 				console.log(err);
+                _this.$message({
+                    showClose: true,
+                    message: err,
+                    type: 'error',
+                });
 			}
 		},
     }
