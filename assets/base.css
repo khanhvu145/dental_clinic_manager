@@ -29,7 +29,7 @@ body{
     overflow-x: hidden;
 }
 
-.wrapper > .content{
+.wrapper .content{
     border: 1px solid #dddddd;
     border-radius: 5px;
     -webkit-border-radius: 5px;

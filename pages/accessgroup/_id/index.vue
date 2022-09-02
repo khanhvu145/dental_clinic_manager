@@ -165,6 +165,11 @@ export default {
 									value: 'customer',
 									customRights: [],
 								},
+                                {
+									name: 'Cấu hình chung',
+									value: 'generalconfig',
+									customRights: [],
+								},
                             ]
                         }
                     ]

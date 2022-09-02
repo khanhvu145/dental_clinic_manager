@@ -17,6 +17,7 @@
                             <span>Quay lại</span>
                         </button>
                         <button
+                            v-if="(checkRight('create'))"
                             type="button" 
                             class="control-btn green" 
                             @click="submitForm"
@@ -158,6 +159,30 @@
                                         </el-select>
                                     </div>
                                 </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="col-form-label">Nhóm khách hàng</div>
+                                        <el-select v-model="formData.customerGroup" placeholder="Nhóm khách hàng" name="customerGroup">
+                                            <el-option
+                                                v-for="item in customerType"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
+                                            ></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-form-label">Nguồn</div>
+                                        <el-select v-model="formData.source" placeholder="Nguồn" name="source">
+                                            <el-option
+                                                v-for="item in customerSource"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
+                                            ></el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -172,7 +197,7 @@ import { mapState } from 'vuex';
 import { cloneDeep, debounce, intersection } from 'lodash';
 import { genderData } from '@/utils/masterData';
 import ImageUpload from '@/components/common/ImageUpload.vue';
-import User from '@/models/tw_User';
+import Customer from '@/models/tw_Customer';
 import buildFormData from '@/utils/buildFormData';
 export default {
     components: { ImageUpload },
@@ -186,12 +211,14 @@ export default {
         return {
             dataLoading: true,
             genderData: genderData,
-            formData: new User(),
+            formData: new Customer(),
             provinceMasterData: [],
             districtMasterData: [],
             districtByProvince: [],
             wardMasterData: [],
             wardByDistrict: [],
+            customerType: [],
+            customerSource: []
         }
     },
     mounted() {
@@ -202,10 +229,11 @@ export default {
         _this.provinceMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'provinceMasterData' })) || [];
         _this.districtMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'districtMasterData' })) || [];
         _this.wardMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'wardMasterData' })) || [];
+        _this.customerType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerType' })) || [];
+        _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
 
-        if (_this.$route.params.id && _this.$route.params.id != 'create') {
-
-        }
+        console.log(_this.customerSource)
+        console.log(_this.customerType)
 
         _this.dataLoading = false;
     },
@@ -233,6 +261,23 @@ export default {
 		},
         submitForm: debounce(async function () {
             const _this = this;
+            _this.formData.createdBy = _this.userInfo.data.username;
+            var oldData = cloneDeep(_this.formData);
+            var newData = new FormData();
+            buildFormData(newData, oldData);
+            const data = await _this.$axios.$post('/api/customer/create', newData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (data.success) {
+                _this.formData = data.data;
+                _this.$message({
+                    message: data.message,
+                    type: 'success',
+                });
+                _this.$router.push(`/customer/${data.data._id}/profile`);
+            } else {
+                _this.$message.error(data.error);
+            }
         })
      }
 }

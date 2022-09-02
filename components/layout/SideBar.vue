@@ -37,6 +37,12 @@
                     <span slot="title">Nhóm người dùng</span>
                 </el-menu-item>
             </nuxt-link>
+            <nuxt-link to="/generalconfig" class="sidebar-nav-link">
+                <el-menu-item index="generalconfig">
+                    <i class='bx bxs-cog'></i>
+                    <span slot="title">Cấu hình chung</span>
+                </el-menu-item>
+            </nuxt-link>
         </el-menu>
     </div>
 </template>

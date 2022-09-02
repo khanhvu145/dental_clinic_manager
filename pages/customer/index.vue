@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <div class="content">
+        <div class="content" v-if="checkRight('view')">
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -25,7 +25,7 @@
                         <el-select v-model="searchQuery.filters.statusF" filterable name="statusF">
                             <el-option
                                 v-for="item in statusData"
-                                :key="item.value"
+                                :key="item.key"
                                 :label="item.label"
                                 :value="item.value"
                             ></el-option>
@@ -72,7 +72,7 @@
                         <el-table :data="data.data" style="width: 100%" stripe>
                             <el-table-column label="Thông tin khách hàng" min-width="150">
                                 <template slot-scope="scope">
-                                    <div>
+                                    <div style="font-weight: bold;">  
                                         <i class='bx bx-user'></i>
                                         {{ scope.row.name || '' }}
                                     </div>
@@ -97,23 +97,38 @@
                                     </el-tag>
 								</template>
                             </el-table-column>
+                            <el-table-column label="Tình trạng chăm sóc" min-width="120">
+                                <template slot-scope="scope">
+                                    <div>  
+                                        <i class='bx bx-heart-circle'
+                                            v-bind:style="{
+												color: customerType.find(e => e.value == scope.row.customerGroup).color || '#ccc',
+											}"
+                                        ></i>
+                                        {{ customerType.find(e => e.value == scope.row.customerGroup).label || 'Chưa có nhóm' }}
+                                    </div>
+                                    <div>
+                                        <i class='bx bx-calendar' ></i>
+                                    </div>
+                                </template>
+                            </el-table-column>
                             <el-table-column label="Thao tác" min-width="80">
                                 <template slot-scope="scope">
-									<nuxt-link :to="`/users/${scope.row._id}`"
+									<nuxt-link :to="`/customer/${scope.row._id}/profile`"
 										><i class="el-icon-edit-outline font-20 text-center"></i
 									></nuxt-link>
 								</template>
                             </el-table-column>
-                            <el-table-column label="Tạo bởi-lúc" min-width="150">
+                            <el-table-column label="Tạo bởi-lúc" min-width="120">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.createdBy || 'System' }}</div>
-                                    <div>{{ $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') }}</div>
+                                    <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
 								</template>
                             </el-table-column>
-                            <el-table-column label="Cập nhật bởi-lúc" min-width="150">
+                            <el-table-column label="Cập nhật bởi-lúc" min-width="120">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.updatedBy }}</div>
-                                    <div>{{ $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') }}</div>
+                                    <div>{{ scope.row.updatedAt ? $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
 								</template>
                             </el-table-column>
                         </el-table>
@@ -133,6 +148,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div v-else>
+            <el-empty description="Bạn không có quyền !!"></el-empty>
         </div>
     </div>
 </template>
@@ -185,11 +203,17 @@ export default {
                     size: 10
                 }
             },
-            currentPage: 1
+            currentPage: 1,
+            customerType: [],
+            customerSource: []
         }
     },
     async created() {
         const _this = this;
+        _this.customerType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerType' })) || [];
+        _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
+
+        _this.getData(_this.searchQuery);
     },
     methods: {
         checkRight(right) {
@@ -215,6 +239,19 @@ export default {
         },
         async getData(searchQuery){
             const _this = this;
+            console.log(searchQuery)
+            await _this.$axios.$post('/api/customer/getByQuery', searchQuery).then(
+                (response) => {
+					_this.data = response;
+				},
+				(error) => {
+					console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+				}
+            );
         },
         refreshData(){
             const _this = this;

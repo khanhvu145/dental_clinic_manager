@@ -67,7 +67,7 @@
                                     <div>{{ scope.row.name || '' }}</div>
 								</template>
                             </el-table-column>
-                            <el-table-column label="Ghi chú" min-width="150">
+                            <el-table-column label="Ghi chú" min-width="180">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.note || '' }}</div>
 								</template>
@@ -89,13 +89,13 @@
                             <el-table-column label="Tạo bởi-lúc" min-width="150">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.createdBy || 'System' }}</div>
-                                    <div>{{ $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') }}</div>
+                                    <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
 								</template>
                             </el-table-column>
                             <el-table-column label="Cập nhật bởi-lúc" min-width="150">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.updatedBy }}</div>
-                                    <div>{{ $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') }}</div>
+                                    <div>{{ scope.row.updatedAt ? $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
 								</template>
                             </el-table-column>
                         </el-table>
@@ -116,11 +116,8 @@
                 </div>
             </div>
         </div>
-        <div v-else style="height: 100%; position: relative;">
-            <div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); text-align: center; font-weight: bold; opacity: 0.6;">
-                <i class='bx bx-x-circle' style="font-size: 80px;"></i>
-                <div class="mt-3" style="font-size: 20px;">BẠN KHÔNG CÓ QUYỀN !!</div>
-            </div>
+        <div v-else>
+            <el-empty description="Bạn không có quyền !!"></el-empty>
         </div>
     </div>
 </template>
