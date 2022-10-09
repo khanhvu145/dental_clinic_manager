@@ -1,24 +1,24 @@
 <template>
     <div class="sidebar">
         <el-menu v-bind:default-active="itemSidebarActive" class="el-menu-vertical-demo" :collapse="isCollapse">
-            <nuxt-link to="/" class="sidebar-nav-link">
+            <!-- <nuxt-link to="/" class="sidebar-nav-link">
                 <el-menu-item index="">
                     <i class='bx bxs-calendar-edit'></i>
                     <span slot="title">Đăng ký khám</span>
                 </el-menu-item>
-            </nuxt-link>
-            <nuxt-link to="/appointment" class="sidebar-nav-link">
+            </nuxt-link> -->
+            <!-- <nuxt-link to="/appointment" class="sidebar-nav-link">
                 <el-menu-item index="appointment">
                     <i class='bx bxs-calendar-plus'></i>
                     <span slot="title">Lịch hẹn</span>
                 </el-menu-item>
-            </nuxt-link>
-            <nuxt-link to="/calendar" class="sidebar-nav-link">
+            </nuxt-link> -->
+            <!-- <nuxt-link to="/calendar" class="sidebar-nav-link">
                 <el-menu-item index="calendar">
                     <i class='bx bxs-calendar' ></i>
                     <span slot="title">Lịch làm việc</span>
                 </el-menu-item>
-            </nuxt-link>
+            </nuxt-link> -->
             <nuxt-link to="/customer" class="sidebar-nav-link">
                 <el-menu-item index="customer">
                     <i class='bx bxs-user-badge'></i>

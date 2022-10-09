@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <div class="content">
-            <div class="container-fluid" v-if="!dataLoading">
+            <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="title titleAfter mb-0">
@@ -10,7 +10,7 @@
                         </div>
                     </div>
                 </div>
-                <form class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
+                <form v-loading="dataLoading" class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
                     <div class="col-md-12" style="text-align: right;">
                         <button type="button" class="control-btn gray" @click="$router.push('/users')">
                             <i class='bx bx-arrow-back'></i>
@@ -312,6 +312,8 @@ export default {
 		},
         submitForm: debounce(async function () {
             const _this = this;
+            _this.dataLoading = true;
+            
             if (_this.$route.params.id != 'create') {
                 _this.formData.updatedBy = _this.userInfo.data.username;
 				var oldData = cloneDeep(_this.formData);
@@ -350,6 +352,8 @@ export default {
                     _this.$message.error(data.error);
                 }
             }
+
+            _this.dataLoading = false;
         })
     }
 }

@@ -151,6 +151,11 @@ export default {
                             value: 'g_role',
                             pages: [
                                 {
+									name: 'Lịch hẹn',
+									value: 'appointment',
+									customRights: [],
+								},
+                                {
 									name: 'Nhóm người dùng',
 									value: 'accessgroup',
 									customRights: [],

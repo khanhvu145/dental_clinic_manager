@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-	  <div class="content">
+	  <!-- <div class="content">
 		  	<el-tabs type="card" v-model="activeName">
 				<el-tab-pane label="THÔNG TIN KHÁCH HÀNG" name="customerInfo">
 					<form id="home__form" class="home__form container-fluid">
@@ -396,56 +396,56 @@
 					</div>
 				</el-tab-pane>
 			</el-tabs>
-	  </div>
+	  </div> -->
 	</div>
 </template>
 
 <script>
-import FullCalendarAll from '@/components/calendar/CalendarAll';
-export default {
-	components: {
-		FullCalendarAll,
-	},
-	data() {
-      return {
-        activeName: 'customerInfo',
-		isAvatar: false,
-		input: '',
-		radio: 1,
-		value1: ''
-      };
-    },
-	methods: {
-		choose_img(){
-			var _this = this;
-			const FILE_INPUT = document.querySelector(".upload__file-img");
-			const AVATAR = document.querySelector(".avatar__content-img");
-			FILE_INPUT.click()
-			FILE_INPUT.addEventListener("change", function (e) {
-				const file = e.target.files[0];
-				const reader = new FileReader();
-				reader.readAsDataURL(file);
-				reader.onloadend = () => {
-					AVATAR.setAttribute("src", reader.result);
-				};
-				_this.isAvatar = true;
-			});
-		},
-		clear_img(){
-			var _this = this;
-			const FILE_INPUT = document.querySelector(".upload__file-img");
-			const AVATAR = document.querySelector(".avatar__content-img");
-			FILE_INPUT.value = "";
-			AVATAR.setAttribute("src", '/images/user.png');
-			_this.isAvatar = false;
-		}
-	}
-}
+// import FullCalendarAll from '@/components/calendar/CalendarAll';
+// export default {
+// 	components: {
+// 		FullCalendarAll,
+// 	},
+// 	data() {
+//       return {
+//         activeName: 'customerInfo',
+// 		isAvatar: false,
+// 		input: '',
+// 		radio: 1,
+// 		value1: ''
+//       };
+//     },
+// 	methods: {
+// 		choose_img(){
+// 			var _this = this;
+// 			const FILE_INPUT = document.querySelector(".upload__file-img");
+// 			const AVATAR = document.querySelector(".avatar__content-img");
+// 			FILE_INPUT.click()
+// 			FILE_INPUT.addEventListener("change", function (e) {
+// 				const file = e.target.files[0];
+// 				const reader = new FileReader();
+// 				reader.readAsDataURL(file);
+// 				reader.onloadend = () => {
+// 					AVATAR.setAttribute("src", reader.result);
+// 				};
+// 				_this.isAvatar = true;
+// 			});
+// 		},
+// 		clear_img(){
+// 			var _this = this;
+// 			const FILE_INPUT = document.querySelector(".upload__file-img");
+// 			const AVATAR = document.querySelector(".avatar__content-img");
+// 			FILE_INPUT.value = "";
+// 			AVATAR.setAttribute("src", '/images/user.png');
+// 			_this.isAvatar = false;
+// 		}
+// 	}
+// }
 </script>
 
 <style>
-.home__form{
+/* .home__form{
 	padding: 5px 20px 20px 20px;
-}
+} */
 
 </style>

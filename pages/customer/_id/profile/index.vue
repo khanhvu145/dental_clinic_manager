@@ -1,6 +1,6 @@
 <template>
     <LeftMenu>
-        <form class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
+        <form class="row mt-4 mb-5" v-loading="dataLoading" v-on:submit.prevent="submitForm">
             <div class="col-md-12" style="text-align: right;">
                 <button type="button" class="control-btn gray" @click="$router.push('/customer')">
                     <i class='bx bx-arrow-back'></i>
@@ -265,6 +265,7 @@ export default {
 		},
         submitForm: debounce(async function () {
             const _this = this;
+            _this.dataLoading = true;
             _this.formData.updatedBy = _this.userInfo.data.username;
             var oldData = cloneDeep(_this.formData);
             var newData = new FormData();
@@ -282,6 +283,7 @@ export default {
             } else {
                 _this.$message.error(data.error);
             }
+            _this.dataLoading = false;
         })
     }
 }

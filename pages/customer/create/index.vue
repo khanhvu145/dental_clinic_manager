@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <div class="content">
-            <div class="container-fluid" v-if="!dataLoading">
+            <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="title titleAfter mb-0">
@@ -10,7 +10,7 @@
                         </div>
                     </div>
                 </div>
-                <form class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
+                <form class="row mt-4 mb-5" v-loading="dataLoading" v-on:submit.prevent="submitForm">
                     <div class="col-md-12" style="text-align: right;">
                         <button type="button" class="control-btn gray" @click="$router.push('/customer')">
                             <i class='bx bx-arrow-back'></i>
@@ -232,9 +232,6 @@ export default {
         _this.customerType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerType' })) || [];
         _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
 
-        console.log(_this.customerSource)
-        console.log(_this.customerType)
-
         _this.dataLoading = false;
     },
      methods: {
@@ -261,6 +258,7 @@ export default {
 		},
         submitForm: debounce(async function () {
             const _this = this;
+            _this.dataLoading = true;
             _this.formData.createdBy = _this.userInfo.data.username;
             var oldData = cloneDeep(_this.formData);
             var newData = new FormData();
@@ -278,6 +276,7 @@ export default {
             } else {
                 _this.$message.error(data.error);
             }
+            _this.dataLoading = false;
         })
      }
 }

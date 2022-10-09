@@ -61,7 +61,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
-                        <el-table :data="data.data" style="width: 100%" stripe>
+                        <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
                             <el-table-column label="Tên" min-width="120">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.name || '' }}</div>
@@ -101,7 +101,7 @@
                         </el-table>
                     </div>
                 </div>
-                <div class="row mt-4 mb-5">
+                <div class="row mt-4 mb-4">
                     <div class="col-md-12">
                         <el-pagination
                             @size-change="handleSizeChange"
@@ -135,6 +135,7 @@ export default {
     data() {
         return {
             data: {},
+            dataLoading: true,
             statusData: statusData,
             sortData: [
                 {
@@ -199,6 +200,7 @@ export default {
             await _this.$axios.$post('/api/accessgroup/getByQuery', searchQuery).then(
                 (response) => {
 					_this.data = response;
+                    _this.dataLoading = false;
 				},
 				(error) => {
 					console.log('Error: ', error);
@@ -206,6 +208,7 @@ export default {
 						type: 'error',
 						message: 'Có lỗi xảy ra',
 					});
+                    _this.dataLoading = false;
 				}
             );
         },

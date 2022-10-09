@@ -69,7 +69,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
-                        <el-table :data="data.data" style="width: 100%" stripe>
+                        <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
                             <el-table-column label="Thông tin khách hàng" min-width="150">
                                 <template slot-scope="scope">
                                     <div style="font-weight: bold;">  
@@ -102,10 +102,10 @@
                                     <div>  
                                         <i class='bx bx-heart-circle'
                                             v-bind:style="{
-												color: customerType.find(e => e.value == scope.row.customerGroup).color || '#ccc',
+												color: customerType.find(e => e.value == scope.row.customerGroup) ? customerType.find(e => e.value == scope.row.customerGroup).color : '#ccc',
 											}"
                                         ></i>
-                                        {{ customerType.find(e => e.value == scope.row.customerGroup).label || 'Chưa có nhóm' }}
+                                        {{ customerType.find(e => e.value == scope.row.customerGroup) ? customerType.find(e => e.value == scope.row.customerGroup).label : 'Chưa có nhóm' }}
                                     </div>
                                     <div>
                                         <i class='bx bx-calendar' ></i>
@@ -134,7 +134,7 @@
                         </el-table>
                     </div>
                 </div>
-                <div class="row mt-4 mb-5">
+                <div class="row mt-4 mb-4">
                     <div class="col-md-12">
                         <el-pagination
                             @size-change="handleSizeChange"
@@ -169,9 +169,9 @@ export default {
     data() {
         return {
             data: {},
+            dataLoading: true,
             statusData: statusData,
             genderData: genderData,
-            searchQuery: {},
             sortData: [
                 {
                     label: 'Thời gian tạo giảm dần',
@@ -243,6 +243,7 @@ export default {
             await _this.$axios.$post('/api/customer/getByQuery', searchQuery).then(
                 (response) => {
 					_this.data = response;
+                    _this.dataLoading = false;
 				},
 				(error) => {
 					console.log('Error: ', error);
@@ -250,6 +251,7 @@ export default {
 						type: 'error',
 						message: 'Có lỗi xảy ra',
 					});
+                    _this.dataLoading = false;
 				}
             );
         },

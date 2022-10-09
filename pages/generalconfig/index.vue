@@ -9,7 +9,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
-                        <el-tabs v-model="activeName">
+                        <el-tabs v-loading="dataLoading" v-model="activeName">
                             <el-tab-pane v-for="tab in generalCategory" :key="tab.key" :label="tab.label || ''" :name="tab.key">
                                 <div class="row">
                                     <div class="col-md-12">
@@ -84,6 +84,7 @@ export default {
             activeName: 'customer_type',
             generalCategory: generalCategory,
             data: {},
+            dataLoading: true
         }
     },
     async created() {
@@ -96,6 +97,7 @@ export default {
                     }
                 });
                 _this.data = Object.assign({}, ...mapped);
+                _this. dataLoading = false;
             },
             (error) => {
                 console.log('Error: ', error);
@@ -103,8 +105,10 @@ export default {
                     type: 'error',
                     message: 'Có lỗi xảy ra',
                 });
+                _this. dataLoading = false;
             }
         );
+
     },
     methods: {
         checkRight(right) {
