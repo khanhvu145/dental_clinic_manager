@@ -24,6 +24,14 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-4">
+                                <div class="col-form-label">Mã khách hàng</div>
+                                <el-input 
+                                    name="code"
+                                    v-model="formData.code"
+                                    disabled
+                                ></el-input>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="col-form-label">Họ và tên *</div>
                                 <el-input 
                                     name="name"

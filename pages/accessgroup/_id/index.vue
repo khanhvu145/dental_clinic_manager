@@ -171,6 +171,11 @@ export default {
 									customRights: [],
 								},
                                 {
+									name: 'Loại hình dịch vụ',
+									value: 'service',
+									customRights: [],
+								},
+                                {
 									name: 'Cấu hình chung',
 									value: 'generalconfig',
 									customRights: [],
@@ -236,6 +241,7 @@ export default {
                         type: 'success',
                     });
                     _this.$router.push(`/accessgroup/${data.data._id}`);
+                    _this.$router.go();
                 } else {
                     _this.$message.error(data.error);
                 }

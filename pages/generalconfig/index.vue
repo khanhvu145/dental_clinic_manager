@@ -97,7 +97,7 @@ export default {
                     }
                 });
                 _this.data = Object.assign({}, ...mapped);
-                _this. dataLoading = false;
+                _this.dataLoading = false;
             },
             (error) => {
                 console.log('Error: ', error);
@@ -105,7 +105,7 @@ export default {
                     type: 'error',
                     message: 'Có lỗi xảy ra',
                 });
-                _this. dataLoading = false;
+                _this.dataLoading = false;
             }
         );
 

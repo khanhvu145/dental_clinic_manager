@@ -215,3 +215,11 @@
 .el-table .el-table__cell{
     vertical-align: top;
 }
+
+.el-dialog__header {
+    background: #27990b;
+}
+
+.el-dialog__title, .el-dialog__close{
+    color: #fff !important;
+}

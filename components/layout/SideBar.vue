@@ -1,12 +1,12 @@
 <template>
     <div class="sidebar">
         <el-menu v-bind:default-active="itemSidebarActive" class="el-menu-vertical-demo" :collapse="isCollapse">
-            <!-- <nuxt-link to="/" class="sidebar-nav-link">
-                <el-menu-item index="">
+            <nuxt-link to="/register" class="sidebar-nav-link">
+                <el-menu-item index="register">
                     <i class='bx bxs-calendar-edit'></i>
                     <span slot="title">Đăng ký khám</span>
                 </el-menu-item>
-            </nuxt-link> -->
+            </nuxt-link>
             <!-- <nuxt-link to="/appointment" class="sidebar-nav-link">
                 <el-menu-item index="appointment">
                     <i class='bx bxs-calendar-plus'></i>
@@ -35,6 +35,12 @@
                 <el-menu-item index="accessgroup">
                     <i class='bx bxs-group'></i>
                     <span slot="title">Nhóm người dùng</span>
+                </el-menu-item>
+            </nuxt-link>
+            <nuxt-link to="/service" class="sidebar-nav-link">
+                <el-menu-item index="service">
+                    <i class='bx bxs-category-alt'></i>
+                    <span slot="title">Loại hình dịch vụ</span>
                 </el-menu-item>
             </nuxt-link>
             <nuxt-link to="/generalconfig" class="sidebar-nav-link">
