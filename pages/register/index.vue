@@ -7,8 +7,9 @@
                         <el-tabs v-loading="dataLoading" v-model="activeName">
                             <!-- Đăng ký offline -->
                             <el-tab-pane label="Đăng ký khám offline" name="offline">
-                                <form class="row">
-                                    <div class="col-md-5 mb-3" style="border-right: 2px solid rgb(232, 231, 231)">
+                                <form class="row mb-4">
+                                    <!-- Thông tin khách hàng -->
+                                    <div class="col-md-5 mb-3">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="col-form-label" style="font-size: 16px; font-weight: bold;">Thông tin khách hàng</div>
@@ -32,7 +33,7 @@
                                                         <button
                                                             type="button" 
                                                             class="control-btn green"
-                                                            @click="dialogCreateCustomer = true"
+                                                            @click="createCustomer()"
                                                         >
                                                             <i class='bx bx-plus-circle'></i>
                                                             <span>Tạo khách hàng</span>
@@ -106,12 +107,120 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-7">
+                                    <!-- Thông tin lịch hẹn -->
+                                    <div class="col-md-7 mb-4" style="border-left: 2px solid rgb(232, 231, 231)">
                                         <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6">
                                                 <div class="col-form-label" style="font-size: 16px; font-weight: bold;">Thông tin đăng ký</div>
                                             </div>
+                                            <div class="col-md-6" style="text-align: right;">
+                                                <button
+                                                    type="button" 
+                                                    class="control-btn green"
+                                                >
+                                                    <i class='bx bxs-calendar'></i>
+                                                    <span>Xem lịch trống</span>
+                                                </button>
+                                            </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="col-form-label">Nha sĩ *</div>
+                                                <el-select v-model="registerData.dentistId" placeholder="Chọn nha sĩ" name="dentistId" clearable filterable>
+                                                    <el-option
+                                                        v-for="item in dentistList"
+                                                        :key="item._id"
+                                                        :label="`Ns ${item.name}`"
+                                                        :value="item._id"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-form-label">Dịch vụ *</div>
+                                                <el-select v-model="registerData.serviceId" placeholder="Chọn dịch vụ" name="serviceId" clearable filterable>
+                                                    <el-option
+                                                        v-for="item in serviceList"
+                                                        :key="item.value"
+                                                        :label="item.label"
+                                                        :value="item.value"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <div class="col-form-label">Thời gian *</div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <el-date-picker
+                                                            v-model="registerData.timeFrom"
+                                                            type="datetime"
+                                                            name="timeFrom"
+                                                            format="dd/MM/yyyy HH:mm:ss"
+                                                            placeholder="Chọn thời gian bắt đầu"
+                                                        ></el-date-picker>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <el-date-picker
+                                                            v-model="registerData.timeTo"
+                                                            type="datetime"
+                                                            name="timeTo"
+                                                            format="dd/MM/yyyy HH:mm:ss"
+                                                            placeholder="Chọn thời gian kết thúc"
+                                                        ></el-date-picker>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <div class="col-form-label">Loại lịch hẹn</div>
+                                                <el-select v-model="registerData.type" placeholder="Loại lịch hẹn" name="type" filterable>
+                                                    <el-option
+                                                        v-for="item in apointmentType"
+                                                        :key="item.value"
+                                                        :label="item.label"
+                                                        :value="item.value"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-form-label">Trạng thái</div>
+                                                <el-select v-model="registerData.status" placeholder="Trạng thái" name="status" filterable disabled>
+                                                    <el-option
+                                                        v-for="item in apointmentStatus"
+                                                        :key="item.value"
+                                                        :label="item.label"
+                                                        :value="item.value"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <div class="col-form-label">Ghi chú</div>
+                                                <el-input
+                                                    type="textarea"
+                                                    :rows="6"
+                                                    placeholder="Ghi chú"
+                                                    v-model="registerData.note">
+                                                </el-input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Thao tác -->
+                                    <div class="col-md-12 mt-4" style="text-align: right;">
+                                        <button type="button" class="control-btn gray">
+                                            <i class='bx bx-x'></i>
+                                            <span>Hủy</span>
+                                        </button>
+                                        <button
+                                            type="button" 
+                                            class="control-btn green"
+                                        >
+                                            <i class='bx bxs-calendar-plus'></i>
+                                            <span>Đặt hẹn</span>
+                                        </button>
                                     </div>
                                 </form>
                             </el-tab-pane>
@@ -292,6 +401,10 @@
                         </button>
                     </span>
                 </el-dialog>
+                <!-- Dialog view empty calendar -->
+                <el-dialog title="Tạo khách hàng" :visible.sync="dialogCreateCustomer" width="60%">
+                    
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -301,6 +414,7 @@
 import { mapState } from 'vuex';
 import { genderData } from '@/utils/masterData';
 import Customer from '@/models/tw_Customer';
+import Appointment from '@/models/tw_Appointment';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import buildFormData from '@/utils/buildFormData';
 export default {
@@ -316,9 +430,11 @@ export default {
             genderData: genderData,
             customerSelected: new Customer(),
             customerCreated: new Customer(),
-            registerData: {},
+            registerData: new Appointment(),
             dataLoading: true,
             customerList: [],
+            dentistList: [],
+            serviceList: [],
             dialogCreateCustomer: false,
             provinceMasterData: [],
             districtMasterData: [],
@@ -326,7 +442,9 @@ export default {
             wardMasterData: [],
             wardByDistrict: [],
             customerType: [],
-            customerSource: []
+            customerSource: [],
+            apointmentType: [],
+            apointmentStatus: []
         }
     },
     async created() {
@@ -336,6 +454,9 @@ export default {
         _this.wardMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'wardMasterData' })) || [];
         _this.customerType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerType' })) || [];
         _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
+        _this.apointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
+        _this.apointmentStatus = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentStatus' })) || [];
+        _this.serviceList = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
         await _this.$axios.$get('/api/customer/getAll').then(
             (response) => {
                 _this.customerList = response.data || [];
@@ -350,9 +471,29 @@ export default {
                 _this.dataLoading = false;
             }
         );
+        await _this.$axios.$get('/api/user/getDentist').then(
+            (response) => {
+                _this.dentistList = response.data || [];
+                _this.dataLoading = false;
+            },
+            (error) => {
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: 'Có lỗi xảy ra',
+                });
+                _this.dataLoading = false;
+            }
+        );
+
         _this.dataLoading = false;
     },
     methods: {
+        createCustomer(){
+            const _this = this;
+            _this.customerCreated = new Customer();
+            _this.dialogCreateCustomer = true;
+        },
         async onSelectCustomer(value) {
             const _this = this;
             if(value){
@@ -399,7 +540,7 @@ export default {
                     }
                 );
                 _this.onSelectCustomer(data.data._id);
-                _this.customerCreated = new Customer();
+                // _this.customerCreated = new Customer();
                 // _this.customerSelected = data.data;
                 _this.$message({
                     message: data.message,

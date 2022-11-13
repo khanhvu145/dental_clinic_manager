@@ -7,57 +7,75 @@
                         <div class="title titleAfter mb-0">Cấu hình chung</div>
                     </div>
                 </div>
-                <div class="row mt-4">
+                <div class="row mt-3 mb-4">
                     <div class="col-md-12">
                         <el-tabs v-loading="dataLoading" v-model="activeName">
                             <el-tab-pane v-for="tab in generalCategory" :key="tab.key" :label="tab.label || ''" :name="tab.key">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button
-                                            v-if="(checkRight('create'))"
-                                            type="button" 
-                                            class="control-btn gray" 
-                                            @click="addGeneralConfig(tab.key)"
-                                        >
-                                            <i class='bx bx-plus' ></i>
-                                            <span>Thêm</span>
-                                        </button>
-                                        <button
-                                            v-if="(checkRight('update'))"
-                                            type="button" 
-                                            class="control-btn green" 
-                                            @click="onSaveGeneralConfig(tab.key)"
-                                        >
-                                            <i class='bx bx-save' ></i>
-                                            <span>Lưu</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row mt-4">
-                                    <div class="col-md-4" style="font-size: 14px; font-weight: bold;">
-                                        {{ tab.planHolder }}
-                                    </div>
-                                    <div v-if="tab.pickColor" class="col-md-1" style="font-size: 14px; font-weight: bold;">
-                                        Màu sắc
-                                    </div>
-                                    <div v-if="tab.active" class="col-md-2" style="font-size: 14px; font-weight: bold;">
-                                        Thao tác
-                                    </div>
-                                </div>
-                                <div class="row mt-4">
-                                    <div class="col-md-12" v-for="(item, index) in data[tab.key] || []" :key="index">
-                                        <div class="row mb-3">
-                                            <div class="col-md-4">
-                                                <el-input v-model="item.value"></el-input>
+                                <div v-for="type in tab.group" :key="type.key">
+                                    <el-collapse id="custome-el-colapse" accordion class="percent-100" style="border: none;">
+                                        <el-collapse-item name="1" class="mb-1">
+                                            <template slot="title">
+												<div class="pl-2 w-100 text-black">{{ type.label }}</div>
+											</template>
+                                            <div class="row mt-3">
+                                                <div class="col-md-12">
+                                                    <button
+                                                        v-if="(checkRight('create'))"
+                                                        type="button" 
+                                                        class="control-btn blue" 
+                                                        @click="addGeneralConfig(type.key)"
+                                                    >
+                                                        <i class='bx bx-plus' ></i>
+                                                        <span>Thêm</span>
+                                                    </button>
+                                                    <button
+                                                        v-if="(checkRight('update'))"
+                                                        type="button" 
+                                                        class="control-btn green" 
+                                                        @click="onSaveGeneralConfig(type.key)"
+                                                    >
+                                                        <i class='bx bx-save' ></i>
+                                                        <span>Lưu</span>
+                                                    </button>
+                                                    <button
+                                                        v-if="(checkRight('update'))"
+                                                        type="button" 
+                                                        class="control-btn gray" 
+                                                        @click="cancelGeneralConfig(type.key)"
+                                                    >
+                                                        <i class='bx bx-x'></i>
+                                                        <span>Hủy</span>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="col-md-1" v-if="tab.pickColor">
-                                                <el-color-picker v-model="item.color"></el-color-picker>
+                                            <div class="row mt-3">
+                                                <div class="col-md-5" style="font-size: 14px; font-weight: bold;">
+                                                    {{ type.planHolder }}
+                                                </div>
+                                                <div v-if="type.pickColor" class="col-md-1" style="font-size: 14px; font-weight: bold;">
+                                                    Màu sắc
+                                                </div>
+                                                <div v-if="type.active" class="col-md-2" style="font-size: 14px; font-weight: bold;">
+                                                    Thao tác
+                                                </div>
                                             </div>
-                                            <div class="col-md-2 d-flex align-items-center" v-if="tab.active">
-                                                <el-switch v-model="item.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                            <div class="row mt-3">
+                                                <div class="col-md-12" v-for="(item, index) in data[type.key] || []" :key="index">
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-5">
+                                                            <el-input v-model="item.value"></el-input>
+                                                        </div>
+                                                        <div class="col-md-1" v-if="type.pickColor">
+                                                            <el-color-picker v-model="item.color"></el-color-picker>
+                                                        </div>
+                                                        <div class="col-md-2 d-flex align-items-center" v-if="type.active">
+                                                            <el-switch v-model="item.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        </el-collapse-item>
+                                    </el-collapse>
                                 </div>
                             </el-tab-pane>
                         </el-tabs>
@@ -81,22 +99,29 @@ export default {
 	},
     data() {
         return {
-            activeName: 'customer_type',
+            activeName: 'customerGeneral',
             generalCategory: generalCategory,
+            generalType: [],
             data: {},
             dataLoading: true
         }
     },
     async created() {
         const _this = this;
+        _this.generalCategory.forEach(e => {
+            e.group.forEach(item => {
+                _this.generalType.push(item.key);
+            })
+        })
         await _this.$axios.$post('/api/generalconfig/getByQuery', { type: '', isActive: null }).then(
             (response) => {
-                const mapped = _this.generalCategory.map((item) => {
-                    return {
-                        [item.key]: response.data[item.key] || []
-                    }
-                });
+                const mapped = _this.generalType.map((item) => ({ [item]: [] }));
                 _this.data = Object.assign({}, ...mapped);
+                _this.generalType.map((o) => {
+                    return (
+                        _this.data[o] = response.data[o] || []
+                    );
+                });
                 _this.dataLoading = false;
             },
             (error) => {
@@ -108,7 +133,6 @@ export default {
                 _this.dataLoading = false;
             }
         );
-
     },
     methods: {
         checkRight(right) {
@@ -128,6 +152,23 @@ export default {
                 createdBy: _this.userInfo.data.username
 			});
 		},
+        async cancelGeneralConfig(type){
+            const _this = this;
+             await _this.$axios.$post('/api/generalconfig/getByQuery', { type: type, isActive: null }).then(
+                (response) => {
+                    _this.data[type] = response.data[type];
+                    _this.dataLoading = false;
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                    _this.dataLoading = false;
+                }
+            );
+        },
         onSaveGeneralConfig: debounce(async function (type) {
             const _this = this;
             var isValid = true;

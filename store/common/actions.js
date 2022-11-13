@@ -74,6 +74,60 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                     isActive: item.isActive,
                 };
             })
+        case 'generalConfigUnit': // Đơn vị tính
+            const unitData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'service_unit', isActive: true });
+            var unit = unitData.data['service_unit'];
+            return unit.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
+        case 'serviceGroupData':
+            var searchQuery = {
+                filters: {
+                    nameF: '',
+                    codeF: '',
+                    statusF: true
+                },
+                sorts: 'name&&1',
+                pages:{
+                    from: 0,
+                    size: 1000
+                }
+            };
+            const serviceGroupData = await this.$axios.$post('/api/service/groupGetByQuery', searchQuery);
+            var serviceGroup = serviceGroupData.data;
+            return serviceGroup.map(item => {
+                return {
+                    value: item._id,
+                    label: item.name,
+                }
+            })
+        case 'generalConfigAppointmentType': // Loại lịch hẹn
+            const appointmentTypeData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'appointment_type', isActive: true });
+            var appointmentType = appointmentTypeData.data['appointment_type'];
+            return appointmentType.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
+        case 'generalConfigAppointmentStatus': // Trạng thái lịch hẹn
+            const appointmentStatusData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'appointment_status', isActive: true });
+            var appointmentStatus = appointmentStatusData.data['appointment_status'];
+            return appointmentStatus.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
     }
     return [];
 }

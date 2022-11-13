@@ -82,7 +82,7 @@
                                     </div>
                                     <div>
                                         <i class='bx bx-calendar-event'></i>
-                                        {{ $moment(scope.row.birthday).format('DD/MM/YYYY') }}
+                                        {{ scope.row.birthday ? $moment(scope.row.birthday).format('DD/MM/YYYY') : '' }}
                                     </div>
                                     <div>
                                         <i class='bx bx-phone' ></i>
