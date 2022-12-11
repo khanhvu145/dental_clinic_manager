@@ -7,7 +7,7 @@
                         <el-tabs v-loading="dataLoading" v-model="activeName">
                             <!-- Đăng ký offline -->
                             <el-tab-pane label="Đăng ký khám offline" name="offline">
-                                <form class="row mb-4">
+                                <form class="row mb-4" v-on:submit.prevent="submitForm">
                                     <!-- Thông tin khách hàng -->
                                     <div class="col-md-5 mb-3">
                                         <div class="row">
@@ -17,7 +17,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <div class="col-form-label">Khách hàng</div>
+                                                <div class="col-form-label">Khách hàng *</div>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <el-select v-model="registerData.customerId" placeholder="Chọn khách hàng" name="customerId" clearable filterable v-on:change="onSelectCustomer($event)">
@@ -117,6 +117,7 @@
                                                 <button
                                                     type="button" 
                                                     class="control-btn green"
+                                                    @click="viewEmptyCalendar()"
                                                 >
                                                     <i class='bx bxs-calendar'></i>
                                                     <span>Xem lịch trống</span>
@@ -137,7 +138,7 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="col-form-label">Dịch vụ *</div>
-                                                <el-select v-model="registerData.serviceId" placeholder="Chọn dịch vụ" name="serviceId" clearable filterable>
+                                                <el-select v-model="registerData.serviceGroupId" placeholder="Chọn dịch vụ" name="serviceGroupId" clearable filterable>
                                                     <el-option
                                                         v-for="item in serviceList"
                                                         :key="item.value"
@@ -156,8 +157,9 @@
                                                             v-model="registerData.timeFrom"
                                                             type="datetime"
                                                             name="timeFrom"
-                                                            format="dd/MM/yyyy HH:mm:ss"
+                                                            format="dd/MM/yyyy HH:mm"
                                                             placeholder="Chọn thời gian bắt đầu"
+                                                            @change="handleChangeTime(1, $event)"
                                                         ></el-date-picker>
                                                     </div>
                                                     <div class="col-md-6">
@@ -165,8 +167,9 @@
                                                             v-model="registerData.timeTo"
                                                             type="datetime"
                                                             name="timeTo"
-                                                            format="dd/MM/yyyy HH:mm:ss"
+                                                            format="dd/MM/yyyy HH:mm"
                                                             placeholder="Chọn thời gian kết thúc"
+                                                            @change="handleChangeTime(2, $event)"
                                                         ></el-date-picker>
                                                     </div>
                                                 </div>
@@ -210,13 +213,14 @@
                                     </div>
                                     <!-- Thao tác -->
                                     <div class="col-md-12 mt-4" style="text-align: right;">
-                                        <button type="button" class="control-btn gray">
+                                        <button type="button" class="control-btn gray" @click="cancelForm">
                                             <i class='bx bx-x'></i>
                                             <span>Hủy</span>
                                         </button>
                                         <button
                                             type="button" 
                                             class="control-btn green"
+                                            @click="submitForm"
                                         >
                                             <i class='bx bxs-calendar-plus'></i>
                                             <span>Đặt hẹn</span>
@@ -402,8 +406,8 @@
                     </span>
                 </el-dialog>
                 <!-- Dialog view empty calendar -->
-                <el-dialog title="Tạo khách hàng" :visible.sync="dialogCreateCustomer" width="60%">
-                    
+                <el-dialog title="Xem lịch trống" :visible.sync="dialogViewEmptyCalendar" width="90%">
+                    <EmptyCalendar @select-empty-calendar = "selectEmptyCalendar" />
                 </el-dialog>
             </div>
         </div>
@@ -417,7 +421,12 @@ import Customer from '@/models/tw_Customer';
 import Appointment from '@/models/tw_Appointment';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import buildFormData from '@/utils/buildFormData';
+import EmptyCalendar from '@/components/register/emptyCalendar.vue';
+import moment from 'moment';
 export default {
+    components: {
+		EmptyCalendar,
+	},
     computed: {
 		...mapState({
 			accesses: (state) => state.accesses,
@@ -444,7 +453,8 @@ export default {
             customerType: [],
             customerSource: [],
             apointmentType: [],
-            apointmentStatus: []
+            apointmentStatus: [],
+            dialogViewEmptyCalendar: false
         }
     },
     async created() {
@@ -551,7 +561,51 @@ export default {
                 _this.$message.error(data.error);
             }
             _this.dataLoading = false;
-        })
+        }),
+        viewEmptyCalendar(){
+            const _this = this;
+            _this.dialogViewEmptyCalendar = true;
+        },
+        selectEmptyCalendar(e){
+            const _this = this;
+            _this.registerData.dentistId = e.resource.id;
+            _this.registerData.timeFrom = e.start;
+            _this.registerData.timeTo = e.end;
+            _this.dialogViewEmptyCalendar = false;
+        },
+        submitForm: debounce(async function () {
+            const _this = this;
+            _this.dataLoading = true;
+            // _this.registerData.customerId = _this.customerSelected._id;
+            _this.registerData.updatedBy = _this.userInfo.data.username;
+            var newData = cloneDeep(_this.registerData);
+            const data = await _this.$axios.$post('/api/appointment/create', newData);
+            if (data.success) {
+                _this.registerData = data.data;
+                _this.$message({
+                    message: data.message,
+                    type: 'success',
+                });
+            } else {
+                _this.$message.error(data.error);
+            }
+
+            _this.dataLoading = false;
+        }),
+        cancelForm(){
+            const _this = this;
+            _this.customerSelected = new Customer();
+            _this.registerData = new Appointment();
+        },
+        handleChangeTime(type, event){
+            const _this = this;
+            if(type == 1 && _this.registerData.timeTo == null && _this.registerData.timeFrom != null){
+                _this.registerData.timeTo = moment(event).add(30, 'm')._d;
+            }
+            else if(type == 2 && _this.registerData.timeFrom == null && _this.registerData.timeTo != null){
+                _this.registerData.timeFrom = moment(event).subtract(30, 'm')._d;
+            }
+        }
     }
 }
 </script>

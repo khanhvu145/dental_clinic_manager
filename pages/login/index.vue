@@ -88,7 +88,10 @@ export default {
     align-items: center;
     justify-content: center;
     color: #555;
-    background-color: #f0f2f5;
+    /* background-color: #f0f2f5; */
+    background: url('/images/login_bg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .login-form{
