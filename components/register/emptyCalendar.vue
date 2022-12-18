@@ -60,7 +60,7 @@ export default {
                 initialView: 'resourceTimeGridDay',
                 datesAboveResources: true,
                 dayMinWidth: 300,
-                aspectRatio: 2.5,
+                aspectRatio: 2,
                 resources: [],
                 headerToolbar: {
                     right: 'type_1,type_2',
@@ -77,7 +77,7 @@ export default {
                         buttonText: 'Ngang'
                     },
                 },
-                editable: true,
+                editable: false,
                 resourceAreaHeaderContent: 'Nha sĩ',
                 selectable: true,
                 selectMirror: true,
@@ -90,6 +90,10 @@ export default {
                 slotLabelInterval: '00:15:00',
                 expandRows: true,
                 scrollTime: moment().format('HH:mm:ss'),
+                events: [],
+                eventTextColor: '#fff',
+                eventBackgroundColor: '#8fdf82',
+                eventBorderColor: '#8fdf82',
             },
             searchQuery: {
                 dentistsF: [],
@@ -98,7 +102,7 @@ export default {
             dentistList: [],
         }
     },
-    async created() {
+    async created() { 
         const _this = this;
         await _this.$axios.$get('/api/user/getDentist').then(
             (response) => {
@@ -118,6 +122,29 @@ export default {
                 title: item.name,
             }
         })
+        await _this.$axios.$get('/api/appointment/getEmptyCalendar').then(
+            (response) => {
+                if(response.data.length > 0){
+                    _this.options.events = response.data.map(item => {
+                        return {
+                            resourceId: item.dentistId,
+                            start: item.timeFrom,
+                            end: item.timeTo,
+                        }
+                    })
+                }
+                else{
+                    _this.options.events = [];
+                }
+            },
+            (error) => {
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: 'Có lỗi xảy ra',
+                });
+            }
+        );
     },
     methods: {
         searchEmptyCalendar(searchQuery){

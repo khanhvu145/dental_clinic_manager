@@ -113,29 +113,72 @@
                                             <div class="col-md-6">
                                                 <div class="col-form-label" style="font-size: 16px; font-weight: bold;">Thông tin đăng ký</div>
                                             </div>
-                                            <div class="col-md-6" style="text-align: right;">
-                                                <button
-                                                    type="button" 
-                                                    class="control-btn green"
-                                                    @click="viewEmptyCalendar()"
-                                                >
-                                                    <i class='bx bxs-calendar'></i>
-                                                    <span>Xem lịch trống</span>
-                                                </button>
-                                            </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="col-form-label">Nha sĩ *</div>
-                                                <el-select v-model="registerData.dentistId" placeholder="Chọn nha sĩ" name="dentistId" clearable filterable>
-                                                    <el-option
-                                                        v-for="item in dentistList"
-                                                        :key="item._id"
-                                                        :label="`Ns ${item.name}`"
-                                                        :value="item._id"
-                                                    ></el-option>
-                                                </el-select>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <el-select v-model="registerData.dentistId" placeholder="Chọn nha sĩ" name="dentistId" clearable filterable>
+                                                            <el-option
+                                                                v-for="item in dentistList"
+                                                                :key="item._id"
+                                                                :label="`Ns ${item.name}`"
+                                                                :value="item._id"
+                                                            ></el-option>
+                                                        </el-select>
+                                                    </div>
+                                                    <div class="col-md-6" style="">
+                                                        <button
+                                                            type="button" 
+                                                            class="control-btn green"
+                                                            @click="viewEmptyCalendar()"
+                                                        >
+                                                            <i class='bx bxs-calendar'></i>
+                                                            <span>Xem lịch trống</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <div class="col-form-label">Thời gian *</div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <el-date-picker
+                                                            v-model="registerData.date"
+                                                            type="date"
+                                                            name="date"
+                                                            format="dd/MM/yyyy"
+                                                            placeholder="Chọn ngày hẹn">
+                                                        </el-date-picker>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <el-time-select
+                                                            v-model="registerData.time"
+                                                            :picker-options="{
+                                                                start: '00:00',
+                                                                step: '00:05',
+                                                                end: '24:00'
+                                                            }"
+                                                            name="time"
+                                                            placeholder="Chọn thời gian"
+                                                            @change="handleChangeTime">
+                                                        </el-time-select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <el-input placeholder="0" v-model="registerData.duration" class="input-with-select" style="text-align: right;" name="duration" type="number">
+                                                            <el-select v-model="registerData.durationType" slot="append" style="width:80px;" name="durationType">
+                                                                <el-option label="Phút" value="minutes"></el-option>
+                                                                <el-option label="Giờ" value="hours"></el-option>
+                                                            </el-select>
+                                                        </el-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
                                             <div class="col-md-6">
                                                 <div class="col-form-label">Dịch vụ *</div>
                                                 <el-select v-model="registerData.serviceGroupId" placeholder="Chọn dịch vụ" name="serviceGroupId" clearable filterable>
@@ -147,51 +190,11 @@
                                                     ></el-option>
                                                 </el-select>
                                             </div>
-                                        </div>
-                                        <div class="row mt-3">
-                                            <div class="col-md-12">
-                                                <div class="col-form-label">Thời gian *</div>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <el-date-picker
-                                                            v-model="registerData.timeFrom"
-                                                            type="datetime"
-                                                            name="timeFrom"
-                                                            format="dd/MM/yyyy HH:mm"
-                                                            placeholder="Chọn thời gian bắt đầu"
-                                                            @change="handleChangeTime(1, $event)"
-                                                        ></el-date-picker>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <el-date-picker
-                                                            v-model="registerData.timeTo"
-                                                            type="datetime"
-                                                            name="timeTo"
-                                                            format="dd/MM/yyyy HH:mm"
-                                                            placeholder="Chọn thời gian kết thúc"
-                                                            @change="handleChangeTime(2, $event)"
-                                                        ></el-date-picker>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row mt-3">
                                             <div class="col-md-6">
                                                 <div class="col-form-label">Loại lịch hẹn</div>
                                                 <el-select v-model="registerData.type" placeholder="Loại lịch hẹn" name="type" filterable>
                                                     <el-option
                                                         v-for="item in apointmentType"
-                                                        :key="item.value"
-                                                        :label="item.label"
-                                                        :value="item.value"
-                                                    ></el-option>
-                                                </el-select>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="col-form-label">Trạng thái</div>
-                                                <el-select v-model="registerData.status" placeholder="Trạng thái" name="status" filterable disabled>
-                                                    <el-option
-                                                        v-for="item in apointmentStatus"
                                                         :key="item.value"
                                                         :label="item.label"
                                                         :value="item.value"
@@ -416,7 +419,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { genderData } from '@/utils/masterData';
+import { genderData, appointmentStatus } from '@/utils/masterData';
 import Customer from '@/models/tw_Customer';
 import Appointment from '@/models/tw_Appointment';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
@@ -453,7 +456,7 @@ export default {
             customerType: [],
             customerSource: [],
             apointmentType: [],
-            apointmentStatus: [],
+            apointmentStatus: appointmentStatus,
             dialogViewEmptyCalendar: false
         }
     },
@@ -465,7 +468,7 @@ export default {
         _this.customerType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerType' })) || [];
         _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
         _this.apointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
-        _this.apointmentStatus = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentStatus' })) || [];
+        // _this.apointmentStatus = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentStatus' })) || [];
         _this.serviceList = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
         await _this.$axios.$get('/api/customer/getAll').then(
             (response) => {
@@ -569,8 +572,14 @@ export default {
         selectEmptyCalendar(e){
             const _this = this;
             _this.registerData.dentistId = e.resource.id;
-            _this.registerData.timeFrom = e.start;
-            _this.registerData.timeTo = e.end;
+            _this.registerData.date = new Date(moment(e.start).format('YYYY/MM/DD'));
+            _this.registerData.time = moment(e.start).format('hh:mm');
+            if(_this.registerData.durationType == 'hours'){
+                _this.registerData.duration = Math.floor(Math.abs(e.end - e.start)/60000)/60;
+            }
+            else{
+                _this.registerData.duration = Math.floor(Math.abs(e.end - e.start)/60000);
+            }
             _this.dialogViewEmptyCalendar = false;
         },
         submitForm: debounce(async function () {
@@ -579,7 +588,7 @@ export default {
             // _this.registerData.customerId = _this.customerSelected._id;
             _this.registerData.updatedBy = _this.userInfo.data.username;
             var newData = cloneDeep(_this.registerData);
-            const data = await _this.$axios.$post('/api/appointment/create', newData);
+            const data = await _this.$axios.$post('/api/appointment/booking', newData);
             if (data.success) {
                 _this.registerData = data.data;
                 _this.$message({
@@ -597,15 +606,32 @@ export default {
             _this.customerSelected = new Customer();
             _this.registerData = new Appointment();
         },
-        handleChangeTime(type, event){
+        handleChangeTime(){
             const _this = this;
-            if(type == 1 && _this.registerData.timeTo == null && _this.registerData.timeFrom != null){
-                _this.registerData.timeTo = moment(event).add(30, 'm')._d;
+            if(_this.registerData.duration == '' || _this.registerData.duration == null){
+                _this.registerData.duration = 60;
             }
-            else if(type == 2 && _this.registerData.timeFrom == null && _this.registerData.timeTo != null){
-                _this.registerData.timeFrom = moment(event).subtract(30, 'm')._d;
-            }
+            // console.log(type, event)
+            // if(type == 1 && _this.registerData.timeTo == '' && _this.registerData.timeFrom != ''){
+            //     _this.registerData.timeTo = moment(event).add(30, 'm').format('HH:mm');
+            //     console.log(moment(event).add(30, 'm'))
+            // }
+            // else if(type == 2 && _this.registerData.timeFrom == '' && _this.registerData.timeTo != ''){
+            //     _this.registerData.timeFrom = moment(event).subtract(30, 'm')._d;
+            // }
         }
     }
 }
 </script>
+
+<style>
+input[name="duration"]{
+    text-align: right;
+    -moz-appearance: textfield;
+}
+input[name="duration"]::-webkit-outer-spin-button,
+input[name="duration"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+</style>

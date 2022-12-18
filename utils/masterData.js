@@ -101,3 +101,22 @@ export const generalCategory = [
     ]
   }
 ];
+
+export const appointmentStatus = [
+  {
+    label: 'Đặt hẹn',
+    value: 'Booked',
+  },
+  {
+    label: 'Đã đến',
+    value: 'Came',
+  },
+  {
+    label: 'Đã khám',
+    value: 'Examined',
+  },
+  {
+    label: 'Đã hủy',
+    value: 'Cancelled',
+  }
+];
