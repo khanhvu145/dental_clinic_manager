@@ -104,47 +104,7 @@ export default {
     },
     async created() { 
         const _this = this;
-        await _this.$axios.$get('/api/user/getDentist').then(
-            (response) => {
-                _this.dentistList = response.data || [];
-            },
-            (error) => {
-                console.log('Error: ', error);
-                _this.$message({
-                    type: 'error',
-                    message: 'Có lỗi xảy ra',
-                });
-            }
-        );
-        _this.options.resources = _this.dentistList.map(item => {
-            return {
-                id: item._id,
-                title: item.name,
-            }
-        })
-        await _this.$axios.$get('/api/appointment/getEmptyCalendar').then(
-            (response) => {
-                if(response.data.length > 0){
-                    _this.options.events = response.data.map(item => {
-                        return {
-                            resourceId: item.dentistId,
-                            start: item.timeFrom,
-                            end: item.timeTo,
-                        }
-                    })
-                }
-                else{
-                    _this.options.events = [];
-                }
-            },
-            (error) => {
-                console.log('Error: ', error);
-                _this.$message({
-                    type: 'error',
-                    message: 'Có lỗi xảy ra',
-                });
-            }
-        );
+        _this.getData();
     },
     methods: {
         searchEmptyCalendar(searchQuery){
@@ -200,6 +160,50 @@ export default {
                 }
             });
 		},
+        async getData(){
+            const _this = this;
+            await _this.$axios.$get('/api/user/getDentist').then(
+                (response) => {
+                    _this.dentistList = response.data || [];
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.options.resources = _this.dentistList.map(item => {
+                return {
+                    id: item._id,
+                    title: item.name,
+                }
+            })
+            await _this.$axios.$get('/api/appointment/getEmptyCalendar').then(
+                (response) => {
+                    if(response.data.length > 0){
+                        _this.options.events = response.data.map(item => {
+                            return {
+                                resourceId: item.dentistId,
+                                start: item.timeFrom,
+                                end: item.timeTo,
+                            }
+                        })
+                    }
+                    else{
+                        _this.options.events = [];
+                    }
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+        }
     },
 }
 </script>

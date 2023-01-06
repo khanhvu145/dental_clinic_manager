@@ -109,7 +109,7 @@ export const appointmentStatus = [
   },
   {
     label: 'Đã đến',
-    value: 'Came',
+    value: 'Checkin',
   },
   {
     label: 'Đã khám',

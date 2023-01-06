@@ -139,7 +139,7 @@
                 </div>
             </div>
             <!-- Dialog create service -->
-            <el-dialog title="Tạo loại hình dịch vụ" :visible.sync="dialogCreateService" width="50%">
+            <el-dialog title="Tạo loại hình dịch vụ" :visible.sync="dialogCreateService" :close-on-click-modal="false" width="50%">
                 <form class="row" v-on:submit.prevent="submitCreateService">
                     <div class="col-md-12">
                         <div class="row">
@@ -230,7 +230,7 @@
                 </span>
             </el-dialog>
             <!-- Dialog update service -->
-            <el-dialog title="Cập nhật loại hình dịch vụ" :visible.sync="dialogUpdateService" width="50%">
+            <el-dialog title="Cập nhật loại hình dịch vụ" :visible.sync="dialogUpdateService" :close-on-click-modal="false" width="50%">
                 <form class="row" v-on:submit.prevent="submitUpdateService">
                     <div class="col-md-12">
                         <div class="row">

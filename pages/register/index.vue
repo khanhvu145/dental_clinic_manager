@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <div class="content">
+        <div class="content" v-if="checkRight('view')">
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -32,8 +32,9 @@
                                                     <div class="col-md-6">
                                                         <button
                                                             type="button" 
-                                                            class="control-btn green"
+                                                            class="control-btn blue"
                                                             @click="createCustomer()"
+                                                            v-if="checkRightCustomer('create')"
                                                         >
                                                             <i class='bx bx-plus-circle'></i>
                                                             <span>Tạo khách hàng</span>
@@ -131,7 +132,7 @@
                                                     <div class="col-md-6" style="">
                                                         <button
                                                             type="button" 
-                                                            class="control-btn green"
+                                                            class="control-btn blue"
                                                             @click="viewEmptyCalendar()"
                                                         >
                                                             <i class='bx bxs-calendar'></i>
@@ -224,6 +225,7 @@
                                             type="button" 
                                             class="control-btn green"
                                             @click="submitForm"
+                                            v-if="checkRight('create')"
                                         >
                                             <i class='bx bxs-calendar-plus'></i>
                                             <span>Đặt hẹn</span>
@@ -239,7 +241,7 @@
                     </div>
                 </div>
                 <!-- Dialog create customer -->
-                <el-dialog title="Tạo khách hàng" :visible.sync="dialogCreateCustomer" width="60%">
+                <el-dialog title="Tạo khách hàng" :visible.sync="dialogCreateCustomer" :close-on-click-modal="false" width="60%">
                     <form class="row" v-on:submit.prevent="submitCreateCustomer">
                         <div class="col-md-12">
                             <div class="row">
@@ -403,16 +405,20 @@
                             type="button" 
                             class="control-btn green"
                             @click="submitCreateCustomer"
+                            v-if="checkRightCustomer('create')"
                         >
                             <span>Lưu</span>
                         </button>
                     </span>
                 </el-dialog>
                 <!-- Dialog view empty calendar -->
-                <el-dialog title="Xem lịch trống" :visible.sync="dialogViewEmptyCalendar" width="90%">
-                    <EmptyCalendar @select-empty-calendar = "selectEmptyCalendar" />
+                <el-dialog title="Xem lịch trống" :visible.sync="dialogViewEmptyCalendar" :close-on-click-modal="false" width="90%">
+                    <EmptyCalendar @select-empty-calendar = "selectEmptyCalendar" ref="emptyCalendarComponent" />
                 </el-dialog>
             </div>
+        </div>
+        <div v-else>
+            <el-empty description="Bạn không có quyền !!"></el-empty>
         </div>
     </div>
 </template>
@@ -502,6 +508,18 @@ export default {
         _this.dataLoading = false;
     },
     methods: {
+        checkRight(right) {
+			const _this = this;
+			// If user have permission below
+			const values = ['appointment.all', 'appointment.' + right];
+			return !!(intersection(_this.accesses || [], values).length > 0);
+		},
+        checkRightCustomer(right) {
+			const _this = this;
+			// If user have permission below
+			const values = ['customer.all', 'customer.' + right];
+			return !!(intersection(_this.accesses || [], values).length > 0);
+		},
         createCustomer(){
             const _this = this;
             _this.customerCreated = new Customer();
@@ -568,12 +586,15 @@ export default {
         viewEmptyCalendar(){
             const _this = this;
             _this.dialogViewEmptyCalendar = true;
+            if(_this.$refs.emptyCalendarComponent){
+                _this.$refs.emptyCalendarComponent.getData();
+            };
         },
         selectEmptyCalendar(e){
             const _this = this;
             _this.registerData.dentistId = e.resource.id;
             _this.registerData.date = new Date(moment(e.start).format('YYYY/MM/DD'));
-            _this.registerData.time = moment(e.start).format('hh:mm');
+            _this.registerData.time = moment(e.start).format('HH:mm');
             if(_this.registerData.durationType == 'hours'){
                 _this.registerData.duration = Math.floor(Math.abs(e.end - e.start)/60000)/60;
             }
@@ -586,7 +607,7 @@ export default {
             const _this = this;
             _this.dataLoading = true;
             // _this.registerData.customerId = _this.customerSelected._id;
-            _this.registerData.updatedBy = _this.userInfo.data.username;
+            _this.registerData.createdBy = _this.userInfo.data.username;
             var newData = cloneDeep(_this.registerData);
             const data = await _this.$axios.$post('/api/appointment/booking', newData);
             if (data.success) {

@@ -1,4 +1,5 @@
 export default function() {
+	this.code = '';
 	this.dentistId = '';
 	this.customerId = '';
     this.serviceGroupId = '';
