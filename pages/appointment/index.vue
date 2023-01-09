@@ -192,7 +192,7 @@
                                                 </div>
                                                 <div class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Xem lịch sử" placement="left-start">
-                                                        <button class="control-btn yellow" style="padding: 4px 6px;">
+                                                        <button class="control-btn yellow" style="padding: 4px 6px;" @click="openDialogLogs(scope.row._id)">
                                                             <i class='bx bx-history' ></i>
                                                         </button>
                                                     </el-tooltip>
@@ -464,6 +464,51 @@
                         </button>
                     </span>
                 </el-dialog>
+
+                <!-- Dialog logs appointment -->
+                <el-dialog title="Xem lịch sử" :visible.sync="dialogLogsAppointment" :close-on-click-modal="false" width="70%">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <el-table :data="logsData" v-loading="dataLoading" style="width: 100%" stripe border>
+                                <el-table-column label="Thời gian" min-width="60">
+                                    <template slot-scope="scope">
+                                        <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Tạo/Cập nhật bởi" min-width="60">
+                                    <template slot-scope="scope">
+                                        <div>{{ scope.row.createdBy || 'System' }}</div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Ghi chú" min-width="60">
+                                    <template slot-scope="scope">
+                                        <div>{{ getLogsType(scope.row.type) }}</div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Nội dung" min-width="120">
+                                    <template slot-scope="scope">
+                                        <ul>
+                                            <li v-for="(item, index) in scope.row.note" :key="index">
+                                                <div>
+                                                    &#9900; 
+                                                    <span style="font-weight: bold;">
+                                                        {{ item.column }}: 
+                                                    </span>
+                                                    {{ (item.oldvalue != '') ? (item.oldvalue + ' &#10142;') : '' }}  {{ item.newvalue }}
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                    <span slot="footer" class="dialog-footer">
+                        <button type="button" class="control-btn gray" @click="dialogLogsAppointment = false">
+                            <span>Đóng</span>
+                        </button>
+                    </span>
+                </el-dialog>
             </div>
         </div>
         <div v-else>
@@ -526,7 +571,9 @@ export default {
             cancelBookingData: {
                 id: 0,
                 cancelReason: ''
-            }
+            },
+            dialogLogsAppointment: false,
+            logsData: []
         }
     },
     async created() {
@@ -661,6 +708,39 @@ export default {
             const _this = this;
             _this.cancelBookingData.id = id;
             _this.dialogCancelAppointment = true;
+        },
+        async openDialogLogs(id){
+            const _this = this;
+            _this.dialogLogsAppointment = true;
+            await _this.$axios.$get(`/api/appointment/getLogs/${id}`).then(
+				(response) => {
+                    _this.logsData = response.data || [];
+                    console.log(_this.logsData)
+				},
+				(error) => {
+                    console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+				}
+			);
+
+            _this.dataLoading = false;
+        },
+        getLogsType(type){
+            if(type == 'create'){
+                return 'Tạo mới';
+            }
+            else if(type == 'update'){
+                return 'Chỉnh sửa';
+            }
+            else if(type == 'cancel'){
+                return 'Hủy';
+            }
+            else {
+                return '';
+            }
         }
     },
 }
