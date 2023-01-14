@@ -414,6 +414,11 @@
                 <!-- Dialog view empty calendar -->
                 <el-dialog title="Xem lịch trống" :visible.sync="dialogViewEmptyCalendar" :close-on-click-modal="false" width="90%">
                     <EmptyCalendar @select-empty-calendar = "selectEmptyCalendar" ref="emptyCalendarComponent" />
+                    <span slot="footer" class="dialog-footer">
+                        <button type="button" class="control-btn gray" @click="dialogViewEmptyCalendar = false">
+                            <span>Đóng</span>
+                        </button>
+                    </span>
                 </el-dialog>
             </div>
         </div>

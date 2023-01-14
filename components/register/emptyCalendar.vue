@@ -60,7 +60,8 @@ export default {
                 initialView: 'resourceTimeGridDay',
                 datesAboveResources: true,
                 dayMinWidth: 300,
-                aspectRatio: 2,
+                height: 600,
+                // aspectRatio: 2,
                 resources: [],
                 headerToolbar: {
                     right: 'type_1,type_2',
