@@ -112,11 +112,26 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Thao tác" min-width="80">
+                            <el-table-column label="Thao tác" width="150">
                                 <template slot-scope="scope">
-									<nuxt-link :to="`/customer/${scope.row._id}/profile`"
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-1">
+                                                    <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
+                                                        <nuxt-link :to="`/customer/${scope.row._id}/profile`">
+                                                            <button class="control-btn blue2" style="padding: 4px 6px;">
+                                                                <i class="el-icon-edit-outline"></i>
+                                                            </button>
+                                                        </nuxt-link>
+                                                    </el-tooltip>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+									<!-- <nuxt-link :to="`/customer/${scope.row._id}/profile`"
 										><i class="el-icon-edit-outline font-20 text-center"></i
-									></nuxt-link>
+									></nuxt-link> -->
 								</template>
                             </el-table-column>
                             <el-table-column label="Tạo bởi-lúc" min-width="120">

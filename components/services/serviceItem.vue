@@ -103,11 +103,21 @@
                                 </el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Thao tác" min-width="80">
+                        <el-table-column label="Thao tác" width="150">
                             <template slot-scope="scope">
-                                <a href="javascript:void(0);" @click="onEdit(scope.row._id)">
-                                    <i class="el-icon-edit-outline font-20 text-center"></i>
-                                </a>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-1">
+                                                <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
+                                                    <button class="control-btn blue2" style="padding: 4px 6px;" @click="onEdit(scope.row._id)">
+                                                        <i class="el-icon-edit-outline"></i>
+                                                    </button>
+                                                </el-tooltip>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </template>
                         </el-table-column>
                         <el-table-column label="Tạo bởi-lúc" min-width="120">

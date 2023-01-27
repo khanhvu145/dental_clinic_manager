@@ -166,33 +166,35 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="row">
-                                                <div v-if="scope.row.status == 'Booked' || scope.row.status == 'Checkin'" class="col-md-6 mb-1">
-                                                    <el-tooltip v-if="scope.row.status == 'Booked'" effect="dark" content="Xác nhận đến khám" placement="left-start">
+                                                <div v-if="checkRight('confirmBooking') && scope.row.status == 'Booked'" class="col-md-6 mb-1">
+                                                    <el-tooltip effect="dark" content="Xác nhận đến khám" placement="left-start">
                                                         <button class="control-btn green2" style="padding: 4px 6px;" @click="changeStatusBooking(scope.row._id, 'Checkin')">
                                                             <i class='bx bx-check'></i>
                                                         </button>
                                                     </el-tooltip>
-                                                    <el-tooltip v-else effect="dark" content="Hủy xác nhận đến khám" placement="left-start">
+                                                </div>
+                                                <div v-if="checkRight('cancelConfirmBooking') && scope.row.status == 'Checkin'" class="col-md-6 mb-1">
+                                                    <el-tooltip effect="dark" content="Hủy xác nhận đến khám" placement="left-start">
                                                         <button class="control-btn red" style="padding: 4px 6px;" @click="changeStatusBooking(scope.row._id, 'Booked')">
                                                             <i class='bx bx-check'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <div v-if="scope.row.status == 'Booked' || scope.row.status == 'Checkin'" class="col-md-6 mb-1">
+                                                <div v-if="checkRight('update') && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')" class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
                                                         <button class="control-btn blue2" style="padding: 4px 6px;" @click="openDialogUpdate(scope.row._id)">
                                                             <i class="el-icon-edit-outline"></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <div v-if="scope.row.status == 'Booked'" class="col-md-6 mb-1">
+                                                <div v-if="checkRight('sendMail') && scope.row.status == 'Booked'" class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Gửi nhắc hẹn" placement="left-start">
                                                         <button class="control-btn blue" style="padding: 4px 6px;">
                                                             <i class='bx bx-mail-send'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <div v-if="scope.row.status == 'Booked' || scope.row.status == 'Checkin'" class="col-md-6 mb-1">
+                                                <div v-if="checkRight('transferBooking') && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')" class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Chuyển lịch hẹn" placement="right-start">
                                                         <button class="control-btn orange" style="padding: 4px 6px;" @click="openDialogTransfer(scope.row)">
                                                             <i class='bx bxs-chevrons-left'></i>
@@ -431,11 +433,12 @@
                             type="button" 
                             class="control-btn red"
                             @click="openDialogCancel(updateData._id)"
+                            v-if="checkRight('cancelBooking')"
                         >
                             <span>Hủy</span>
                         </button>
                         <button
-                            v-if="updateData.status == 'Booked'"
+                            v-if="checkRight('update') && updateData.status == 'Booked'"
                             type="button" 
                             class="control-btn green"
                             @click="submitUpdate"
@@ -470,6 +473,7 @@
                             type="button" 
                             class="control-btn red"
                             @click="cancelBooking"
+                            v-if="checkRight('cancelBooking')"
                         >
                             <span>Hủy</span>
                         </button>
@@ -614,6 +618,7 @@
                             type="button" 
                             class="control-btn green"
                             @click="submitTransfer"
+                            v-if="checkRight('transferBooking')"
                         >
                             <span>Xác nhận</span>
                         </button>

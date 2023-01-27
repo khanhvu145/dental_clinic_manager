@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <div class="content" v-if="checkRight('view')">
+        <div class="content" v-if="checkRight('create')">
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -134,6 +134,7 @@
                                                             type="button" 
                                                             class="control-btn blue"
                                                             @click="viewEmptyCalendar()"
+                                                            v-if="checkRight('view')"
                                                         >
                                                             <i class='bx bxs-calendar'></i>
                                                             <span>Xem lịch trống</span>

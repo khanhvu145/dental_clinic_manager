@@ -50,7 +50,7 @@
                                 <div class="col-form-label">Ghi chú</div>
                                 <el-input 
                                     type="textarea"
-                                    :rows="2"
+                                    :rows="4"
                                     name="note"
                                     placeholder="Ghi chú"
                                     v-model="formData.note"
@@ -72,10 +72,10 @@
                                                     v-for="pageSub in pageGroup['pages']"
                                                     :key="pageSub.value"
                                                 >
-                                                    <div class="col-md-3 text-dark">
+                                                    <div class="col-md-2 text-dark">
                                                         <span style="font-weight: bold">{{ pageSub.name }}</span>
                                                     </div>
-                                                    <div class="col-md-9">
+                                                    <div class="col-md-10">
                                                         <el-checkbox
                                                             name="accessgroupkey"
                                                             v-for="defaultRight in defaultRights"
@@ -153,8 +153,34 @@ export default {
                                 {
 									name: 'Lịch hẹn',
 									value: 'appointment',
-									customRights: [],
+									customRights: [
+                                        {
+											name: 'Xác nhận',
+											value: 'confirmBooking',
+										},
+                                        {
+											name: 'Hủy xác nhận',
+											value: 'cancelConfirmBooking',
+										},
+                                        {
+											name: 'Hủy lịch hẹn',
+											value: 'cancelBooking',
+										},
+                                        {
+											name: 'Chuyển lịch hẹn',
+											value: 'transferBooking',
+										},
+                                        {
+											name: 'Gửi nhắc hẹn',
+											value: 'sendMail',
+										},
+                                    ],
 								},
+                                {
+                                    name: 'Cấu hình lịch hẹn',
+									value: 'appointmentConfig',
+                                    customRights: []
+                                },
                                 {
 									name: 'Nhóm người dùng',
 									value: 'accessgroup',
