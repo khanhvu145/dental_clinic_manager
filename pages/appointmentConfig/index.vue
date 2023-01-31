@@ -7,13 +7,14 @@
                         <div class="title titleAfter mb-0">Cấu hình lịch hẹn</div>
                     </div>
                 </div>
-                <form>
+                <form v-on:submit.prevent="submitForm">
                     <div class="row" style="margin-top: 9px;">
                         <div class="col-md-12" style="text-align: right;">
                             <button
                                 v-if="checkRight('create') || checkRight('update')"
                                 type="button" 
                                 class="control-btn green" 
+                                @click="submitForm"
                             >
                                 <i class='bx bx-save' ></i>
                                 <span>Lưu cấu hình</span>
@@ -29,8 +30,10 @@
                         <div class="col-md-12">
                             <div class="appointmentConfigItem">
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <el-checkbox v-model="data.workingTime.apply">Áp dụng</el-checkbox>
+                                    <div class="col-md-12 mb-1">
+                                        <el-switch v-model="data.workingTime.apply" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                        <span style="font-size:14px; font-weight:bold;">Áp dụng</span>
+                                        <!-- <el-checkbox v-model="data.workingTime.apply">Áp dụng</el-checkbox> -->
                                     </div>
                                     <div class="col-md-4">
                                         <div class="col-form-label">Thời gian làm việc buổi sáng</div>
@@ -110,8 +113,13 @@
                             <div class="appointmentConfigItem">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <el-checkbox v-model="data.autoRemind.apply">Áp dụng</el-checkbox>
-                                        <el-checkbox v-model="data.autoRemind.repeat">Lặp lại</el-checkbox>
+                                        <el-switch v-model="data.autoRemind.apply" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                        <span style="font-size:14px;font-weight:bold;margin-right:8px;">Áp dụng</span>
+
+                                        <el-switch v-model="data.autoRemind.repeat" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                        <span style="font-size:14px; font-weight:bold;">Lặp lại</span>
+                                        <!-- <el-checkbox v-model="data.autoRemind.apply">Áp dụng</el-checkbox> -->
+                                        <!-- <el-checkbox v-model="data.autoRemind.repeat">Lặp lại</el-checkbox> -->
                                     </div>
                                     <div class="col-md-3">
                                         <div class="col-form-label">Trước ngày hẹn</div>
@@ -143,23 +151,43 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <div class="row mt-3 mb-5">
                         <div class="col-md-12">
                             <div class="appointmentConfigContent red">
-                                Cấu hình chung
+                                Cấu hình hủy hẹn tự động
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="appointmentConfigItem">
                                 <div class="row">
+                                    <div class="col-md-12">
+                                        <el-switch v-model="data.autoCancel.apply" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                        <span style="font-size:14px;font-weight:bold;margin-right:8px;">Áp dụng</span>
+                                    </div>
                                     <div class="col-md-3">
-                                        <div class="col-form-label">Tự động hủy hẹn</div>
-                                        <el-input placeholder="0" v-model="data.autoCancelDuration" class="input-with-select" style="text-align:right;" type="number" name="duration">
-                                            <el-select v-model="data.autoCancelDurationType" slot="append" style="width:80px;" name="durationType">
+                                        <div class="col-form-label">Tự động hủy hẹn sau</div>
+                                        <el-input placeholder="0" v-model="data.autoCancel.duration" class="input-with-select" style="text-align:right;" type="number" name="duration">
+                                            <el-select v-model="data.autoCancel.type" slot="append" style="width:95px;" name="durationType">
                                                 <el-option label="Phút" value="minutes"></el-option>
                                                 <el-option label="Giờ" value="hours"></el-option>
+                                                <el-option label="Ngày" value="day"></el-option>
                                             </el-select>
                                         </el-input>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Gửi thông báo cho khách hàng</div>
+                                        <el-radio-group v-model="data.autoCancel.notification">
+                                            <el-radio-button :label="true">Có</el-radio-button>
+                                            <el-radio-button :label="false">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Gửi đến</div>
+                                        <el-select v-model="data.autoCancel.notificationType">
+                                            <el-option label="Tin nhắn" value="type1"></el-option>
+                                            <el-option label="Email" value="type2"></el-option>
+                                            <el-option label="Tin nhắn và Email" value="type3"></el-option>
+                                        </el-select>
                                     </div>
                                 </div>
                             </div>
@@ -177,6 +205,7 @@
 <script>
 import { mapState } from 'vuex';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
+import AppointmentConfig from '@/models/tw_AppointmentConfig';
 export default {
     computed: {
 		...mapState({
@@ -186,69 +215,13 @@ export default {
 	},
     data() {
         return {
-            data: {
-                autoCancelDuration: 30, 
-                autoCancelType: 'minutes', 
-                workingTime: {
-                    apply: true,
-                    timeAM: {
-                        timeFrom: null,
-                        timeTo: null
-                    },
-                    timePM: {
-                        timeFrom: null,
-                        timeTo: null
-                    },
-                    dayOfWeek: [
-                        {
-                            key: 'monday',
-                            label: 'Thứ hai',
-                            value: true
-                        },
-                        {
-                            key: 'tuesday',
-                            label: 'Thứ ba',
-                            value: true
-                        },
-                        {
-                            key: 'wednesday',
-                            label: 'Thứ tư',
-                            value: true
-                        },
-                        {
-                            key: 'thursday',
-                            label: 'Thứ năm',
-                            value: true
-                        },
-                        {
-                            key: 'friday',
-                            label: 'Thứ sáu',
-                            value: true
-                        },
-                        {
-                            key: 'saturday',
-                            label: 'Thứ bảy',
-                            value: true
-                        },
-                        {
-                            key: 'sunday',
-                            label: 'Chủ nhật',
-                            value: false
-                        },
-                    ]
-                },
-                autoRemind: {
-                    apply: true,
-                    repeat: true,
-                    duration: 1,
-                    time: null,
-                    type: 'type3'
-                }
-            }
+            data: new AppointmentConfig(),
+            dataLoading: true
         }
     },
     async created() {
-
+        const _this = this;
+        _this.getData();
     },
     methods: {
         checkRight(right) {
@@ -257,6 +230,42 @@ export default {
 			const values = ['appointmentConfig.all', 'appointmentConfig.' + right];
 			return !!(intersection(_this.accesses || [], values).length > 0);
 		},
+        submitForm: debounce(async function (){
+            const _this = this;
+            _this.dataLoading = true;
+
+            _this.data.createdBy = _this.userInfo.data.username;
+            var newData = cloneDeep(_this.data);
+            const data = await _this.$axios.$post('/api/appointmentConfig/createUpdate', newData);
+            if (data.success) {
+                _this.$message({
+                    message: data.message,
+                    type: 'success',
+                });
+                _this.getData();
+            } else {
+                _this.$message.error(data.error);
+            }
+
+            _this.dataLoading = false;
+        }),
+        async getData(){
+            const _this = this;
+            await _this.$axios.$get('/api/appointmentConfig/getData').then(
+                (response) => {
+					_this.data = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
+                    _this.dataLoading = false;
+				},
+				(error) => {
+					console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: 'Có lỗi xảy ra',
+					});
+                    _this.dataLoading = false;
+				}
+            );
+        },
     }
 }
 </script>
@@ -277,7 +286,7 @@ export default {
     background-color: rgb(30, 224, 160);
 }
 .appointmentConfigContent.red{
-    background-color: rgb(30, 224, 160);
+    background-color: #E7505A;
 }
 .appointmentConfigItem{
     border: 1px solid rgb(219, 219, 219);
