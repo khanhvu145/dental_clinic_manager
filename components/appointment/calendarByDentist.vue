@@ -19,8 +19,16 @@ export default {
     components: {
 		FullCalendar,
 	},
-    props: ['dentistId'],
+    props: ['dentistId', 'appointmentConfig'],
     data(){
+        var _this = this;
+        var dayOff = _this.appointmentConfig.workingTime.dayOfWeek.filter(item => item.value == false);
+        dayOff = dayOff.map(item => item.key);
+        var timeAMFrom = _this.appointmentConfig.workingTime.timeAM.timeFrom + ':00';
+        var timeAMTo = _this.appointmentConfig.workingTime.timeAM.timeTo + ':00';
+        var timePMFrom = _this.appointmentConfig.workingTime.timePM.timeFrom + ':00';
+        var timePMTo = _this.appointmentConfig.workingTime.timePM.timeTo + ':00';
+        var applyConfig = _this.appointmentConfig.workingTime.apply;
         return {
             options: {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
@@ -40,8 +48,33 @@ export default {
                 select: this.handleDateSelect,
                 selectOverlap: false,
                 selectAllow: function(selectInfo) {
-                    return moment().diff(selectInfo.start) <= 0;
+                    if(applyConfig){
+                        var check = false;
+                        if(
+                            (
+                                moment(selectInfo.start).isBetween((moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timeAMFrom), (moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timeAMTo), undefined, '[)') &&
+                                moment(selectInfo.end).isBetween((moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timeAMFrom), (moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timeAMTo), undefined, '(]')
+                            ) 
+                            ||
+                            (
+                                moment(selectInfo.start).isBetween((moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timePMFrom), (moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timePMTo), undefined, '[)') &&
+                                moment(selectInfo.end).isBetween((moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timePMFrom), (moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timePMTo), undefined, '(]')
+                            )
+                        ){
+                            check = true;
+                        }
+                        if((moment().diff(selectInfo.start) <= 0) == false || dayOff.includes(moment(selectInfo.start).day()) == true || check == false) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else{
+                        return moment().diff(selectInfo.start) <= 0;
+                    }
                 },
+                hiddenDays: applyConfig ? dayOff : [],
                 slotDuration: '00:05:00',
                 slotLabelInterval: '00:15:00',
                 expandRows: true,

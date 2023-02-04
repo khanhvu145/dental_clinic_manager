@@ -47,15 +47,35 @@ import interactionPlugin from '@fullcalendar/interaction';
 import viLocale from '@fullcalendar/core/locales/vi';
 import moment from 'moment';
 import scrollgridPlugin from '@fullcalendar/scrollgrid';
+import 'bootstrap-icons/font/bootstrap-icons.css'
 export default {
     components: {
 		FullCalendar,
 	},
+    props: {
+        appointmentConfig: {
+            type: Object,
+        }
+    },
     data(){
+        var _this = this;
+        var dayOff = _this.appointmentConfig.workingTime.dayOfWeek.filter(item => item.value == false);
+        dayOff = dayOff.map(item => item.key);
+        var timeAMFrom = _this.appointmentConfig.workingTime.timeAM.timeFrom + ':00';
+        var timeAMTo = _this.appointmentConfig.workingTime.timeAM.timeTo + ':00';
+        var timePMFrom = _this.appointmentConfig.workingTime.timePM.timeFrom + ':00';
+        var timePMTo = _this.appointmentConfig.workingTime.timePM.timeTo + ':00';
+        var applyConfig = _this.appointmentConfig.workingTime.apply;
         return {
             options: {
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
                 locales: [viLocale],
+                titleFormat: {
+                    month: '2-digit',
+                    year: 'numeric',
+                    day: '2-digit',
+                    weekday: 'long'
+                },
                 plugins: [ resourceTimeGridPlugin, resourceTimelinePlugin, interactionPlugin, scrollgridPlugin ],
                 initialView: 'resourceTimeGridDay',
                 datesAboveResources: true,
@@ -64,20 +84,35 @@ export default {
                 // aspectRatio: 2,
                 resources: [],
                 headerToolbar: {
-                    right: 'type_1,type_2',
+                    right: 'type_1 type_2',
                     left: 'prev today next',
                     center: 'title'
                 },
-                views: {
+                customButtons: {
                     type_1: {
-                        type: 'resourceTimeGridDay',
-                        buttonText: 'Dọc'
+                        icon: 'bi bi-grid-fill',
+                        click: function() {
+                            _this.$refs.emptyCalendar.getApi().changeView('resourceTimeGridDay');
+                        }
                     },
                     type_2: {
-                        type: 'resourceTimelineDay',
-                        buttonText: 'Ngang'
-                    },
+                        icon: 'bi bi-grid-3x2-gap-fill',
+                        click: function() {
+                            _this.$refs.emptyCalendar.getApi().changeView('resourceTimelineDay');
+                        }
+                    }
                 },
+                // views: {
+                //     type_1: {
+                //         type: 'resourceTimeGridDay',
+                //         // buttonText: 'Dọc'
+                //         buttonIcons: 'chevrons-right'
+                //     },
+                //     type_2: {
+                //         type: 'resourceTimelineDay',
+                //         buttonText: 'Ngang'
+                //     },
+                // },
                 editable: false,
                 resourceAreaHeaderContent: 'Nha sĩ',
                 selectable: true,
@@ -85,8 +120,33 @@ export default {
                 select: this.handleDateSelect,
                 selectOverlap: false,
                 selectAllow: function(selectInfo) {
-                    return moment().diff(selectInfo.start) <= 0;
+                    if(applyConfig){
+                        var check = false;
+                        if(
+                            (
+                                moment(selectInfo.start).isBetween((moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timeAMFrom), (moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timeAMTo), undefined, '[)') &&
+                                moment(selectInfo.end).isBetween((moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timeAMFrom), (moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timeAMTo), undefined, '(]')
+                            ) 
+                            ||
+                            (
+                                moment(selectInfo.start).isBetween((moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timePMFrom), (moment(selectInfo.start).format('YYYY-MM-DD') + ' ' + timePMTo), undefined, '[)') &&
+                                moment(selectInfo.end).isBetween((moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timePMFrom), (moment(selectInfo.end).format('YYYY-MM-DD') + ' ' + timePMTo), undefined, '(]')
+                            )
+                        ){
+                            check = true;
+                        }
+                        if((moment().diff(selectInfo.start) <= 0) == false || dayOff.includes(moment(selectInfo.start).day()) == true || check == false) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else{
+                        return moment().diff(selectInfo.start) <= 0;
+                    }
                 },
+                hiddenDays: applyConfig ? dayOff : [],
                 slotDuration: '00:05:00',
                 slotLabelInterval: '00:15:00',
                 expandRows: true,
@@ -100,7 +160,7 @@ export default {
                 dentistsF: [],
                 dateF: ''
             },
-            dentistList: [],
+            dentistList: []
         }
     },
     async created() { 
@@ -136,7 +196,7 @@ export default {
         },
         handleDateSelect(clickInfo) {
             const _this = this;
-            this.$confirm(`<div>Thời gian: <span style="font-weight:bold">${moment(clickInfo.start).format('DD/MM/YYYY HH:mm')} - ${moment(clickInfo.end).format('DD/MM/YYYY HH:mm')}</span></div><div>Nha sĩ phụ trách: <span style="font-weight:bold">${clickInfo.resource.title}</span></div>`, 'Thông tin đã chọn', {
+            _this.$confirm(`<div>Thời gian: <span style="font-weight:bold">${moment(clickInfo.start).format('DD/MM/YYYY HH:mm')} - ${moment(clickInfo.end).format('DD/MM/YYYY HH:mm')}</span></div><div>Nha sĩ phụ trách: <span style="font-weight:bold">${clickInfo.resource.title}</span></div>`, 'Thông tin đã chọn', {
                 dangerouslyUseHTMLString: true,
                 distinguishCancelAndClose: true,
                 confirmButtonText: 'Xác nhận',

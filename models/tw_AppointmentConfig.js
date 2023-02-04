@@ -2,46 +2,46 @@ export default function() {
 	this.workingTime = {
         apply: true,
         timeAM: {
-            timeFrom: '',
-            timeTo: ''
+            timeFrom: '07:00',
+            timeTo: '12:00'
         },
         timePM: {
-            timeFrom: '',
-            timeTo: ''
+            timeFrom: '14:00',
+            timeTo: '20:00'
         },
         dayOfWeek: [
             {
-                key: 'monday',
+                key: 1,
                 label: 'Thứ hai',
                 value: true
             },
             {
-                key: 'tuesday',
+                key: 2,
                 label: 'Thứ ba',
                 value: true
             },
             {
-                key: 'wednesday',
+                key: 3,
                 label: 'Thứ tư',
                 value: true
             },
             {
-                key: 'thursday',
+                key: 4,
                 label: 'Thứ năm',
                 value: true
             },
             {
-                key: 'friday',
+                key: 5,
                 label: 'Thứ sáu',
                 value: true
             },
             {
-                key: 'saturday',
+                key: 6,
                 label: 'Thứ bảy',
                 value: true
             },
             {
-                key: 'sunday',
+                key: 0,
                 label: 'Chủ nhật',
                 value: false
             },
@@ -51,7 +51,7 @@ export default function() {
         apply: true,
         repeat: true,
         duration: 1,
-        time: '',
+        time: '08:00',
         type: 'type3'
     };
     this.autoCancel = {

@@ -627,7 +627,7 @@
 
                 <!-- Dialog calendar -->
                 <el-dialog title="Xem lịch trống" :visible.sync="dialogCalendarByDentist" :close-on-click-modal="false" width="80%">
-                    <CalendarByDentist :dentistId="transferData.dentistId" @select-empty-calendar = "selectEmptyCalendar" ref="calendarByDentistComponent" />
+                    <CalendarByDentist :dentistId="transferData.dentistId" :appointmentConfig="appointmentConfig" @select-empty-calendar = "selectEmptyCalendar" ref="calendarByDentistComponent" />
                     <span slot="footer" class="dialog-footer">
                         <button type="button" class="control-btn gray" @click="dialogCalendarByDentist = false">
                             <span>Đóng</span>
@@ -650,6 +650,7 @@ import moment from 'moment';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import Appointment from '@/models/tw_Appointment';
 import CalendarByDentist from '@/components/appointment/calendarByDentist';
+import AppointmentConfig from '@/models/tw_AppointmentConfig';
 export default {
     components: {
 		CalendarByDentist,
@@ -706,6 +707,7 @@ export default {
             transferData: {},
             dialogTransfer: false,
             dialogCalendarByDentist: false,
+            appointmentConfig: new AppointmentConfig()
         }
     },
     async created() {
@@ -724,6 +726,18 @@ export default {
         );
         _this.appointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
         _this.serviceData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
+        await _this.$axios.$get('/api/appointmentConfig/getData').then(
+            (response) => {
+                _this.appointmentConfig = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
+            },
+            (error) => {
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: 'Có lỗi xảy ra',
+                });
+            }
+        );
 
         _this.getData(_this.searchQuery);
     },

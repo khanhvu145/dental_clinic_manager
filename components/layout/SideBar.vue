@@ -61,12 +61,24 @@
                     <span slot="title">Loại hình dịch vụ</span>
                 </el-menu-item>
             </nuxt-link>
-            <nuxt-link to="/generalconfig" class="sidebar-nav-link">
-                <el-menu-item index="generalconfig">
+            <el-submenu index="2">
+                <template slot="title">
                     <i class='bx bxs-cog'></i>
-                    <span slot="title">Cấu hình chung</span>
-                </el-menu-item>
-            </nuxt-link>
+                    <span slot="title">Cấu hình</span>
+                </template>
+                <nuxt-link to="/generalconfig" class="sidebar-nav-link">
+                    <el-menu-item index="generalconfig">
+                        <i class='bx bx-cog'></i>
+                        <span slot="title">Cấu hình chung</span>
+                    </el-menu-item>
+                </nuxt-link>
+                <nuxt-link to="/smtpConfig" class="sidebar-nav-link">
+                    <el-menu-item index="smtpConfig">
+                        <i class='bx bxs-envelope'></i>
+                        <span slot="title">Cấu hình mail</span>
+                    </el-menu-item>
+                </nuxt-link>
+            </el-submenu>
         </el-menu>
     </div>
 </template>

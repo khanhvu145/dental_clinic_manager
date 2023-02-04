@@ -153,21 +153,24 @@
                                                             type="date"
                                                             name="date"
                                                             format="dd/MM/yyyy"
-                                                            placeholder="Chọn ngày hẹn">
+                                                            placeholder="Chọn ngày hẹn"
+                                                            :picker-options="{ 
+                                                                disabledDate: (time) => disabledDate(time) 
+                                                            }">
                                                         </el-date-picker>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <el-time-select
+                                                        <el-time-picker
                                                             v-model="registerData.time"
                                                             :picker-options="{
-                                                                start: '00:00',
-                                                                step: '00:05',
-                                                                end: '24:00'
+                                                                selectableRange: selectableRange,
+                                                                format: 'HH:mm',
                                                             }"
+                                                            value-format="HH:mm"
                                                             name="time"
                                                             placeholder="Chọn thời gian"
                                                             @change="handleChangeTime">
-                                                        </el-time-select>
+                                                        </el-time-picker>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <el-input placeholder="0" v-model="registerData.duration" class="input-with-select" style="text-align: right;" name="duration" type="number">
@@ -414,7 +417,7 @@
                 </el-dialog>
                 <!-- Dialog view empty calendar -->
                 <el-dialog title="Xem lịch trống" :visible.sync="dialogViewEmptyCalendar" :close-on-click-modal="false" width="90%">
-                    <EmptyCalendar @select-empty-calendar = "selectEmptyCalendar" ref="emptyCalendarComponent" />
+                    <EmptyCalendar @select-empty-calendar = "selectEmptyCalendar" ref="emptyCalendarComponent" :appointmentConfig="appointmentConfig" />
                     <span slot="footer" class="dialog-footer">
                         <button type="button" class="control-btn gray" @click="dialogViewEmptyCalendar = false">
                             <span>Đóng</span>
@@ -438,6 +441,7 @@ import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'l
 import buildFormData from '@/utils/buildFormData';
 import EmptyCalendar from '@/components/register/emptyCalendar.vue';
 import moment from 'moment';
+import AppointmentConfig from '@/models/tw_AppointmentConfig';
 export default {
     components: {
 		EmptyCalendar,
@@ -469,7 +473,9 @@ export default {
             customerSource: [],
             apointmentType: [],
             apointmentStatus: appointmentStatus,
-            dialogViewEmptyCalendar: false
+            dialogViewEmptyCalendar: false,
+            appointmentConfig: new AppointmentConfig(),
+            selectableRange: []
         }
     },
     async created() {
@@ -510,6 +516,26 @@ export default {
                 _this.dataLoading = false;
             }
         );
+        await _this.$axios.$get('/api/appointmentConfig/getData').then(
+            (response) => {
+                _this.appointmentConfig = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
+                
+            },
+            (error) => {
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: 'Có lỗi xảy ra',
+                });
+            }
+        );
+
+        if(_this.appointmentConfig.workingTime.apply){
+            _this.selectableRange = [
+                `${ _this.appointmentConfig.workingTime.timeAM.timeFrom + ':00' } - ${ _this.appointmentConfig.workingTime.timeAM.timeTo + ':00' }`, 
+                `${ _this.appointmentConfig.workingTime.timePM.timeFrom + ':00' } - ${ _this.appointmentConfig.workingTime.timePM.timeTo + ':00' }`
+            ]
+        }
 
         _this.dataLoading = false;
     },
@@ -622,6 +648,7 @@ export default {
                     message: data.message,
                     type: 'success',
                 });
+                console.log(data);
             } else {
                 _this.$message.error(data.error);
             }
@@ -635,6 +662,7 @@ export default {
         },
         handleChangeTime(){
             const _this = this;
+            console.log(_this.registerData.time)
             if(_this.registerData.duration == '' || _this.registerData.duration == null){
                 _this.registerData.duration = 60;
             }
@@ -646,6 +674,17 @@ export default {
             // else if(type == 2 && _this.registerData.timeFrom == '' && _this.registerData.timeTo != ''){
             //     _this.registerData.timeFrom = moment(event).subtract(30, 'm')._d;
             // }
+        },
+        disabledDate(date){
+            const _this = this;
+            if(_this.appointmentConfig.workingTime.apply){
+                var dayOff = _this.appointmentConfig.workingTime.dayOfWeek.filter(item => item.value == false);
+                dayOff = dayOff.map(item => item.key);
+                return (moment(moment(date).format('YYYY/MM/DD')).isBefore(moment().format('YYYY/MM/DD')) || dayOff.includes(moment(date).day()));
+            }
+            else{
+                return false;
+            }
         }
     }
 }
