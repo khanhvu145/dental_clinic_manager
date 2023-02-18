@@ -5,9 +5,9 @@
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="title titleAfter mb-0">Cấu hình lịch hẹn</div>
-                    </div>
+                    </div> 
                 </div>
-                <form v-on:submit.prevent="submitForm">
+                <form v-loading="dataLoading" v-on:submit.prevent="submitForm">
                     <div class="row" style="margin-top: 9px;">
                         <div class="col-md-12" style="text-align: right;">
                             <button
@@ -154,41 +154,70 @@
                     <div class="row mt-3 mb-5">
                         <div class="col-md-12">
                             <div class="appointmentConfigContent red">
-                                Cấu hình hủy hẹn tự động
+                                Cấu hình khác
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="appointmentConfigItem">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <!-- <div class="col-md-12">
                                         <el-switch v-model="data.autoCancel.apply" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                                         <span style="font-size:14px;font-weight:bold;margin-right:8px;">Áp dụng</span>
+                                    </div> -->
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="col-form-label">Tự động hủy hẹn khi qua thời gian đặt hẹn</div>
+                                                <el-input placeholder="0" v-model="data.other.autoCancelDuration" class="input-with-select" style="text-align:right;" type="number" name="duration">
+                                                    <el-select v-model="data.other.autoCancelType" slot="append" style="width:95px;" name="durationType">
+                                                        <el-option label="Phút" value="minutes"></el-option>
+                                                        <el-option label="Giờ" value="hours"></el-option>
+                                                        <el-option label="Ngày" value="day"></el-option>
+                                                    </el-select>
+                                                </el-input>
+                                            </div>
+                                            <div class="col-md-3 mt-4" style="display:flex;align-items:center;">
+                                                <el-switch v-model="data.other.autoCancelApply" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                                <span style="font-size:14px;font-weight:bold;margin-left:8px;">Áp dụng</span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <div class="col-form-label">Tự động hủy hẹn sau</div>
-                                        <el-input placeholder="0" v-model="data.autoCancel.duration" class="input-with-select" style="text-align:right;" type="number" name="duration">
-                                            <el-select v-model="data.autoCancel.type" slot="append" style="width:95px;" name="durationType">
-                                                <el-option label="Phút" value="minutes"></el-option>
-                                                <el-option label="Giờ" value="hours"></el-option>
-                                                <el-option label="Ngày" value="day"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="col-form-label">Gửi thông báo cho khách hàng</div>
-                                        <el-radio-group v-model="data.autoCancel.notification">
+                                        <div class="col-form-label">Gửi thông báo khi có lịch hẹn mới</div>
+                                        <el-radio-group v-model="data.other.notifyIsBooked">
                                             <el-radio-button :label="true">Có</el-radio-button>
                                             <el-radio-button :label="false">Không</el-radio-button>
                                         </el-radio-group>
                                     </div>
                                     <div class="col-md-3">
+                                        <div class="col-form-label">Gửi thông báo khi khách hàng đến khám</div>
+                                        <el-radio-group v-model="data.other.notifyIsCheckin">
+                                            <el-radio-button :label="true">Có</el-radio-button>
+                                            <el-radio-button :label="false">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Gửi thông báo khi có lịch hẹn bị hủy</div>
+                                        <el-radio-group v-model="data.other.notifyIsCancelled">
+                                            <el-radio-button :label="true">Có</el-radio-button>
+                                            <el-radio-button :label="false">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Gửi thông báo khi có lịch hẹn được chuyển</div>
+                                        <el-radio-group v-model="data.other.notifyIsTranfer">
+                                            <el-radio-button :label="true">Có</el-radio-button>
+                                            <el-radio-button :label="false">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <!-- <div class="col-md-3">
                                         <div class="col-form-label">Gửi đến</div>
                                         <el-select v-model="data.autoCancel.notificationType">
                                             <el-option label="Tin nhắn" value="type1"></el-option>
                                             <el-option label="Email" value="type2"></el-option>
                                             <el-option label="Tin nhắn và Email" value="type3"></el-option>
                                         </el-select>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

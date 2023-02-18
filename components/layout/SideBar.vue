@@ -75,7 +75,7 @@
                 <nuxt-link to="/smtpConfig" class="sidebar-nav-link">
                     <el-menu-item index="smtpConfig">
                         <i class='bx bxs-envelope'></i>
-                        <span slot="title">Cấu hình mail</span>
+                        <span slot="title">Cấu hình SMTP</span>
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>

@@ -206,6 +206,11 @@ export default {
 									value: 'generalconfig',
 									customRights: [],
 								},
+                                {
+                                    name: 'Cấu hình SMTP',
+									value: 'smtpConfig',
+                                    customRights: []
+                                },
                             ]
                         }
                     ]

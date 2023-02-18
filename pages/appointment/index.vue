@@ -804,6 +804,14 @@ export default {
             await _this.$axios.$get(`/api/appointment/getById/${val}`).then(
 				(response) => {
                     _this.updateData = response.data || new Appointment();
+                    var expireTime = moment(_this.updateData.timeFrom).add(1, 'm')._d;
+                    const date = new Date(expireTime);
+                    const minutes = date.getMinutes();
+                    const hours = date.getHours();
+                    const days = date.getDate();
+                    const months = date.getMonth() + 1;
+                    const dayOfWeek = date.getDay();
+                    console.log(`00 ${minutes} ${hours} ${days} ${months} ${dayOfWeek}`)
 				},
 				(error) => {
                     console.log('Error: ', error);

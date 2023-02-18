@@ -54,11 +54,13 @@ export default function() {
         time: '08:00',
         type: 'type3'
     };
-    this.autoCancel = {
-        apply: true,
-        duration: 30, 
-        type: 'minutes', 
-        notification: true,
-        notificationType: 'type3'
+    this.other = {
+        autoCancelDuration: 30,
+        autoCancelApply: false,
+        autoCancelType: 'minutes', 
+        notifyIsBooked: true,
+        notifyIsCheckin: true,
+        notifyIsCancelled: true,
+        notifyIsTranfer: true,
     };
 }
