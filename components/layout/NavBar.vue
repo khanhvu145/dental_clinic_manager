@@ -72,8 +72,8 @@ export default {
                 await this.$auth.logout();
 			    await this.$router.push('/login');
             }
-            if(command == 'manager') {
-			    await this.$router.push('/administration');
+            if(command == 'account') {
+			    await this.$router.push('/account');
             }
         },
         collapseSidebar(){

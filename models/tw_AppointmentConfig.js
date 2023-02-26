@@ -52,7 +52,7 @@ export default function() {
         repeat: true,
         duration: 1,
         time: '08:00',
-        type: 'type3'
+        type: 'type2'
     };
     this.other = {
         autoCancelDuration: 30,

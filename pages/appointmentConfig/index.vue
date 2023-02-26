@@ -142,9 +142,9 @@
                                     <div class="col-md-3">
                                         <div class="col-form-label">Gửi đến</div>
                                         <el-select v-model="data.autoRemind.type">
-                                            <el-option label="Tin nhắn" value="type1"></el-option>
+                                            <!-- <el-option label="Tin nhắn" value="type1"></el-option> -->
                                             <el-option label="Email" value="type2"></el-option>
-                                            <el-option label="Tin nhắn và Email" value="type3"></el-option>
+                                            <!-- <el-option label="Tin nhắn và Email" value="type3"></el-option> -->
                                         </el-select>
                                     </div>
                                 </div>
