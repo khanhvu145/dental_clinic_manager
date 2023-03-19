@@ -151,6 +151,51 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="appointmentConfigContent blue">
+                                Cấu hình hiện thị
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="appointmentConfigItem" style="font-size:14px;">
+                                <div class="row">
+                                    <div class="col-md-2" style="font-weight: bold;">
+                                        Trạng thái
+                                    </div>
+                                    <div class="col-md-2" style="font-weight: bold;">
+                                        Màu nền
+                                    </div>
+                                    <div class="col-md-2" style="font-weight: bold;">
+                                        Màu chữ
+                                    </div>
+                                    <div class="col-md-2" style="font-weight: bold;">
+                                        Màu viền
+                                    </div>
+                                    <div class="col-md-2" style="font-weight: bold;">
+                                        Áp dụng
+                                    </div>
+                                </div>
+                                <div v-for="(item, index) in data.views" :key="index" class="row mt-3">
+                                    <div class="col-md-2">
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <el-color-picker v-model="data.views[index].backgroundColor"></el-color-picker>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <el-color-picker v-model="data.views[index].textColor"></el-color-picker>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <el-color-picker v-model="data.views[index].borderColor"></el-color-picker>
+                                    </div>
+                                    <div class="col-md-2">
+                                         <el-switch v-model="data.views[index].apply" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row mt-3 mb-5">
                         <div class="col-md-12">
                             <div class="appointmentConfigContent red">
@@ -235,6 +280,7 @@
 import { mapState } from 'vuex';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import AppointmentConfig from '@/models/tw_AppointmentConfig';
+import { appointmentStatus } from '@/utils/masterData';
 export default {
     computed: {
 		...mapState({
@@ -250,6 +296,7 @@ export default {
     },
     async created() {
         const _this = this;
+        console.log(_this.data)
         _this.getData();
     },
     methods: {
@@ -283,6 +330,9 @@ export default {
             await _this.$axios.$get('/api/appointmentConfig/getData').then(
                 (response) => {
 					_this.data = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
+                    // _this.appointmentStatus.forEach(() => {
+                    //     var view = _this.data.views.find(e => e.type ==)
+                    // });
                     _this.dataLoading = false;
 				},
 				(error) => {
@@ -313,6 +363,9 @@ export default {
 }
 .appointmentConfigContent.green{
     background-color: rgb(30, 224, 160);
+}
+.appointmentConfigContent.blue{
+    background-color: #659be0;
 }
 .appointmentConfigContent.red{
     background-color: #E7505A;

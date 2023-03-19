@@ -48,6 +48,7 @@ import viLocale from '@fullcalendar/core/locales/vi';
 import moment from 'moment';
 import scrollgridPlugin from '@fullcalendar/scrollgrid';
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import { genderData, appointmentStatus } from '@/utils/masterData';
 export default {
     components: {
 		FullCalendar,
@@ -152,15 +153,16 @@ export default {
                 expandRows: true,
                 scrollTime: moment().format('HH:mm:ss'),
                 events: [],
-                eventTextColor: '#fff',
-                eventBackgroundColor: '#8fdf82',
-                eventBorderColor: '#8fdf82',
+                // eventTextColor: '#fff',
+                // eventBackgroundColor: '#8fdf82',
+                // eventBorderColor: '#8fdf82',
             },
             searchQuery: {
                 dentistsF: [],
                 dateF: ''
             },
-            dentistList: []
+            dentistList: [],
+            appointmentStatus: appointmentStatus
         }
     },
     async created() { 
@@ -249,6 +251,9 @@ export default {
                                 resourceId: item.dentistId,
                                 start: item.timeFrom,
                                 end: item.timeTo,
+                                color: _this.appointmentConfig.views.find(e => e.value == item.status).apply ? _this.appointmentConfig.views.find(e => e.value == item.status).backgroundColor : _this.appointmentStatus.find(e => e.value == item.status).backgroundColor,
+                                textColor: _this.appointmentConfig.views.find(e => e.value == item.status).apply ? _this.appointmentConfig.views.find(e => e.value == item.status).textColor : _this.appointmentStatus.find(e => e.value == item.status).textColor,
+                                borderColor: _this.appointmentConfig.views.find(e => e.value == item.status).apply ? _this.appointmentConfig.views.find(e => e.value == item.status).borderColor : _this.appointmentStatus.find(e => e.value == item.status).borderColor
                             }
                         })
                     }

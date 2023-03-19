@@ -197,6 +197,11 @@ export default {
 									customRights: [],
 								},
                                 {
+									name: 'Lịch làm việc',
+									value: 'workingCalendar',
+									customRights: [],
+								},
+                                {
 									name: 'Loại hình dịch vụ',
 									value: 'service',
 									customRights: [],

@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import SocketioService from '../../services/socketio.service.js';
 export default {
     layout: 'blank',
     name: 'Login',
@@ -47,8 +48,9 @@ export default {
         async userLogin() {
 			const _this = this;
 			try {
-				const response = await this.$auth.loginWith('local', { data: this.login });
+				const response = await this.$auth.loginWith('local', { data: _this.login });
 				if (response.data.success) {
+                    await SocketioService.setupSocketConnection(_this.$store, _this.login.username);
                     _this.$message({
 						showClose: true,
 						message: response.data.message,
@@ -72,7 +74,7 @@ export default {
                 });
 			}
 		},
-    }
+    },
 }
 </script>
 

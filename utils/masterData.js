@@ -106,17 +106,33 @@ export const appointmentStatus = [
   {
     label: 'Đặt hẹn',
     value: 'Booked',
+    backgroundColor: "#ecf5ff",
+    textColor: "#409eff",
+    borderColor: "#d9ecff",
+    apply: true,
   },
   {
     label: 'Đã đến',
     value: 'Checkin',
+    backgroundColor: '#fef0f0',
+    borderColor: '#fde2e2',
+    textColor: '#f56c6c',
+    apply: true,
   },
   {
     label: 'Đã khám',
     value: 'Examined',
+    backgroundColor: "#f0f9eb",
+    borderColor: '#e1f3d8',
+    textColor: '#67c23a',
+    apply: true,
   },
   {
     label: 'Đã hủy',
     value: 'Cancelled',
+    backgroundColor: "#f4f4f5",
+    borderColor: "#e9e9eb",
+    textColor: "#909399",
+    apply: true,
   }
 ];

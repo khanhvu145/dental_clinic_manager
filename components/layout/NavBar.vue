@@ -49,6 +49,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import SocketioService from '../../services/socketio.service.js';
 export default {
     props: { 
         isCollapse: Boolean,
@@ -71,6 +72,7 @@ export default {
             if(command == 'logout') {
                 await this.$auth.logout();
 			    await this.$router.push('/login');
+                await SocketioService.disconnect();
             }
             if(command == 'account') {
 			    await this.$router.push('/account');

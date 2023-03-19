@@ -12,6 +12,7 @@
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import NavBar from '@/components/layout/NavBar';
 import SideBar from '@/components/layout/SideBar';
+import SocketioService from '../services/socketio.service.js';
 export default {
   components: {
 		NavBar,
@@ -21,6 +22,9 @@ export default {
 		const _this = this;
 		await _this.$store.dispatch('getAccesses');
 	},
+  // beforeUnmount() {
+  //   SocketioService.disconnect();
+  // },
   data() {
     return { 
       isCollapse: true,

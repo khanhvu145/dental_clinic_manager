@@ -242,16 +242,32 @@
                             </el-table-column>
                             <el-table-column v-if="columns[5].isShow" :label="columns[5].name" min-width="150">
                                 <template slot-scope="scope">
-                                    <el-tag v-if="scope.row.status == 'Booked'">
+                                    <el-tag v-if="scope.row.status == 'Booked'" :style="{
+                                        'background-color': appointmentConfig.views.find(e => e.value == 'Booked').apply ? appointmentConfig.views.find(e => e.value == 'Booked').backgroundColor : statusData.find(e => e.value == 'Booked').backgroundColor,
+                                        'border-color': appointmentConfig.views.find(e => e.value == 'Booked').apply ? appointmentConfig.views.find(e => e.value == 'Booked').borderColor : statusData.find(e => e.value == 'Booked').borderColor,
+                                        'color': appointmentConfig.views.find(e => e.value == 'Booked').apply ? appointmentConfig.views.find(e => e.value == 'Booked').textColor : statusData.find(e => e.value == 'Booked').textColor,
+                                    }">
                                         Đặt hẹn
                                     </el-tag>
-                                    <el-tag v-else-if="scope.row.status == 'Checkin'" type="danger">
+                                    <el-tag v-else-if="scope.row.status == 'Checkin'" :style="{
+                                        'background-color': appointmentConfig.views.find(e => e.value == 'Checkin').apply ? appointmentConfig.views.find(e => e.value == 'Checkin').backgroundColor : statusData.find(e => e.value == 'Checkin').backgroundColor,
+                                        'border-color': appointmentConfig.views.find(e => e.value == 'Checkin').apply ? appointmentConfig.views.find(e => e.value == 'Checkin').borderColor : statusData.find(e => e.value == 'Checkin').borderColor,
+                                        'color': appointmentConfig.views.find(e => e.value == 'Checkin').apply ? appointmentConfig.views.find(e => e.value == 'Checkin').textColor : statusData.find(e => e.value == 'Checkin').textColor,
+                                    }">
                                         Đã đến
                                     </el-tag>
-                                    <el-tag v-else-if="scope.row.status == 'Examined'" type="success">
+                                    <el-tag v-else-if="scope.row.status == 'Examined'" :style="{
+                                        'background-color': appointmentConfig.views.find(e => e.value == 'Examined').apply ? appointmentConfig.views.find(e => e.value == 'Examined').backgroundColor : statusData.find(e => e.value == 'Examined').backgroundColor,
+                                        'border-color': appointmentConfig.views.find(e => e.value == 'Examined').apply ? appointmentConfig.views.find(e => e.value == 'Examined').borderColor : statusData.find(e => e.value == 'Examined').borderColor,
+                                        'color': appointmentConfig.views.find(e => e.value == 'Examined').apply ? appointmentConfig.views.find(e => e.value == 'Examined').textColor : statusData.find(e => e.value == 'Examined').textColor,
+                                    }">
                                         Đã khám
                                     </el-tag>
-                                    <el-tag v-else type="info">
+                                    <el-tag v-else :style="{
+                                        'background-color': appointmentConfig.views.find(e => e.value == 'Cancelled').apply ? appointmentConfig.views.find(e => e.value == 'Cancelled').backgroundColor : statusData.find(e => e.value == 'Cancelled').backgroundColor,
+                                        'border-color': appointmentConfig.views.find(e => e.value == 'Cancelled').apply ? appointmentConfig.views.find(e => e.value == 'Cancelled').borderColor : statusData.find(e => e.value == 'Cancelled').borderColor,
+                                        'color': appointmentConfig.views.find(e => e.value == 'Cancelled').apply ? appointmentConfig.views.find(e => e.value == 'Cancelled').textColor : statusData.find(e => e.value == 'Cancelled').textColor,
+                                    }">
                                         Đã hủy
                                     </el-tag>
 								</template>
@@ -659,6 +675,7 @@ export default {
 		...mapState({
 			accesses: (state) => state.accesses,
             userInfo: (state) => state.auth.user,
+            socketUser: (state) => state.socketUser,
 		}),
 	},
     data() {
@@ -712,6 +729,7 @@ export default {
     },
     async created() {
         const _this = this;
+        console.log(_this.socketUser);
         await _this.$axios.$get('/api/user/getDentist').then(
             (response) => {
                 _this.dentistsData = response.data || [];
@@ -729,6 +747,9 @@ export default {
         await _this.$axios.$get('/api/appointmentConfig/getData').then(
             (response) => {
                 _this.appointmentConfig = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
+                if(_this.appointmentConfig.views == null || _this.appointmentConfig.views.length <= 0){
+                    _this.appointmentConfig.views = _this.statusData;
+                }
             },
             (error) => {
                 console.log('Error: ', error);
@@ -750,8 +771,8 @@ export default {
 		},
         async getData(searchQuery){
             const _this = this;
-            if(_this.searchQuery.filters.dateF == null || _this.searchQuery.filters.dateF == ''){
-                _this.searchQuery.filters.dateF = [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))];
+            if(searchQuery.filters.dateF == null || searchQuery.filters.dateF == ''){
+                searchQuery.filters.dateF = [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))];
             }
             await _this.$axios.$post('/api/appointment/getByQuery', searchQuery).then(
                 (response) => {
@@ -803,7 +824,7 @@ export default {
             const _this = this;
             await _this.$axios.$get(`/api/appointment/getById/${val}`).then(
 				(response) => {
-                    _this.updateData = response.data || new Appointment();
+                    _this.updateData = (response.data != null && response.data.length > 0) ? response.data[0] : new Appointment();
                     var expireTime = moment(_this.updateData.timeFrom).add(1, 'm')._d;
                     const date = new Date(expireTime);
                     const minutes = date.getMinutes();
@@ -935,7 +956,7 @@ export default {
             _this.transferData = {};
             _this.transferData.durationType = 'minutes';
             _this.transferData.code = item.code;
-            _this.transferData.id = item._id;
+            _this.transferData._id = item._id;
             _this.dialogTransfer = true;
         },
         submitTransfer: debounce(async function (){

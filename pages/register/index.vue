@@ -519,7 +519,9 @@ export default {
         await _this.$axios.$get('/api/appointmentConfig/getData').then(
             (response) => {
                 _this.appointmentConfig = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
-                
+                if(_this.appointmentConfig.views == null || _this.appointmentConfig.views.length <= 0){
+                    _this.appointmentConfig.views = _this.statusData;
+                }
             },
             (error) => {
                 console.log('Error: ', error);

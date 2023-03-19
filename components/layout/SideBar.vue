@@ -43,6 +43,12 @@
                     <span slot="title">Khách hàng</span>
                 </el-menu-item>
             </nuxt-link>
+            <nuxt-link to="/workingCalendar" class="sidebar-nav-link">
+                <el-menu-item index="workingCalendar">
+                    <i class='bx bxs-calendar'></i>
+                    <span slot="title">Lịch làm việc</span>
+                </el-menu-item>
+            </nuxt-link>
             <nuxt-link to="/users" class="sidebar-nav-link">
                 <el-menu-item index="users">
                     <i class='bx bxs-user'></i>

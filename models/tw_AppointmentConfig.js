@@ -1,3 +1,4 @@
+import { appointmentStatus } from '../utils/masterData';
 export default function() {
 	this.workingTime = {
         apply: true,
@@ -45,7 +46,7 @@ export default function() {
                 label: 'Chủ nhật',
                 value: false
             },
-        ]
+        ],
     };
     this.autoRemind = {
         apply: true,
@@ -63,4 +64,5 @@ export default function() {
         notifyIsCancelled: true,
         notifyIsTranfer: true,
     };
+    this.views = appointmentStatus;
 }

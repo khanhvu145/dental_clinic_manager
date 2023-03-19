@@ -1,5 +1,6 @@
 const state = {
   accesses: [],
+  socketUser: null,
 }
 
 export default () => {
