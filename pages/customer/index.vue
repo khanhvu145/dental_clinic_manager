@@ -73,6 +73,10 @@
                             <el-table-column label="Thông tin khách hàng" min-width="150">
                                 <template slot-scope="scope">
                                     <div style="font-weight: bold;">  
+                                        <i class='bx bx-code-alt'></i>
+                                        {{ scope.row.code || '' }}
+                                    </div>
+                                    <div style="font-weight: bold;">  
                                         <i class='bx bx-user'></i>
                                         {{ scope.row.name || '' }}
                                     </div>

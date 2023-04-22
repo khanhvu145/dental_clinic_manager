@@ -50,51 +50,50 @@
                                 <div class="col-form-label">Ghi chú</div>
                                 <el-input 
                                     type="textarea"
-                                    :rows="4"
+                                    :rows="5"
                                     name="note"
                                     placeholder="Ghi chú"
                                     v-model="formData.note"
                                 ></el-input>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12 mt-3">
+                                <div class="col-form-label" style="font-size:20px;font-weight:bold;">Phân quyền</div>
                                 <div v-for="page in pages" :key="page.app">
                                     <div v-for="pageGroup in page['group']" :key="pageGroup.value">
-                                        <el-collapse id="custome-el-colapse" accordion class="percent-100" style="border: none; margin-top: 16px;">
-                                            <el-collapse-item name="1" class="mb-1">
+                                        <el-collapse id="custome-el-colapse" accordion class="percent-100" style="border: none;">
+                                            <el-collapse-item>
                                                 <template slot="title">
                                                     <div class="pl-2 w-100 text-black">
-                                                        {{ pageGroup.name }}
+                                                        Phân quyền nhóm người dùng
                                                     </div>
                                                 </template>
-                                                <div
-                                                    class="row mx-0 mt-2"
-                                                    style="border-bottom: 1px solid #eee"
-                                                    v-for="pageSub in pageGroup['pages']"
-                                                    :key="pageSub.value"
-                                                >
+                                                <div v-for="pageSub in pageGroup['pages']" :key="pageSub.value" :name="pageSub.value" class="row mx-0 pt-4 pb-4" style="border-bottom: 2px solid #eee;align-items:center;">
                                                     <div class="col-md-2 text-dark">
-                                                        <span style="font-weight: bold">{{ pageSub.name }}</span>
+                                                        <span style="font-weight:bold;">{{ pageSub.name }}</span>
                                                     </div>
                                                     <div class="col-md-10">
-                                                        <el-checkbox
-                                                            name="accessgroupkey"
-                                                            v-for="defaultRight in defaultRights"
-                                                            :key="defaultRight.value"
-                                                            :checked="checkAccessRight(`${pageSub.value}.${defaultRight.value}`)"
-                                                            :label="`${pageSub.value}.${defaultRight.value}`"
-                                                            >{{ defaultRight.name }}</el-checkbox
-                                                        >
-                                                        <el-checkbox
-                                                            name="accessgroupkey"
-                                                            v-for="customRight in pageSub.customRights"
-                                                            :key="customRight.value"
-                                                            :checked="checkAccessRight(`${pageSub.value}.${customRight.value}`)"
-                                                            :label="`${pageSub.value}.${customRight.value}`"
-                                                            >{{ customRight.name }}</el-checkbox
-                                                        >
+                                                        <div class="row">
+                                                            <div :class="'col-md-2' + (pageSub.hideDefaultRights ? ' hideDefaultRights' : '')" v-for="defaultRight in defaultRights" :key="defaultRight.value">
+                                                                <el-checkbox
+                                                                    v-if="!pageSub.hideDefaultRights"
+                                                                    name="accessgroupkey"
+                                                                    :checked="checkAccessRight(`${pageSub.value}.${defaultRight.value}`)"
+                                                                    :label="`${pageSub.value}.${defaultRight.value}`"
+                                                                    >{{ defaultRight.name }}</el-checkbox
+                                                                >
+                                                            </div>
+                                                            <div class="col-md-2" v-for="customRight in pageSub.customRights" :key="customRight.value">
+                                                                <el-checkbox
+                                                                    name="accessgroupkey"
+                                                                    :checked="checkAccessRight(`${pageSub.value}.${customRight.value}`)"
+                                                                    :label="`${pageSub.value}.${customRight.value}`"
+                                                                    >{{ customRight.name }}</el-checkbox
+                                                                >
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-									        </el-collapse-item>
+                                            </el-collapse-item>
                                         </el-collapse>
                                     </div>
                                 </div>
@@ -175,46 +174,55 @@ export default {
 											value: 'sendMail',
 										},
                                     ],
+                                    hideDefaultRights: false,
 								},
                                 {
                                     name: 'Cấu hình lịch hẹn',
 									value: 'appointmentConfig',
-                                    customRights: []
+                                    customRights: [],
+                                    hideDefaultRights: false,
                                 },
                                 {
 									name: 'Nhóm người dùng',
 									value: 'accessgroup',
 									customRights: [],
+                                    hideDefaultRights: false,
 								},
                                 {
 									name: 'Người dùng',
 									value: 'users',
 									customRights: [],
+                                    hideDefaultRights: false,
 								},
                                 {
 									name: 'Khách hàng',
 									value: 'customer',
 									customRights: [],
+                                    hideDefaultRights: false,
 								},
                                 {
 									name: 'Lịch làm việc',
 									value: 'workingCalendar',
 									customRights: [],
+                                    hideDefaultRights: false,
 								},
                                 {
 									name: 'Loại hình dịch vụ',
 									value: 'service',
 									customRights: [],
+                                    hideDefaultRights: false,
 								},
                                 {
 									name: 'Cấu hình chung',
 									value: 'generalconfig',
 									customRights: [],
+                                    hideDefaultRights: false,
 								},
                                 {
                                     name: 'Cấu hình SMTP',
 									value: 'smtpConfig',
-                                    customRights: []
+                                    customRights: [],
+                                    hideDefaultRights: false,
                                 },
                             ]
                         }
@@ -301,3 +309,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.hideDefaultRights{
+    display: none;
+}
+</style>

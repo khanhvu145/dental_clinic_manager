@@ -189,7 +189,7 @@
                                                 </div>
                                                 <div v-if="checkRight('sendMail') && scope.row.status == 'Booked'" class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Gửi nhắc hẹn" placement="left-start">
-                                                        <button class="control-btn blue" style="padding: 4px 6px;">
+                                                        <button class="control-btn blue" style="padding: 4px 6px;" @click="sendMail(scope.row._id)">
                                                             <i class='bx bx-mail-send'></i>
                                                         </button>
                                                     </el-tooltip>
@@ -964,7 +964,7 @@ export default {
             console.log(_this.transferData);
             _this.transferData.updatedBy = _this.userInfo.data.username;
             var newData = cloneDeep(_this.transferData);
-            const data = await _this.$axios.$put('/api/appointment/transferBooking', newData);
+            const data = await _this.$axios.$post('/api/appointment/transferBooking', newData);
             if (data.success) {
                 _this.dialogTransfer = false;
                 _this.transferData = {};
@@ -997,6 +997,26 @@ export default {
             }
             _this.dialogCalendarByDentist = false;
         },
+        async sendMail(id){
+            const _this = this;
+            _this.$confirm('Bạn có chắc muốn gửi email nhắc hẹn cho lịch hẹn này?', 'Xác nhận', {
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Đóng',
+                type: 'warning',
+                closeOnClickModal: false
+            }).then(async () => {
+                const data = await _this.$axios.$post('/api/appointment/sendMail', { id: id });
+                if(data.success){
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.getData(_this.searchQuery);
+                }else {
+                    _this.$message.error(data.error);
+                }
+            }).catch(() => {});
+        }
     },
 }
 </script>

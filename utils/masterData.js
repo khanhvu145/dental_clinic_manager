@@ -99,6 +99,40 @@ export const generalCategory = [
         active: true,
       }
     ]
+  },
+  {
+    key: 'examinationGeneral',
+    label: 'Khám và điều trị',
+    group: [
+      {
+        key: 'exam_anamnesis',
+        label: 'Tiền sử bệnh',
+        pickColor: false,
+        planHolder: 'Tiền sử bệnh',
+        active: true,
+      },
+      {
+        key: 'exam_allergy',
+        label: 'Loại dị ứng',
+        pickColor: false,
+        planHolder: 'Loại dị ứng',
+        active: true,
+      },
+      {
+        key: 'exam_xquang',
+        label: 'Loại X-Quang',
+        pickColor: false,
+        planHolder: 'Loại X-Quang',
+        active: true,
+      },
+      {
+        key: 'exam_test',
+        label: 'Loại xét nghiệm',
+        pickColor: false,
+        planHolder: 'Loại xét nghiệm',
+        active: true,
+      },
+    ]
   }
 ];
 
@@ -135,4 +169,150 @@ export const appointmentStatus = [
     textColor: "#909399",
     apply: true,
   }
+];
+
+export const anamnesisList = [
+  {
+    label: 'Chảy máu lâu',
+    value: 1,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Dị ứng thấp khớp',
+    value: 2,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Cao huyết áp',
+    value: 3,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Tim mạch',
+    value: 4,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Tiểu đường',
+    value: 5,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Bệnh phổi (lao, hen)',
+    value: 6,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Bệnh truyền nhiễm (HIV, viêm gan siêu vi,...)',
+    value: 7,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Bệnh cấp tính',
+    value: 8,
+    note: '',
+    isCheck: false,
+  },
+  {
+    label: 'Khác',
+    value: 9,
+    note: '',
+    isCheck: false,
+  },
+];
+
+export const xquangList = [
+  {
+    label: 'Panorex',
+    value: 1,
+    isCheck: false,
+  },
+  {
+    label: 'Cephalo',
+    value: 2,
+    isCheck: false,
+  },
+  {
+    label: 'Periapical',
+    value: 3,
+    isCheck: false,
+  },
+  {
+    label: 'Occlusal',
+    value: 4,
+    isCheck: false,
+  },
+  {
+    label: 'Face',
+    value: 5,
+    isCheck: false,
+  },
+  {
+    label: 'CT conebeam',
+    value: 6,
+    isCheck: false,
+  },
+  {
+    label: 'CT scan',
+    value: 7,
+    isCheck: false,
+  },
+  {
+    label: 'Hirtz',
+    value: 8,
+    isCheck: false,
+  },
+];
+
+export const testList = [
+  {
+    label: 'Máu',
+    value: 1,
+    isCheck: false,
+  },
+  {
+    label: 'Nước tiểu',
+    value: 2,
+    isCheck: false,
+  },
+  {
+    label: 'TS',
+    value: 3,
+    isCheck: false,
+  },
+  {
+    label: 'TC',
+    value: 4,
+    isCheck: false,
+  },
+  {
+    label: 'NGFL',
+    value: 5,
+    isCheck: false,
+  },
+  {
+    label: 'TQ',
+    value: 6,
+    isCheck: false,
+  },
+  {
+    label: 'TCK',
+    value: 7,
+    isCheck: false,
+  },
+];
+
+export const allergyList = [
+  {
+    label: 'Máu',
+    value: 1,
+    isCheck: false,
+  },
 ];

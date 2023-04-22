@@ -128,6 +128,50 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                     isActive: item.isActive,
                 };
             })
+        case 'generalConfigExamAnamnesis': // Tiền sử bệnh
+            const examAnamnesisData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_anamnesis', isActive: true });
+            var examAnamnesis = examAnamnesisData.data['exam_anamnesis'];
+            return examAnamnesis.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
+        case 'generalConfigExamAllergy': // Dị ứng
+            const examAllergyData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_allergy', isActive: true });
+            var examAllergy = examAllergyData.data['exam_allergy'];
+            return examAllergy.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
+        case 'generalConfigExamXquang': // Xquang
+            const examXquangData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_xquang', isActive: true });
+            var examXquang = examXquangData.data['exam_xquang'];
+            return examXquang.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
+        case 'generalConfigExamTest': // Test
+            const examTestData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_test', isActive: true });
+            var examTest = examTestData.data['exam_test'];
+            return examTest.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
     }
     return [];
 }

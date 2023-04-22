@@ -7,7 +7,7 @@
                         <div class="title titleAfter mb-0">Lịch làm việc</div>
                     </div>
                 </div>
-                <div class="row mt-4" v-loading="dataLoading">
+                <div class="row mt-4 mb-4" v-loading="dataLoading">
                     <div class="col-md-12">
                         <WorkingCalendar v-if="isCheck" :listAppointments="listAppointments" ref="workingCalendarComponent" />
                     </div>
