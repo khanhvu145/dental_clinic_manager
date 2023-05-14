@@ -220,3 +220,7 @@ a:hover {
 	background-color: #fff;
 	color: #3b3b3b;
 }
+
+.inputTextRight input{
+    text-align: right;
+}

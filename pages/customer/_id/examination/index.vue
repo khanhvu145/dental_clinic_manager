@@ -32,7 +32,7 @@
                                         <!-- Thông tin khách hàng -->
                                         <div class="row">
                                             <div class="col-md-12 mb-2">
-                                                <span style="font-weight: bold;font-size:15px;">Thông tin khách hàng:</span>
+                                                <span style="font-weight: bold;font-size:16px;">Thông tin khách hàng:</span>
                                             </div>
                                             <div class="col-md-6 mb-2">
                                                 Mã khách hàng:
@@ -62,7 +62,7 @@
                                         <!-- Tiền sử bệnh -->
                                         <div class="row">
                                             <div class="col-md-12 mb-2">
-                                                <span style="font-weight: bold;font-size:15px;">Tiền sử bệnh:</span>
+                                                <span style="font-weight: bold;font-size:16px;">Tiền sử bệnh:</span>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="row" style="border: 1px solid #dddddd;">
@@ -96,7 +96,7 @@
                                         <!-- Dị ứng -->
                                         <div class="row mt-3">
                                             <div class="col-md-12 mb-2">
-                                                <span style="font-weight: bold;font-size:15px;">Dị ứng:</span>
+                                                <span style="font-weight: bold;font-size:16px;">Dị ứng:</span>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="row">
@@ -123,7 +123,7 @@
                                         <!-- Khám lâm sàng -->
                                         <div class="row mt-3">
                                             <div class="col-md-12 mb-2">
-                                                <span style="font-weight: bold;font-size:15px;">Khám lâm sàng:</span>
+                                                <span style="font-weight: bold;font-size:16px;">Khám lâm sàng:</span>
                                             </div>
                                             <div class="col-md-12">
                                                 <el-input type="textarea" :rows="6" placeholder="Nhập nội dung" v-model="formData.clinicalExam"></el-input>
@@ -132,14 +132,18 @@
                                         <!-- Khám cận lâm sàng -->
                                         <div class="row mt-3">
                                             <div class="col-md-12 mb-2">
-                                                <span style="font-weight: bold;font-size:15px;">Khám cận lâm sàng:</span>
+                                                <span style="font-weight: bold;font-size:16px;">Khám cận lâm sàng:</span>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="row">
                                                     <div class="col-md-2">X-quang:</div>
                                                     <div class="col-md-10">
                                                         <el-checkbox-group v-model="formData.preclinicalExam.xquang">
-                                                            <el-checkbox v-for="(item, index) in xquangData" :key="index" :label="item.value">{{item.label}}</el-checkbox>
+                                                            <div class="row">
+                                                                <div class="col-md-2" v-for="(item, index) in xquangData" :key="index">
+                                                                    <el-checkbox :label="item.value">{{item.label}}</el-checkbox>
+                                                                </div>
+                                                            </div>
                                                         </el-checkbox-group>
                                                     </div>
                                                 </div>
@@ -147,7 +151,11 @@
                                                     <div class="col-md-2">Xét nghiệm:</div>
                                                     <div class="col-md-10">
                                                         <el-checkbox-group v-model="formData.preclinicalExam.test">
-                                                            <el-checkbox v-for="(item, index) in testData" :key="index" :label="item.value">{{item.label}}</el-checkbox>
+                                                            <div class="row">
+                                                                <div class="col-md-2" v-for="(item, index) in testData" :key="index">
+                                                                    <el-checkbox :label="item.value">{{item.label}}</el-checkbox>
+                                                                </div>
+                                                            </div>
                                                         </el-checkbox-group>
                                                     </div>
                                                 </div>
@@ -171,38 +179,21 @@
                                     <div class="attachFile-content mt-3 mb-4" style="padding:0 12px;">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button class="control-btn green" style="float:right;" @click="openDialogAttachFile">
+                                                <button class="control-btn green" style="float:right;" @click="addDesignation">
                                                     <i class='bx bxs-file-plus'></i>
                                                     Thêm chỉ định mới
                                                 </button>
                                             </div>
                                         </div>
-
-                                        <!-- Dialog working calendar detail -->
-                                        <el-dialog title="Thêm chỉ định mới" :visible.sync="dialogAttachFile" :close-on-click-modal="false" width="60%">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="col-form-label">Tên chỉ định *</div>
-                                                    <el-input 
-                                                        name="name"
-                                                        placeholder="Tên chỉ định"
-                                                        v-model="dialogAttachFileData.name"
-                                                        required
-                                                    ></el-input>
-                                                </div>
-                                                <div class="col-md-12 mt-3">
-                                                    <div class="col-form-label">File và hình ảnh</div>
-                                                </div>
+                                        <div class="row mt-3">
+                                            <div class="col-xl-6 mb-3" v-for="(item, index) in formData.attachFiles" :key="index">
+                                                <Designation 
+                                                    :data="item" 
+                                                    :designationTypeData="designationTypeData"
+                                                    @removeDesignation="(newValue) => removeDesignation(newValue)"
+                                                ></Designation>
                                             </div>
-                                            <span slot="footer" class="dialog-footer">
-                                                <button class="control-btn green">
-                                                    Lưu
-                                                </button>
-                                                <button type="button" class="control-btn gray" @click="dialogAttachFile = false">
-                                                    <span>Đóng</span>
-                                                </button>
-                                            </span>
-                                        </el-dialog>
+                                        </div>
                                     </div>
                                 </el-collapse-item>
                                 <!-- Chẩn đoán và điều trị -->
@@ -212,7 +203,50 @@
                                             Chẩn đoán và điều trị
                                         </div>
                                     </template>
-                                    <div class="row mx-0 pt-4 pb-4">
+                                    <div class="examination-content mt-3 mb-4" style="padding:0 12px;">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button class="control-btn green" style="float:right;" @click="addExamination">
+                                                    <i class='bx bx-list-plus'></i>
+                                                    Thêm mới
+                                                </button>
+                                                <ExaminationDialog 
+                                                    :dialog="addExaminationDialog"
+                                                ></ExaminationDialog>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <el-table :data="tableData" style="width: 100%" stripe>
+                                                    <el-table-column label="Răng" min-width="60">
+
+                                                    </el-table-column>
+                                                    <el-table-column label="Tình trạng răng" min-width="120">
+                                                        
+                                                    </el-table-column>
+                                                    <el-table-column label="Thủ thuật điều trị" min-width="120">
+                                                        
+                                                    </el-table-column>
+                                                    <el-table-column label="Đơn giá" min-width="100">
+                                                        
+                                                    </el-table-column>
+                                                    <el-table-column label="Giảm giá" min-width="100">
+                                                        
+                                                    </el-table-column>
+                                                    <el-table-column label="Thành tiền" min-width="100">
+                                                        
+                                                    </el-table-column>
+                                                    <el-table-column label="Ghi chú" min-width="100">
+                                                        
+                                                    </el-table-column>
+                                                    <el-table-column label="Thao tác" min-width="60">
+                                                        
+                                                    </el-table-column>
+                                                </el-table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="row mx-0 pt-4 pb-4">
                                         <div class="col-md-12">
                                             <el-checkbox-group v-model="checkboxGroup1" size="mini">
                                                 <el-checkbox-button>
@@ -224,6 +258,13 @@
                                                     </template>
                                                 </el-checkbox-button>
                                             </el-checkbox-group>
+                                            <button class="control-btn green mb-3" style="float:right;" @click="addDesignation">
+                                                <i class='bx bx-list-plus'></i>
+                                                Thêm mới
+                                            </button>
+                                            <ExaminationDialog 
+                                                :dialogVisible="examinationDialog"
+                                            ></ExaminationDialog>
                                         </div>
                                         <div class="col-md-12">
                                             <el-table :data="tableData" style="width: 100%" stripe>
@@ -253,7 +294,7 @@
                                                 </el-table-column>
                                             </el-table>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </el-collapse-item>
                             </el-collapse>
                         </div>
@@ -299,14 +340,18 @@ import Customer from '@/models/tw_Customer';
 import Examination from '@/models/tw_Examination';
 import LeftMenu from '@/components/customer/LeftMenu';
 import ImageUpload from '@/components/common/ImageUpload.vue';
-import { cloneDeep, debounce, intersection } from 'lodash';
-import { genderData, anamnesisList, xquangList, testList } from '@/utils/masterData';
+import Designation from '@/components/customer/Designation.vue';
+import ExaminationDialog from '@/components/customer/ExaminationDialog.vue';
+import { cloneDeep, debounce, intersection, remove } from 'lodash';
+import { genderData, anamnesisList, xquangList, testList, milkTooth, permanentTeeth } from '@/utils/masterData';
 import buildFormData from '@/utils/buildFormData';
 import moment from 'moment';
 export default {
     components: {
 		LeftMenu,
-        ImageUpload
+        ImageUpload,
+        Designation,
+        ExaminationDialog
 	},
     computed: {
 		...mapState({
@@ -325,11 +370,13 @@ export default {
             xquangData: xquangList,
             testData: testList,
             formData: new Examination(),
-            dialogAttachFile: false,
-            dialogAttachFileData: {
-                name: '',
-                file: []
-            }
+            designationTypeData: [],
+            permanentTeethData: permanentTeeth,
+            milkToothData: milkTooth,
+            addExaminationDialog: {
+                visible: false,
+                type: 'create'
+            },
         }
     },
     async created() { 
@@ -366,6 +413,8 @@ export default {
         _this.xquangData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamXquang' })) || [];
         //Lấy danh sách loại xét nghiệm
         _this.testData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamTest' })) || [];
+        //Lấy danh sách loại chỉ định
+        _this.designationTypeData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigDesignationType' })) || [];
     },
     methods: {
         checkRight(right) {
@@ -383,9 +432,25 @@ export default {
             console.log(_this.formData)
             // _this.isExam = false;
         },
-        openDialogAttachFile(){
+        addDesignation(){
             const _this = this;
-            _this.dialogAttachFile = true;
+            var index = _this.formData.attachFiles.length <= 0 ? 1 : _this.formData.attachFiles[_this.formData.attachFiles.length - 1].key + 1;
+            _this.formData.attachFiles.push({
+                key: index,
+                type: '',
+                files: [],
+                fileList: [],
+            });
+        },
+        removeDesignation(key) {
+            const _this = this;
+            var newArr = _this.formData.attachFiles.filter(item => item.key !== key);
+            _this.formData.attachFiles = newArr
+        },
+        addExamination(){
+            const _this = this;
+            _this.addExaminationDialog.visible = true;
+            _this.addExaminationDialog.type = 'create';
         }
     }
 }

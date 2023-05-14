@@ -268,3 +268,10 @@
 .el-radio-button__inner:hover{
     color: #74bc20;
 }
+.el-upload--picture-card:hover, .el-upload:focus {
+    border-color: #74bc20 !important;
+    color: #74bc20;
+}
+.el-upload--picture-card:hover i, .el-upload:focus i {
+    color: #74bc20;
+}

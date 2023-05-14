@@ -85,7 +85,7 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                     isActive: item.isActive,
                 };
             })
-        case 'serviceGroupData':
+        case 'serviceGroupData': //Nhóm dịch vụ
             var searchQuery = {
                 filters: {
                     nameF: '',
@@ -104,6 +104,29 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                 return {
                     value: item._id,
                     label: item.name,
+                }
+            })
+        case 'serviceData': //Dịch vụ
+            var searchQuery = {
+                filters: {
+                    nameF: '',
+                    codeF: '',
+                    groupF: '',
+                    statusF: true
+                },
+                sorts: 'name&&1',
+                pages:{
+                    from: 0,
+                    size: 1000
+                }
+            };
+            const serviceData = await this.$axios.$post('/api/service/getByQuery', searchQuery);
+            var service = serviceData.data;
+            return service.map(item => {
+                return {
+                    value: item._id,
+                    label: item.name,
+                    serviceGroupId: item.groupId
                 }
             })
         case 'generalConfigAppointmentType': // Loại lịch hẹn
@@ -165,6 +188,17 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
             const examTestData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_test', isActive: true });
             var examTest = examTestData.data['exam_test'];
             return examTest.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
+        case 'generalConfigDesignationType': // Loại chỉ định
+            const examDesignationTypeData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_designationType', isActive: true });
+            var examDesignationType = examDesignationTypeData.data['exam_designationType'];
+            return examDesignationType.map((item) => {
                 return {
                     value: item._id,
                     label: item.value,

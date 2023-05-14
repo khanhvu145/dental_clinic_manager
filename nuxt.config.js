@@ -37,6 +37,7 @@ export default {
 		'@/plugins/element-ui',
     '@/plugins/lodash',
     '@/plugins/async-computed',
+    '@/plugins/icons',
   ],
 
   router: {

@@ -93,7 +93,7 @@
                         </el-table-column>
                         <el-table-column label="Đơn vị tính" min-width="80">
                             <template slot-scope="scope">
-                                <div>{{ unitData.find(e => e.value == scope.row.unit) ? unitData.find(e => e.value == scope.row.unit).label : '' }}</div>
+                                <div>{{ scope.row.unit == 'unit1' ? 'Răng' : scope.row.unit == 'unit2' ? 'Hàm' : '' }}</div>
                             </template>
                         </el-table-column>
                         <el-table-column label="Trạng thái" min-width="80">
@@ -202,13 +202,15 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="col-form-label">Đơn vị tính</div>
-                                <el-select v-model="createData.unit" placeholder="Đơn vị tính" name="unit" filterable>
-                                    <el-option
+                                <el-select v-model="createData.unit" name="unit">
+                                    <el-option label="Răng" value="unit1"></el-option>
+                                    <el-option label="Hàm" value="unit2"></el-option>
+                                    <!-- <el-option
                                         v-for="item in unitData"
                                         :key="item.value"
                                         :label="item.label"
                                         :value="item.value"
-                                    ></el-option>
+                                    ></el-option> -->
                                 </el-select>
                             </div>
                         </div>
@@ -293,13 +295,15 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="col-form-label">Đơn vị tính</div>
-                                <el-select v-model="updateData.unit" placeholder="Đơn vị tính" name="unit" filterable>
-                                    <el-option
+                                <el-select v-model="updateData.unit" name="unit">
+                                    <el-option label="Răng" value="unit1"></el-option>
+                                    <el-option label="Hàm" value="unit2"></el-option>
+                                    <!-- <el-option
                                         v-for="item in unitData"
                                         :key="item.value"
                                         :label="item.label"
                                         :value="item.value"
-                                    ></el-option>
+                                    ></el-option> -->
                                 </el-select>
                             </div>
                         </div>
@@ -396,7 +400,7 @@ export default {
         const _this = this;
         _this.getData(_this.searchQuery);
         _this.groupData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
-        _this.unitData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigUnit' })) || [];
+        // _this.unitData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigUnit' })) || [];
     },
     methods: {
         checkRight(right) {
