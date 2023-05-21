@@ -61,7 +61,7 @@
                 <div class="col-md-7 mt-2"></div>
                 <div class="col-md-2">
                     <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                        <button class="control-btn blue" @click="dialogCreateService = true" v-if="(checkRight('create'))">
+                        <button class="control-btn blue" @click="openCreateDialog" v-if="(checkRight('create'))">
                             <i class='bx bx-plus' ></i>
                             Thêm
                         </button>
@@ -192,13 +192,28 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="col-form-label">Giá dịch vụ</div>
-                                <el-input 
+                                <vue-autonumeric
+                                    v-model="createData.price"
+                                    class="el-input__inner"
+                                    placeholder="Giá dịch vụ"
+                                    :options="{
+                                        decimalPlaces: 0,
+                                        digitGroupSeparator: ',',
+                                        decimalCharacter: '.',
+                                        decimalCharacterAlternative: '.',
+                                        currencySymbol: '\u00a0VND',
+                                        currencySymbolPlacement: 's',
+                                        roundingMethod: 'U',
+                                        minimumValue: '0',
+                                    }"
+                                ></vue-autonumeric>
+                                <!-- <el-input 
                                     name="price"
                                     placeholder="Giá dịch vụ"
                                     v-model="createData.price"
                                 >
                                     <template slot="append">VND</template>
-                                </el-input>
+                                </el-input> -->
                             </div>
                             <div class="col-md-6">
                                 <div class="col-form-label">Đơn vị tính</div>
@@ -285,13 +300,28 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="col-form-label">Giá dịch vụ *</div>
-                                <el-input 
+                                <vue-autonumeric
+                                    v-model="updateData.price"
+                                    class="el-input__inner"
+                                    placeholder="Giá dịch vụ"
+                                    :options="{
+                                        decimalPlaces: 0,
+                                        digitGroupSeparator: ',',
+                                        decimalCharacter: '.',
+                                        decimalCharacterAlternative: '.',
+                                        currencySymbol: '\u00a0VND',
+                                        currencySymbolPlacement: 's',
+                                        roundingMethod: 'U',
+                                        minimumValue: '0',
+                                    }"
+                                ></vue-autonumeric>
+                                <!-- <el-input 
                                     name="price"
                                     placeholder="Giá dịch vụ"
                                     v-model="updateData.price"
                                 >
                                     <template slot="append">VND</template>
-                                </el-input>
+                                </el-input> -->
                             </div>
                             <div class="col-md-6">
                                 <div class="col-form-label">Đơn vị tính</div>
@@ -344,6 +374,7 @@ import { mapState } from 'vuex';
 import { statusData } from '@/utils/masterData';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import Service from '@/models/tw_Service';
+import VueAutonumeric from 'vue-autonumeric';
 export default {
     computed: {
 		...mapState({
@@ -351,6 +382,9 @@ export default {
             userInfo: (state) => state.auth.user,
 		}),
 	},
+    components: {
+        'vue-autonumeric': VueAutonumeric,
+    },
     data() {
         return {
             data: {},
@@ -501,6 +535,11 @@ export default {
                 _this.$message.error(data.error);
             }
         }),
+        openCreateDialog(){
+            const _this = this;
+            _this.createData = new Service();
+            _this.dialogCreateService = true;
+        }
     }
 }
 </script>

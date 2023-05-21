@@ -8,7 +8,7 @@
                 </button>
             </div>
         </div>
-        <div v-if="isExam" class="row mt-3 mb-4">
+        <form v-if="isExam" class="row mt-3 mb-4" v-loading="dataLoading" v-on:submit.prevent="submitForm">
             <div class="col-md-12">
                 <el-card class="box-card">
                     <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
@@ -206,95 +206,105 @@
                                     <div class="examination-content mt-3 mb-4" style="padding:0 12px;">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button class="control-btn green" style="float:right;" @click="addExamination">
+                                                <button class="control-btn green" style="float:right;" @click="openExaminationDialog('create')">
                                                     <i class='bx bx-list-plus'></i>
                                                     Thêm mới
                                                 </button>
-                                                <ExaminationDialog 
+                                                <el-dialog
+                                                    :visible.sync='diagnosisTreatment.visible'
+                                                    width='95%'
+                                                    title="Thêm/sửa chẩn đoán và điều trị"
+                                                    :close-on-click-modal="false"
+                                                >
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <DiagnosisTreatment 
+                                                                :data="diagnosisTreatment.data"
+                                                                :serviceGroupData="serviceGroupData"
+                                                                :serviceData="serviceData"
+                                                            ></DiagnosisTreatment>
+                                                        </div>
+                                                    </div>
+                                                    <span slot="footer" class="dialog-footer">
+                                                        <button type="button" class="control-btn gray" @click="resetDiagnosisTreatment">
+                                                            <span>Đóng</span>
+                                                        </button>
+                                                        <button
+                                                            v-if="diagnosisTreatment.type == 'create'"
+                                                            type="button" 
+                                                            class="control-btn green"
+                                                            @click="addExamination()"
+                                                        >
+                                                            <span>Thêm</span>
+                                                        </button>
+                                                        <button
+                                                            v-else-if="diagnosisTreatment.type == 'update'"
+                                                            type="button" 
+                                                            class="control-btn green"
+                                                            @click="updateExamination"
+                                                        >
+                                                            <span>Cập nhật</span>
+                                                        </button>
+                                                    </span>
+                                                </el-dialog>
+                                                <!-- <ExaminationDialog 
                                                     :dialog="addExaminationDialog"
-                                                ></ExaminationDialog>
+                                                    @addExamination="(data) => addExamination(data)"
+                                                ></ExaminationDialog> -->
                                             </div>
                                         </div>
                                         <div class="row mt-3">
                                             <div class="col-md-12">
-                                                <el-table :data="tableData" style="width: 100%" stripe>
-                                                    <el-table-column label="Răng" min-width="60">
-
+                                                <el-table :data="tableData" v-loading="tableLoading" style="width: 100%" stripe>
+                                                    <el-table-column label="#" min-width="40">
+                                                        <template slot-scope="scope">
+                                                            {{ scope.row.key }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Tình trạng răng" min-width="120">
-                                                        
+                                                    <el-table-column label="Răng/hàm" min-width="150">
+                                                        <template slot-scope="scope">
+                                                            {{ getToothName(scope.row.isJaw, scope.row.toothList, scope.row.jaw[0]) }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Thủ thuật điều trị" min-width="120">
-                                                        
+                                                    <el-table-column label="Chẩn đoán" min-width="200">
+                                                        <template slot-scope="scope">
+                                                            {{ scope.row.diagnose }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Đơn giá" min-width="100">
-                                                        
+                                                    <el-table-column label="Điều trị" min-width="150">
+                                                        <template slot-scope="scope">
+                                                            {{ getServiceName(scope.row.serviceId) }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Giảm giá" min-width="100">
-                                                        
+                                                    <el-table-column label="Đơn giá" min-width="120">
+                                                        <template slot-scope="scope">
+                                                            {{ (scope.row.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Thành tiền" min-width="100">
-                                                        
+                                                    <el-table-column label="Giảm giá" min-width="120">
+                                                        <template slot-scope="scope">
+                                                            {{ (scope.row.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Ghi chú" min-width="100">
-                                                        
+                                                    <el-table-column label="Tổng chi phí" min-width="120">
+                                                        <template slot-scope="scope">
+                                                            {{ (scope.row.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                                        </template>
                                                     </el-table-column>
-                                                    <el-table-column label="Thao tác" min-width="60">
-                                                        
+                                                    <el-table-column label="Thao tác" min-width="100">
+                                                        <template slot-scope="scope">
+                                                            <button class="control-btn blue2" style="padding: 4px 6px;" @click="openExaminationDialog('update', scope.row)">
+                                                                <i class="el-icon-edit-outline"></i>
+                                                            </button>
+                                                            <button class="control-btn red" style="padding: 4px 6px;" @click="removeExamination(scope.row.key)">
+                                                                <i class='bx bx-trash'></i>
+                                                            </button>
+                                                        </template>
                                                     </el-table-column>
                                                 </el-table>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- <div class="row mx-0 pt-4 pb-4">
-                                        <div class="col-md-12">
-                                            <el-checkbox-group v-model="checkboxGroup1" size="mini">
-                                                <el-checkbox-button>
-                                                    <template>
-                                                        <div class="tooth-content">
-                                                            <i class='bx bx-sushi'></i>
-                                                            <img class="tooth-img" src="/images/tooth.png" alt="">
-                                                        </div>
-                                                    </template>
-                                                </el-checkbox-button>
-                                            </el-checkbox-group>
-                                            <button class="control-btn green mb-3" style="float:right;" @click="addDesignation">
-                                                <i class='bx bx-list-plus'></i>
-                                                Thêm mới
-                                            </button>
-                                            <ExaminationDialog 
-                                                :dialogVisible="examinationDialog"
-                                            ></ExaminationDialog>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <el-table :data="tableData" style="width: 100%" stripe>
-                                                <el-table-column label="Răng" min-width="60">
-
-                                                </el-table-column>
-                                                <el-table-column label="Tình trạng răng" min-width="120">
-                                                    
-                                                </el-table-column>
-                                                <el-table-column label="Thủ thuật điều trị" min-width="120">
-                                                    
-                                                </el-table-column>
-                                                <el-table-column label="Đơn giá" min-width="100">
-                                                    
-                                                </el-table-column>
-                                                <el-table-column label="Giảm giá" min-width="100">
-                                                    
-                                                </el-table-column>
-                                                <el-table-column label="Thành tiền" min-width="100">
-                                                    
-                                                </el-table-column>
-                                                <el-table-column label="Ghi chú" min-width="100">
-                                                    
-                                                </el-table-column>
-                                                <el-table-column label="Thao tác" min-width="60">
-                                                    
-                                                </el-table-column>
-                                            </el-table>
-                                        </div>
-                                    </div> -->
                                 </el-collapse-item>
                             </el-collapse>
                         </div>
@@ -303,24 +313,61 @@
                         <div class="col-md-12">
                             <div class="col-form-label" style="font-weight:bold;">TỔNG CHI PHÍ ĐIỀU TRỊ</div>
                             <div class="row">
-                                <div class="col-md-12 ml-3" style="font-size:14px;">
-                                    Chi phí điều trị: <span style="font-weight:bold;"></span>
+                                <div class="col-md-4">
+                                    <table class="table table-borderless" style="font-size:14px;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:45%">Chi phí điều trị</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:50%">
+                                                    <span style="font-weight:bold;">{{ formData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:45%">Giảm giá</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:50%">
+                                                    <span style="font-weight:bold;">{{ formData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:45%">Thành tiền</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:50%">
+                                                    <span style="font-weight:bold;">{{ formData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- <div class="col-md-12 ml-3" style="font-size:14px;">
+                                    Chi phí điều trị <span class="ml-4 mr-4">:</span> <span style="font-weight:bold;">{{ formData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
                                 </div>
                                 <div class="col-md-12 mt-3 ml-3" style="font-size:14px;">
-                                    Giảm giá: <span style="font-weight:bold;"></span>
+                                    Giảm giá <span class="ml-4 mr-4">:</span> <span style="font-weight:bold;">{{ formData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
                                 </div>
                                 <div class="col-md-12 mt-3 ml-3" style="font-size:14px;">
-                                    Tổng chi phí điều trị: <span style="font-weight:bold;"></span>
-                                </div>
+                                    Thành tiền <span class="ml-4 mr-4">:</span> <span style="font-weight:bold;">{{ formData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                </div> -->
                             </div>
                         </div>
                         <div class="col-md-12">
                             
                         </div>
                     </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12" style="text-align: right;">
+                            <button type="button" class="control-btn green" @click="$router.push('/customer')">
+                                <span>Lưu phiếu khám</span>
+                            </button>
+                            <button type="button" class="control-btn yellow" @click="$router.push('/customer')">
+                                <span>Lưu & xuất phiếu khám</span>
+                            </button>
+                        </div>
+                    </div>
                 </el-card>
             </div>
-        </div>
+        </form>
         <div v-else class="row">
             <div class="col-md-12">
                 <el-empty description="Tạo phiếu khám mới để bắt đầu khám và điều trị.">
@@ -342,6 +389,7 @@ import LeftMenu from '@/components/customer/LeftMenu';
 import ImageUpload from '@/components/common/ImageUpload.vue';
 import Designation from '@/components/customer/Designation.vue';
 import ExaminationDialog from '@/components/customer/ExaminationDialog.vue';
+import DiagnosisTreatment from '@/components/customer/DiagnosisTreatment.vue';
 import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import { genderData, anamnesisList, xquangList, testList, milkTooth, permanentTeeth } from '@/utils/masterData';
 import buildFormData from '@/utils/buildFormData';
@@ -351,7 +399,8 @@ export default {
 		LeftMenu,
         ImageUpload,
         Designation,
-        ExaminationDialog
+        ExaminationDialog,
+        DiagnosisTreatment
 	},
     computed: {
 		...mapState({
@@ -361,8 +410,10 @@ export default {
 	},
     data(){
         return {
+            dataLoading: true,
             isExam: false,
             tableData: [],
+            tableLoading: false,
             checkboxGroup1: false,
             customerInfo: new Customer(),
             anamnesisData: [],
@@ -375,8 +426,30 @@ export default {
             milkToothData: milkTooth,
             addExaminationDialog: {
                 visible: false,
-                type: 'create'
+                type: 'create',
+                data: {},
             },
+            diagnosisTreatment: {
+                visible: false,
+                type: 'create',
+                data: {
+                    key: 0,
+                    toothType: 'permanentTeeth',
+                    isJaw: false,
+                    jaw: [],
+                    toothList: [],
+                    diagnose: '',
+                    serviceGroupId: '',
+                    serviceId: '',
+                    quantity: 0,
+                    quantityJaw: 0,
+                    unitPrice: 0,
+                    discount: 0,
+                    totalPrice: 0,
+                }
+            },
+            serviceGroupData: [],
+            serviceData: [],
         }
     },
     async created() { 
@@ -415,6 +488,23 @@ export default {
         _this.testData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamTest' })) || [];
         //Lấy danh sách loại chỉ định
         _this.designationTypeData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigDesignationType' })) || [];
+        //Lấy danh sách nhóm dịch vụ
+         _this.serviceGroupData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
+        //Lấy danh sách dịch vụ
+        const services = await this.$axios.$post('/api/service/getByQuery', {
+            filters: {
+                nameF: '',
+                codeF: '',
+                groupF: '',
+                statusF: true
+            },
+            sorts: 'name&&1',
+            pages:{
+                from: 0,
+                size: 1000
+            }
+        });
+        _this.serviceData = services.data;
     },
     methods: {
         checkRight(right) {
@@ -426,6 +516,7 @@ export default {
         async addExamForm(){
             const _this = this;
             _this.isExam = true;
+            _this.dataLoading = false;
         },
         async deleteExamForm(){
             const _this = this;
@@ -447,10 +538,250 @@ export default {
             var newArr = _this.formData.attachFiles.filter(item => item.key !== key);
             _this.formData.attachFiles = newArr
         },
+        openExaminationDialog(type, data){
+            const _this = this;
+            if(type == 'create'){
+                _this.diagnosisTreatment = {
+                    visible: true,
+                    type: 'create',
+                    data: {
+                        key: 0,
+                        toothType: 'permanentTeeth',
+                        isJaw: false,
+                        jaw: [],
+                        toothList: [],
+                        diagnose: '',
+                        serviceGroupId: '',
+                        serviceId: '',
+                        quantity: 0,
+                        quantityJaw: 0,
+                        unitPrice: 0,
+                        discount: 0,
+                        totalPrice: 0,
+                    }
+                };
+            }
+            else if(type == 'update'){
+                _this.diagnosisTreatment = {
+                    visible: true,
+                    type: 'update',
+                    data: {
+                        ...data
+                    }
+                };
+            }
+        },
         addExamination(){
             const _this = this;
-            _this.addExaminationDialog.visible = true;
-            _this.addExaminationDialog.type = 'create';
+            _this.tableLoading = true;
+            //#region Kiểm tra điều kiện
+            if(_this.diagnosisTreatment.data.serviceId == null || _this.diagnosisTreatment.data.serviceId == ''){
+                return _this.$message({
+                    message: 'Vui lòng chọn thủ thuật điều trị',
+                    type: 'error',
+                });
+            }
+            else{
+                var service = _.find(_this.serviceData, function(item) {
+                    if (item._id == _this.diagnosisTreatment.data.serviceId) {
+                        return item;
+                    }
+                });
+                if(service){
+                    if(service.unit == 'unit2'){
+                        if(!_this.diagnosisTreatment.data.isJaw){
+                            return _this.$message({
+                                message: 'Dịch vụ đã chọn được điều trị và thanh toán theo số hàm!',
+                                type: 'error',
+                            });
+                        }
+                    }
+                    else{
+                        if(_this.diagnosisTreatment.data.isJaw){
+                            return _this.$message({
+                                message: 'Dịch vụ đã chọn được điều trị và thanh toán theo số răng!',
+                                type: 'error',
+                            });
+                        }
+                    }
+                }
+                else{
+                    return _this.$message({
+                        message: 'Có lỗi xảy ra.',
+                        type: 'error',
+                    });
+                }
+            }
+            if(_this.diagnosisTreatment.data.quantity == 0 && _this.diagnosisTreatment.data.quantityJaw == 0){
+                return _this.$message({
+                    message: 'Vui lòng chọn răng/hàm điều trị',
+                    type: 'error',
+                });
+            }
+            //#endregion
+
+            //#region Xử lý
+            if(_this.tableData.length == 0){
+                _this.diagnosisTreatment.data.key = 1;
+            }
+            else{
+                _this.diagnosisTreatment.data.key = _this.tableData.length + 1;
+            }
+            _this.tableData.push(_this.diagnosisTreatment.data);
+            _this.resetDiagnosisTreatment();
+            //#endregion
+            setTimeout(async function () {
+                _this.calculateAmount();
+                _this.tableLoading = false;
+            }, 500);
+        },
+        updateExamination(){
+            const _this = this;
+            _this.tableLoading = true;
+            //#region Kiểm tra điều kiện
+            if(_this.diagnosisTreatment.data.serviceId == null || _this.diagnosisTreatment.data.serviceId == ''){
+                return _this.$message({
+                    message: 'Vui lòng chọn thủ thuật điều trị',
+                    type: 'error',
+                });
+            }
+            else{
+                var service = _.find(_this.serviceData, function(item) {
+                    if (item._id == _this.diagnosisTreatment.data.serviceId) {
+                        return item;
+                    }
+                });
+                if(service){
+                    if(service.unit == 'unit2'){
+                        if(!_this.diagnosisTreatment.data.isJaw){
+                            return _this.$message({
+                                message: 'Dịch vụ đã chọn được điều trị và thanh toán theo số hàm!',
+                                type: 'error',
+                            });
+                        }
+                    }
+                    else{
+                        if(_this.diagnosisTreatment.data.isJaw){
+                            return _this.$message({
+                                message: 'Dịch vụ đã chọn được điều trị và thanh toán theo số răng!',
+                                type: 'error',
+                            });
+                        }
+                    }
+                }
+                else{
+                    return _this.$message({
+                        message: 'Có lỗi xảy ra.',
+                        type: 'error',
+                    });
+                }
+            }
+            if(_this.diagnosisTreatment.data.quantity == 0 && _this.diagnosisTreatment.data.quantityJaw == 0){
+                return _this.$message({
+                    message: 'Vui lòng chọn răng/hàm điều trị',
+                    type: 'error',
+                });
+            }
+            //#endregion
+
+            //#region Xử lý
+            _this.tableData = _.map(_this.tableData, item => {
+                if(item.key == _this.diagnosisTreatment.data.key){
+                    return _this.diagnosisTreatment.data;
+                }
+                else{
+                    return item;
+                }
+            });
+            _this.resetDiagnosisTreatment();
+            //#endregion
+
+            setTimeout(async function () {
+                _this.calculateAmount();
+                _this.tableLoading = false;
+            }, 500);
+        },
+        getToothName(isJaw, toothList, jaw){
+            const _this = this;
+            if(isJaw){
+                if(jaw == 'twoJaw'){
+                    return 'Hai hàm';
+                }
+                else if(jaw == 'upperJaw'){
+                    return 'Hàm trên';
+                }
+                else if(jaw == 'lowerJaw'){
+                    return 'Hàm dưới';
+                }
+                else{
+                    return '';
+                }
+            }
+            else{
+                if(toothList != null && toothList.length > 0){
+                    var newArr = _.map(toothList, item => {
+                        return `R${item}`;
+                    })
+                    var text = newArr.join(", ");
+                    return text;
+                }
+                else{
+                    return '';
+                }
+            }
+        },
+        getServiceName(serviceId){
+            const _this = this;
+            let data = _.find(_this.serviceData, { _id: serviceId });
+			return data ? data.name : '';
+        },
+        resetDiagnosisTreatment(){
+            const _this = this;
+            _this.diagnosisTreatment= {
+                visible: false,
+                type: 'create',
+                data: {
+                    key: 0,
+                    toothType: 'permanentTeeth',
+                    isJaw: false,
+                    jaw: [],
+                    toothList: [],
+                    diagnose: '',
+                    serviceGroupId: '',
+                    serviceId: '',
+                    quantity: 0,
+                    quantityJaw: 0,
+                    unitPrice: 0,
+                    discount: 0,
+                    totalPrice: 0,
+                }
+            };
+        },
+        removeExamination(key){
+            const _this = this;
+            _this.tableLoading = true;
+            var arr = _this.tableData.filter(e => e.key != key);
+            for(var i = key - 1; i < arr.length; i++){
+                arr[i].key = i + 1;
+            }
+            _this.tableData = arr;
+            setTimeout(async function () {
+                _this.calculateAmount();
+                _this.tableLoading = false;
+            }, 500);
+        },
+        submitForm: debounce(async function () {
+            const _this = this;
+        }),
+        calculateAmount(){
+            const _this = this;
+            _this.formData.treatmentAmount = _this.tableData.reduce((accumulator, object) => {
+                return accumulator + (object.totalPrice + object.discount);
+            }, 0);
+            _this.formData.totalDiscountAmount = _this.tableData.reduce((accumulator, object) => {
+                return accumulator + object.discount;
+            }, 0);
+            _this.formData.totalAmount = _this.formData.treatmentAmount - _this.formData.totalDiscountAmount;
         }
     }
 }

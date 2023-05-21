@@ -12,16 +12,23 @@
                         <legend class="custom-legend">Sơ đồ răng *</legend>
                         <div class="row mt-3 mb-3">
                             <div class="col-md-12" style="text-align: right;">
-                                <el-radio-group v-model="toothDiagramActive" @change="toothDiagramTabChange">
+                                <el-radio-group v-model="data.toothType" @change="toothDiagramTabChange">
                                     <el-radio-button label="permanentTeeth">Răng vĩnh viễn</el-radio-button>
                                     <el-radio-button label="milkTooth">Răng sữa</el-radio-button>
                                 </el-radio-group>
+                            </div>
+                            <div class="col-md-12 mt-3" style="text-align: right;">
+                                <el-checkbox-group v-model="jawList" :max="1" @change="handleChangeJawList">
+                                    <el-checkbox label="twoJaw">Hai hàm</el-checkbox>
+                                    <el-checkbox label="upperJaw">Hàm trên</el-checkbox>
+                                    <el-checkbox label="lowerJaw">Hàm dưới</el-checkbox>
+                                </el-checkbox-group>
                             </div>
                         </div>
                         <div v-if="toothDiagramActive=='permanentTeeth'" class="row">
                             <div v-for="item in permanentTeethData" :key="item.key" class="col-md-6 mb-2 col-custom">
                                 <div class="toothDiagramItem">
-                                    <el-checkbox-group v-model="data.toothData" size="mini">
+                                    <el-checkbox-group v-model="data.toothList" size="mini" :disabled="(jawList != null && jawList.length > 0)" @change="handleChangeToothList">
                                         <template>
                                             <div class="permanentTeethGrid">
                                                 <el-checkbox-button v-for="teeth in item.tooths" :label="teeth.value" :key="teeth.value">
@@ -43,7 +50,7 @@
                         <div v-else class="row">
                             <div v-for="item in milkToothData" :key="item.key" class="col-lg-6 mb-2 col-custom">
                                 <div class="toothDiagramItem">
-                                    <el-checkbox-group v-model="data.toothData" size="mini">
+                                    <el-checkbox-group v-model="data.toothList" size="mini" :disabled="(jawList != null && jawList.length > 0)" @change="handleChangeToothList">
                                         <template>
                                             <div class="milkToothGrid">
                                                 <el-checkbox-button v-for="teeth in item.tooths" :label="teeth.value" :key="teeth.value">
@@ -80,7 +87,7 @@
                                 <div class="col-md-9">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <el-select v-model="data.serviceGroupId" placeholder="Nhóm dịch vụ" name="serviceGroupId" clearable filterable v-on:change="onSelectServiceGroup($event)">
+                                            <el-select v-model="data.serviceGroupId" placeholder="Nhóm dịch vụ" name="serviceGroupId" clearable filterable @change="onSelectServiceGroup($event)">
                                                 <el-option
                                                     v-for="item in serviceGroupData"
                                                     :key="item.value"
@@ -90,12 +97,12 @@
                                             </el-select>
                                         </div>
                                         <div class="col-md-12 mt-3">
-                                            <el-select v-model="data.serviceId" placeholder="Dịch vụ" name="serviceId" clearable filterable>
+                                            <el-select v-model="data.serviceId" placeholder="Dịch vụ" name="serviceId" clearable filterable :disabled="data.serviceGroupId == null || data.serviceGroupId == ''" @change="handleChangeService($event)">
                                                 <el-option
                                                     v-for="item in serviceByGroupData"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value"
+                                                    :key="item._id"
+                                                    :label="item.name"
+                                                    :value="item._id"
                                                 ></el-option>
                                             </el-select>
                                         </div>
@@ -111,18 +118,47 @@
                             <div class="col-md-3">Số lượng:</div>
                             <div class="col-md-9">
                                 <el-input 
+                                    v-if="(jawList != null && jawList.length > 0)"
                                     name="quantity" 
                                     placeholder="Số lượng" 
-                                    v-model="data.toothData.length" 
+                                    v-model="data.quantityJaw" 
                                     class="inputTextRight"
-                                    disabled
-                                ></el-input>
+                                    readonly
+                                >
+                                    <template slot="append">Hàm</template>
+                                </el-input>
+                                <el-input 
+                                    v-else
+                                    name="quantity" 
+                                    placeholder="Số lượng" 
+                                    v-model="data.quantity" 
+                                    class="inputTextRight"
+                                    readonly
+                                >
+                                    <template slot="append">Răng</template>
+                                </el-input>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-3">Đơn giá:</div>
-                            <div class="col-md-9">
-                                <el-input 
+                            <div class="col-md-9 inputTextRight">
+                                <vue-autonumeric
+                                    v-model="data.unitPrice"
+                                    class="el-input__inner"
+                                    placeholder="Đơn giá" 
+                                    readonly
+                                    :options="{
+                                        decimalPlaces: 0,
+                                        digitGroupSeparator: ',',
+                                        decimalCharacter: '.',
+                                        decimalCharacterAlternative: '.',
+                                        currencySymbol: '\u00a0VND',
+                                        currencySymbolPlacement: 's',
+                                        roundingMethod: 'U',
+                                        minimumValue: '0',
+                                    }"
+                                ></vue-autonumeric>
+                                <!-- <el-input 
                                     name="quantity" 
                                     placeholder="Đơn giá" 
                                     v-model="data.toothData.length" 
@@ -130,26 +166,57 @@
                                     disabled
                                 >
                                     <template slot="append">VND</template>
-                                </el-input>
+                                </el-input> -->
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-3">Giảm giá:</div>
-                            <div class="col-md-9">
-                                <el-input 
+                            <div class="col-md-9 inputTextRight">
+                                <vue-autonumeric
+                                    placeholder="Giảm giá" 
+                                    v-model="data.discount" 
+                                    class="el-input__inner"
+                                    @change.native="handleChangeDiscount"
+                                    :options="{
+                                        decimalPlaces: 0,
+                                        digitGroupSeparator: ',',
+                                        decimalCharacter: '.',
+                                        decimalCharacterAlternative: '.',
+                                        currencySymbol: '\u00a0VND',
+                                        currencySymbolPlacement: 's',
+                                        roundingMethod: 'U',
+                                        minimumValue: '0',
+                                    }"
+                                ></vue-autonumeric>
+                                <!-- <el-input 
                                     name="quantity" 
                                     placeholder="Giảm giá" 
                                     v-model="data.discount" 
                                     class="inputTextRight"
                                 >
                                     <template slot="append">VND</template>
-                                </el-input>
+                                </el-input> -->
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-3">Thành tiền:</div>
-                            <div class="col-md-9">
-                                <el-input 
+                            <div class="col-md-9 inputTextRight">
+                                <vue-autonumeric
+                                    v-model="data.totalPrice"
+                                    class="el-input__inner"
+                                    placeholder="Thành tiền" 
+                                    readonly
+                                    :options="{
+                                        decimalPlaces: 0,
+                                        digitGroupSeparator: ',',
+                                        decimalCharacter: '.',
+                                        decimalCharacterAlternative: '.',
+                                        currencySymbol: '\u00a0VND',
+                                        currencySymbolPlacement: 's',
+                                        roundingMethod: 'U',
+                                    }"
+                                ></vue-autonumeric>
+                                <!-- <el-input 
                                     name="quantity" 
                                     placeholder="Thành tiền" 
                                     v-model="data.toothData.length" 
@@ -157,7 +224,7 @@
                                     disabled
                                 >
                                     <template slot="append">VND</template>
-                                </el-input>
+                                </el-input> -->
                             </div>
                         </div>
                     </fieldset>
@@ -191,6 +258,7 @@
 <script>
 import { mapState } from 'vuex';
 import { milkTooth, permanentTeeth } from '@/utils/masterData';
+import VueAutonumeric from 'vue-autonumeric';
 export default {
     name: 'AddExamination',
     props: {
@@ -198,26 +266,31 @@ export default {
             type: Object,
             default: {
                 visible: false,
-                type: 'create'
+                type: 'create',
+                data: {
+                    key: 0,
+                    toothType: 'permanentTeeth',
+                    isJaw: false,
+                    jaw: '',
+                    toothList: [],
+                    diagnose: '',
+                    serviceGroupId: '',
+                    serviceId: '',
+                    quantity: 0,
+                    quantityJaw: 0,
+                    unitPrice: 0,
+                    discount: 0,
+                    totalPrice: 0,
+                }
             }
         },
     },
-    computed: {
-		...mapState({
-			accesses: (state) => state.accesses,
-            userInfo: (state) => state.auth.user,
-		}),
-	},
+    components: {
+        'vue-autonumeric': VueAutonumeric,
+    },
      data() {
         return {
-            data: {
-                key: 0,
-                toothData: [],
-                diagnose: '',
-                serviceGroupId: '',
-                serviceId: '',
-                discount: 0,
-            },
+            data: {},
             dialogVisible: false,
             toothDiagramActive: 'permanentTeeth',
             permanentTeethData: permanentTeeth,
@@ -225,6 +298,7 @@ export default {
             serviceGroupData: [],
             serviceData: [],
             serviceByGroupData: [],
+            jawList: [],
         }
     },
     watch: {
@@ -242,42 +316,194 @@ export default {
     async created() {
         const _this = this;
         _this.serviceGroupData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
-        _this.serviceData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceData' })) || [];
-        _this.serviceByGroupData = _this.serviceData;
-        _this.resetDialog();
+        const services = await this.$axios.$post('/api/service/getByQuery', {
+            filters: {
+                nameF: '',
+                codeF: '',
+                groupF: '',
+                statusF: true
+            },
+            sorts: 'name&&1',
+            pages:{
+                from: 0,
+                size: 1000
+            }
+        });
+        // _this.resetDialog();
+        _this.serviceData = services.data;
+        // _this.data = _this.dialog.data;
     },
     methods: {
         resetDialog() {
             const _this = this;
-            _this.data = {
-                key: 0,
-                toothData: [],
-                diagnose: '',
-                serviceGroupId: '',
-                serviceId: '',
-                discount: 0,
-            };
+            if(_this.dialog.type == 'update'){
+                _this.data = _this.dialog.data;
+                if(_this.dialog.data.jaw != null && _this.dialog.data.jaw != ''){
+                    _this.jawList.push(_this.dialog.data.jaw);
+                }
+                else{
+                    _this.jawList = [];
+                }
+            }
+            else{
+                _this.data = {
+                    key: 0,
+                    toothType: 'permanentTeeth',
+                    isJaw: false,
+                    jaw: '',
+                    toothList: [],
+                    diagnose: '',
+                    serviceGroupId: '',
+                    serviceId: '',
+                    quantity: 0,
+                    quantityJaw: 0,
+                    unitPrice: 0,
+                    discount: 0,
+                    totalPrice: 0,
+                };
+                _this.jawList = [];
+            }
         },
         toothDiagramTabChange(){
             const _this = this;
-            _this.data.toothDiagramData = [];
+            _this.data.toothList = [];
+            _this.data.quantity = 0;
         },
         onSelectServiceGroup(value) {
             const _this = this;
+            _this.data.serviceId = '';
             if(value){
-                _this.serviceByGroupData = _.filter([..._this.serviceData] || [], {'serviceGroupId': value});
+                var service = _.filter([..._this.serviceData] || [], {'groupId': value});
+                _this.serviceByGroupData = service.map(item => {
+                    return {
+                        ...item,
+                    }
+                })
             }
             else{
-                _this.serviceByGroupData = _this.serviceData;
+                _this.serviceByGroupData = [];
             }
 		},
         addItem(){
             const _this = this;
-            console.log(_this.data)
+            //Kiểm tra điều kiện
+            if(_this.data.serviceId == null || _this.data.serviceId == ''){
+                return _this.$message({
+                    message: 'Vui lòng chọn thủ thuật điều trị',
+                    type: 'error',
+                });
+            }
+            else{
+                var service = _.find(_this.serviceByGroupData, function(item) {
+                    if (item._id == _this.data.serviceId) {
+                        return item;
+                    }
+                });
+                if(service){
+                    if(service.unit == 'unit2'){
+                        if(!_this.data.isJaw){
+                            return _this.$message({
+                                message: 'Dịch vụ đã chọn được điều trị và thanh toán theo số hàm!',
+                                type: 'error',
+                            });
+                        }
+                    }
+                    else{
+                        if(_this.data.isJaw){
+                            return _this.$message({
+                                message: 'Dịch vụ đã chọn được điều trị và thanh toán theo số răng!',
+                                type: 'error',
+                            });
+                        }
+                    }
+                }
+                else{
+                    return _this.$message({
+                        message: 'Có lỗi xảy ra.',
+                        type: 'error',
+                    });
+                }
+            }
+            if(_this.data.quantity == 0 && _this.data.quantityJaw == 0){
+                return _this.$message({
+                    message: 'Vui lòng chọn răng/hàm điều trị',
+                    type: 'error',
+                });
+            }
+            //Xử lý
+            _this.$emit('addExamination', _this.data);
+            _this.dialog.visible = false;
+            // _this.resetDialog();
         },
         updateItem(){
             const _this = this;
-        }
+        },
+        handleChangeJawList(e){
+            const _this = this;
+            if(e.length > 0){
+                _this.data.isJaw = true;
+                _this.data.toothList = [];
+                _this.data.jaw = e[0];
+                _this.data.quantityJaw = e[0] == 'twoJaw' ? 2 : 1;
+            }
+            else{
+                _this.data.isJaw = false;
+                _this.data.jaw = '';
+                _this.data.quantityJaw = 0;
+            }
+
+            _this.calcTotalPrice();
+        },
+        handleChangeToothList(){
+            const _this = this;
+            _this.data.quantity = _this.data.toothList.length;
+            _this.calcTotalPrice();
+        },
+        handleChangeService(value){
+            const _this = this;
+            if(value != null && value != ''){
+                var service = _.find(_this.serviceByGroupData, function(item) {
+                    if (item._id == value) {
+                        return item;
+                    }
+                });
+
+                if(service){
+                    if(service.unit == 'unit2'){
+                        if(!_this.data.isJaw){
+                            _this.$message({
+                                message: 'Dịch vụ này được điều trị và thanh toán theo số hàm!',
+                                type: 'warning',
+                            });
+                        }
+                    }
+                    else{
+                        if(_this.data.isJaw){
+                            _this.$message({
+                                message: 'Dịch vụ này được điều trị và thanh toán theo số răng!',
+                                type: 'warning',
+                            });
+                        }
+                    }
+                }
+
+                _this.data.unitPrice = service ? (service.price || 0) : 0;
+            }
+            else{
+                _this.data.unitPrice = 0;
+            }
+            _this.calcTotalPrice();
+        },
+        handleChangeDiscount(){
+            const _this = this;
+            _this.calcTotalPrice();
+        },
+        calcTotalPrice(){
+            const _this = this;
+            _this.data.totalPrice = 0;
+            var quantity = _this.data.isJaw ? _this.data.quantityJaw : _this.data.quantity;
+            _this.data.totalPrice = (_this.data.unitPrice*quantity) - _this.data.discount;
+        },
     }
 }
 </script>

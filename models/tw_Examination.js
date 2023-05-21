@@ -11,4 +11,8 @@ export default function() {
         other: ''
     };
     this.attachFiles = [];
+    this.diagnosisTreatment = [];
+    this.treatmentAmount = 0;
+    this.totalDiscountAmount = 0;
+    this.totalAmount = 0;
 }

@@ -37,6 +37,7 @@
     "nuxt": "^2.15.7",
     "socket.io-client": "^4.6.1",
     "vue-async-computed": "^3.9.0",
+    "vue-autonumeric": "^1.2.6",
     "vue-lodash": "^2.1.2"
   },
   "devDependencies": {
