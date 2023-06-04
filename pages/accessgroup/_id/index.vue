@@ -197,7 +197,16 @@ export default {
                                 {
 									name: 'Khách hàng',
 									value: 'customer',
-									customRights: [],
+									customRights: [
+                                        {
+											name: 'Tạo phiếu khám',
+											value: 'createExamination',
+										},
+                                        {
+											name: 'In phiếu khám',
+											value: 'printExamination',
+										},
+                                    ],
                                     hideDefaultRights: false,
 								},
                                 {

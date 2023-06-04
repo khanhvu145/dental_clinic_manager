@@ -13,9 +13,9 @@
                     </el-select>
                 </div>
                 <div class="col-md-2">
-                    <button class="control-btn red" style="padding: 4px 6px;float:right;" @click="removeItem(data.key)">
+                    <a class="btn control-btn red" style="padding: 4px 6px;float:right;" @click="removeItem(data.key)">
                         <i class='bx bxs-trash'></i>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

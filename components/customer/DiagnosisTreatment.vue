@@ -150,6 +150,7 @@
                                     currencySymbolPlacement: 's',
                                     roundingMethod: 'U',
                                     minimumValue: '0',
+                                    emptyInputBehavior: '0'
                                 }"
                             ></vue-autonumeric>
                         </div>
@@ -171,6 +172,7 @@
                                     currencySymbolPlacement: 's',
                                     roundingMethod: 'U',
                                     minimumValue: '0',
+                                    emptyInputBehavior: '0'
                                 }"
                             ></vue-autonumeric>
                         </div>
@@ -191,6 +193,7 @@
                                     currencySymbol: '\u00a0VND',
                                     currencySymbolPlacement: 's',
                                     roundingMethod: 'U',
+                                    emptyInputBehavior: '0'
                                 }"
                             ></vue-autonumeric>
                         </div>

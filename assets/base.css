@@ -54,7 +54,7 @@ body{
     margin-top: 16px;
 }
 
-.control-btn{
+.control-btn, a.control-btn{
    display: inline-flex;
    text-align: center;
    justify-content: center;

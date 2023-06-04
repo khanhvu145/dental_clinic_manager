@@ -13,10 +13,10 @@
                 <el-card class="box-card">
                     <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                         <span>NGÀY KHÁM: {{ $moment().format('DD/MM/YYYY') }}</span>
-                        <button class="control-btn red" @click="deleteExamForm">
+                        <a class="btn control-btn red" @click="deleteExamForm">
                             <i class='bx bxs-trash mr-1'></i>
                             Xóa
-                        </button>
+                        </a>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -179,10 +179,10 @@
                                     <div class="attachFile-content mt-3 mb-4" style="padding:0 12px;">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button class="control-btn green" style="float:right;" @click="addDesignation">
+                                                <a class="btn control-btn green" style="float:right;" @click="addDesignation">
                                                     <i class='bx bxs-file-plus'></i>
                                                     Thêm chỉ định mới
-                                                </button>
+                                                </a>
                                             </div>
                                         </div>
                                         <div class="row mt-3">
@@ -206,10 +206,10 @@
                                     <div class="examination-content mt-3 mb-4" style="padding:0 12px;">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button class="control-btn green" style="float:right;" @click="openExaminationDialog('create')">
+                                                <a class="btn control-btn green" style="float:right;" @click="openExaminationDialog('create')">
                                                     <i class='bx bx-list-plus'></i>
                                                     Thêm mới
-                                                </button>
+                                                </a>
                                                 <el-dialog
                                                     :visible.sync='diagnosisTreatment.visible'
                                                     width='95%'
@@ -293,12 +293,12 @@
                                                     </el-table-column>
                                                     <el-table-column label="Thao tác" min-width="100">
                                                         <template slot-scope="scope">
-                                                            <button class="control-btn blue2" style="padding: 4px 6px;" @click="openExaminationDialog('update', scope.row)">
+                                                            <a class="btn control-btn blue2" style="padding: 4px 6px;" @click="openExaminationDialog('update', scope.row)">
                                                                 <i class="el-icon-edit-outline"></i>
-                                                            </button>
-                                                            <button class="control-btn red" style="padding: 4px 6px;" @click="removeExamination(scope.row.key)">
+                                                            </a>
+                                                            <a class="btn control-btn red" style="padding: 4px 6px;" @click="removeExamination(scope.row.key)">
                                                                 <i class='bx bx-trash'></i>
-                                                            </button>
+                                                            </a>
                                                         </template>
                                                     </el-table-column>
                                                 </el-table>
@@ -357,10 +357,22 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-12" style="text-align: right;">
-                            <button type="button" class="control-btn green" @click="$router.push('/customer')">
+                            <button
+                                v-if="(checkRight('createExamination'))"
+                                type="button" 
+                                class="control-btn green" 
+                                @click="submitForm(false)"
+                            >
+                                <i class='bx bx-save' ></i>
                                 <span>Lưu phiếu khám</span>
                             </button>
-                            <button type="button" class="control-btn yellow" @click="$router.push('/customer')">
+                            <button
+                                v-if="(checkRight('createExamination') && checkRight('printExamination'))"
+                                type="button" 
+                                class="control-btn yellow" 
+                                @click="submitForm(true)"
+                            >
+                                <i class='bx bx-printer'></i>
                                 <span>Lưu & xuất phiếu khám</span>
                             </button>
                         </div>
@@ -417,6 +429,7 @@ export default {
             checkboxGroup1: false,
             customerInfo: new Customer(),
             anamnesisData: [],
+            anamnesisList: [],
             allergyData: anamnesisList,
             xquangData: xquangList,
             testData: testList,
@@ -450,6 +463,7 @@ export default {
             },
             serviceGroupData: [],
             serviceData: [],
+            latestExamination: [],
         }
     },
     async created() { 
@@ -469,10 +483,13 @@ export default {
 					 _this.customerInfo = new Customer();
 				}
 			);
+            //Lấy phiếu khám gần nhất của KH
+            const exam = await _this.$axios.$post('/api/customer/getLatestExamination', { customerId: _this.$route.params.id });
+            _this.latestExamination = exam.data || [];
         }
         //Lấy danh sách tiền sử bệnh
-        var anamnesisList = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamAnamnesis' })) || [];
-        _this.anamnesisData = anamnesisList.map(item => {
+        var anamnesisArr = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamAnamnesis' })) || [];
+        _this.anamnesisList = anamnesisArr.map(item => {
             return {
                 value: item.value,
                 label: item.label,
@@ -480,6 +497,7 @@ export default {
                 isCheck: false
             }
         });
+        _this.anamnesisData = _this.anamnesisList;
         //Lấy danh sách dị ứng
         _this.allergyData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamAllergy' })) || [];
         //Lấy danh sách loại x-quang
@@ -491,7 +509,7 @@ export default {
         //Lấy danh sách nhóm dịch vụ
          _this.serviceGroupData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
         //Lấy danh sách dịch vụ
-        const services = await this.$axios.$post('/api/service/getByQuery', {
+        const services = await _this.$axios.$post('/api/service/getByQuery', {
             filters: {
                 nameF: '',
                 codeF: '',
@@ -510,18 +528,18 @@ export default {
         checkRight(right) {
 			const _this = this;
 			// If user have permission below
-			const values = ['examination.all', 'examination.' + right];
+			const values = ['customer.all', 'customer.' + right];
 			return !!(intersection(_this.accesses || [], values).length > 0);
 		},
         async addExamForm(){
             const _this = this;
+            _this.resetFormData();
             _this.isExam = true;
             _this.dataLoading = false;
         },
         async deleteExamForm(){
             const _this = this;
-            console.log(_this.formData)
-            // _this.isExam = false;
+            _this.isExam = false;
         },
         addDesignation(){
             const _this = this;
@@ -529,7 +547,6 @@ export default {
             _this.formData.attachFiles.push({
                 key: index,
                 type: '',
-                files: [],
                 fileList: [],
             });
         },
@@ -737,6 +754,7 @@ export default {
         },
         resetDiagnosisTreatment(){
             const _this = this;
+            _this.tableLoading = true;
             _this.diagnosisTreatment= {
                 visible: false,
                 type: 'create',
@@ -756,6 +774,9 @@ export default {
                     totalPrice: 0,
                 }
             };
+            setTimeout(async function () {
+                _this.tableLoading = false;
+            }, 500);
         },
         removeExamination(key){
             const _this = this;
@@ -770,8 +791,30 @@ export default {
                 _this.tableLoading = false;
             }, 500);
         },
-        submitForm: debounce(async function () {
+        submitForm: debounce(async function (isPrint) {
             const _this = this;
+            _this.dataLoading = true;
+            _this.formData.createdBy = _this.userInfo.data.username;
+            _this.formData.anamnesis = _.filter(_this.anamnesisData, ['isCheck', true]);
+            _this.formData.diagnosisTreatment = _this.tableData;
+            _this.formData.customerId = _this.$route.params.id;
+            var oldData = cloneDeep(_this.formData);
+            var newData = new FormData();
+            buildFormData(newData, oldData);
+            const data = await _this.$axios.$post('/api/customer/createExamination', newData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (data.success) {
+                console.log(data.data)
+                _this.$message({
+                    message: data.message,
+                    type: 'success',
+                });
+                // _this.$router.push(`/customer/${data.data.customerId}/profile`);
+            } else {
+                _this.$message.error(data.error);
+            }
+            _this.dataLoading = false;
         }),
         calculateAmount(){
             const _this = this;
@@ -782,6 +825,37 @@ export default {
                 return accumulator + object.discount;
             }, 0);
             _this.formData.totalAmount = _this.formData.treatmentAmount - _this.formData.totalDiscountAmount;
+        },
+        async resetFormData(){
+            const _this = this;
+            _this.formData = new Examination();
+            _this.tableData = [];
+            if(_this.latestExamination != null && _this.latestExamination.length > 0){
+                _this.anamnesisData = _this.anamnesisData.map(item => {
+                    if(_this.latestExamination[0].anamnesis.some(x => x.value == item.value)){
+                        var result  = _.find(_this.latestExamination[0].anamnesis, (obj) => {
+                            return obj.value == item.value;
+                        })
+                        return {
+                            ...item,
+                            isCheck: result.isCheck,
+                            note: result.note,
+                        }
+                    }
+                    else{
+                        return{
+                            ...item
+                        }
+                    }
+                });
+                _this.formData.allergy.allergies = _this.latestExamination[0].allergy.allergies || [];
+                _this.formData.allergy.other = _this.latestExamination[0].allergy.other || '';
+            }
+            else{
+                _this.formData.allergy.allergies = [];
+                _this.formData.allergy.other = '';
+                _this.anamnesisData = _this.anamnesisList;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 export default function() {
+    this.customerId = '';
 	this.anamnesis = [];
     this.allergy = {
         allergies: [],
