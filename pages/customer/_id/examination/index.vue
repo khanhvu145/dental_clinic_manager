@@ -13,10 +13,19 @@
                 <el-card class="box-card">
                     <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                         <span>NGÀY KHÁM: {{ $moment().format('DD/MM/YYYY') }}</span>
-                        <a class="btn control-btn red" @click="deleteExamForm">
-                            <i class='bx bxs-trash mr-1'></i>
-                            Xóa
-                        </a>
+                        <div v-if="formData._id" class="">
+                            <a  class="btn control-btn gray" @click="isExam = false">
+                                Đóng
+                            </a>
+                            <a class="btn control-btn blue" @click="addExamForm">
+                                Tạo phiếu khám mới
+                            </a>
+                        </div>
+                        <div v-else class="">
+                            <a class="btn control-btn red" @click="deleteExamForm">
+                                Hủy
+                            </a>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -281,6 +290,11 @@
                                                             {{ (scope.row.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                         </template>
                                                     </el-table-column>
+                                                    <el-table-column label="Số lượng" min-width="80">
+                                                        <template slot-scope="scope">
+                                                            {{ scope.row.isJaw ? scope.row.quantityJaw : scope.row.quantity }}
+                                                        </template>
+                                                    </el-table-column>
                                                     <el-table-column label="Giảm giá" min-width="120">
                                                         <template slot-scope="scope">
                                                             {{ (scope.row.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
@@ -310,55 +324,43 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-md-12">
+                        <div class="col-md-5">
                             <div class="col-form-label" style="font-weight:bold;">TỔNG CHI PHÍ ĐIỀU TRỊ</div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <table class="table table-borderless" style="font-size:14px;">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width:45%">Chi phí điều trị</td>
-                                                <td style="width:5%">:</td>
-                                                <td style="text-align:right;width:50%">
-                                                    <span style="font-weight:bold;">{{ formData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width:45%">Giảm giá</td>
-                                                <td style="width:5%">:</td>
-                                                <td style="text-align:right;width:50%">
-                                                    <span style="font-weight:bold;">{{ formData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width:45%">Thành tiền</td>
-                                                <td style="width:5%">:</td>
-                                                <td style="text-align:right;width:50%">
-                                                    <span style="font-weight:bold;">{{ formData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- <div class="col-md-12 ml-3" style="font-size:14px;">
-                                    Chi phí điều trị <span class="ml-4 mr-4">:</span> <span style="font-weight:bold;">{{ formData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                </div>
-                                <div class="col-md-12 mt-3 ml-3" style="font-size:14px;">
-                                    Giảm giá <span class="ml-4 mr-4">:</span> <span style="font-weight:bold;">{{ formData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                </div>
-                                <div class="col-md-12 mt-3 ml-3" style="font-size:14px;">
-                                    Thành tiền <span class="ml-4 mr-4">:</span> <span style="font-weight:bold;">{{ formData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                </div> -->
-                            </div>
+                            <table class="table table-borderless" style="font-size:14px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:40%">Chi phí điều trị</td>
+                                        <td style="width:5%">:</td>
+                                        <td style="text-align:right;width:55%">
+                                            <span style="font-weight:bold;">{{ formData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:40%">Giảm giá</td>
+                                        <td style="width:5%">:</td>
+                                        <td style="text-align:right;width:55%">
+                                            <span style="font-weight:bold;">{{ formData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:40%">Thành tiền</td>
+                                        <td style="width:5%">:</td>
+                                        <td style="text-align:right;width:55%">
+                                            <span style="font-weight:bold;">{{ formData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-md-12">
-                            
+                        <div class="col-md-7">
+                            <div class="col-form-label" style="font-weight:bold;">GHI CHÚ</div>
+                            <el-input type="textarea" :rows="5" placeholder="Nhập nội dung" v-model="formData.note"></el-input>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-12" style="text-align: right;">
                             <button
-                                v-if="(checkRight('createExamination'))"
+                                v-if="(checkRight('createExamination') && (formData._id == null || formData._id == ''))"
                                 type="button" 
                                 class="control-btn green" 
                                 @click="submitForm(false)"
@@ -367,13 +369,13 @@
                                 <span>Lưu phiếu khám</span>
                             </button>
                             <button
-                                v-if="(checkRight('createExamination') && checkRight('printExamination'))"
+                                
                                 type="button" 
                                 class="control-btn yellow" 
-                                @click="submitForm(true)"
+                                @click="exportPDF"
                             >
                                 <i class='bx bx-printer'></i>
-                                <span>Lưu & xuất phiếu khám</span>
+                                <span>Xuất phiếu khám</span>
                             </button>
                         </div>
                     </div>
@@ -390,6 +392,297 @@
                 </el-empty>
             </div>
         </div>
+
+        <vue-html2pdf 
+            class="print-content"
+            id="print-content-pdf"
+            :show-layout="false"
+            :float-layout="true"
+            :preview-modal="true"
+            :enable-download="false"
+            :paginate-elements-by-height="1500"
+            :filename="'test'"
+            :pdf-quality="2"
+            :manual-pagination="false"
+            pdf-format="a4"
+            pdf-orientation="portrait"
+            pdf-content-width="100%"
+            ref="html2Pdf"
+        >
+            <section slot="pdf-content">
+                <div class="container mt-3" style="color:#000;font-size:13px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <el-image
+                                style="width: 100%; height: auto"
+                                src="/images/logoclinic.png"
+                                fit="cover">
+                            </el-image>
+                        </div>
+                        <div class="col-md-9">
+                            <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
+                            <div class="mt-3">
+                                <span style="font-weight:bold;">Địa chỉ:</span>
+                                <span>Quận 3, HCM</span>
+                            </div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Số điện thoại:</span>
+                                <span>0703260457</span>
+                            </div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Email:</span>
+                                <span>dentalclinic@gmail.com</span>
+                            </div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Website:</span>
+                                <span>https://www.google.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <div style="font-weight:bold;font-size:24px;">PHIẾU KHÁM VÀ ĐIỀU TRỊ</div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="row">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4 text-center">Ngày {{$moment().format('DD')}} tháng {{$moment().format('MM')}} năm {{$moment().format('YYYY')}}</div>
+                                <div class="col-md-4 text-right">Mã: {{formData.code}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Mã khách hàng: </span>
+                            {{ customerInfo.code || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Họ và tên: </span>
+                            {{ customerInfo.name || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Ngày sinh: </span>
+                            {{ $moment(customerInfo.birthday).format('DD/MM/YYYY') || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Giới tính: </span>
+                            {{ customerInfo.gender == 'male' ? 'Nam' : 'Nữ' || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">CMND/CCCD: </span>
+                            {{ customerInfo.physicalId || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                                <span style="font-weight: bold;">Số điện thoại: </span>
+                            {{ customerInfo.phone || '' }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    TIỀN SỬ BỆNH
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="formData.anamnesis != null && formData.anamnesis.length > 0" class="ml-3">
+                                        <li v-for="item in formData.anamnesis" :key="item.value" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{item.label}} {{item.note ? ` - ${item.note}` : ''}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    DỊ ỨNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="formData.allergy != null && formData.allergy.allergies != null && formData.allergy.allergies.length > 0" class="ml-3">
+                                        <li v-for="item in formData.allergy.allergies" :key="item" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{getAllergyName(item)}}
+                                        </li>
+                                        <li v-if="formData.allergy.other" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{formData.allergy.other}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    KHÁM LÂM SÀNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="formData.clinicalExam" class="ml-3">
+                                        <li  class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{formData.clinicalExam}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có thông tin khám</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    KHÁM CẬN LÂM SÀNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul class="ml-3">
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            X-quang: 
+                                            <span v-for="(item, index) in formData.preclinicalExam.xquang" :key="index">
+                                                {{index > 0 ? ', ' : ' '}} {{getXquangName(item)}}
+                                            </span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            Xét nghiệm:
+                                            <span v-for="(item, index) in formData.preclinicalExam.test" :key="index">
+                                                {{index > 0 ? ', ' : ' '}} {{getTestName(item)}}
+                                            </span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            Khác: {{formData.preclinicalExam.other}}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                            <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                            CHẨN ĐOÁN VÀ ĐIỀU TRỊ
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
+                                        <th scope="col">Răng/hàm</th>
+                                        <th scope="col">Chẩn đoán</th>
+                                        <th scope="col">Điều trị</th>
+                                        <th scope="col">Đơn giá</th>
+                                        <th scope="col">SL</th>
+                                        <th scope="col">Giảm giá</th>
+                                        <th scope="col">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in tableData" :key="item.key">
+                                        <td>
+                                            {{ getToothName(item.isJaw, item.toothList, item.jaw[0]) }}
+                                        </td>
+                                        <td>
+                                            {{ item.diagnose }}
+                                        </td>
+                                        <td>
+                                            {{ getServiceName(item.serviceId) }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                        <td style="text-align:center;">
+                                            {{ item.isJaw ? item.quantityJaw : item.quantity }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                    GHI CHÚ
+                                </div>
+                                <div class="col-md-12 ml-3 mt-2">
+                                    {{formData.note}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                    TỔNG CHI PHÍ ĐIỀU TRỊ
+                                </div>
+                                <div class="col-md-12 ml-2">
+                                    <table class="table table-borderless" style="font-size:14px;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Chi phí điều trị</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ formData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Giảm giá</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ formData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Thành tiền</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ formData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mt-4">
+                        <div class="col-md-6" style="text-align:center;">
+                            <div>Nha sĩ điều trị</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div>
+                        <div class="col-md-6" style="text-align:center;">
+                            <div>Khách hàng</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div>
+                        <!-- <div class="col-md-4" style="text-align:center;">
+                            <div>Nhân viên thu ngân</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div> -->
+                    </div>
+                </div>
+            </section>
+        </vue-html2pdf>
     </LeftMenu>
 </template>
 
@@ -406,6 +699,8 @@ import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import { genderData, anamnesisList, xquangList, testList, milkTooth, permanentTeeth } from '@/utils/masterData';
 import buildFormData from '@/utils/buildFormData';
 import moment from 'moment';
+import { jsPDF } from "jspdf";
+import readFile from '@/utils/functions/readFile';
 export default {
     components: {
 		LeftMenu,
@@ -539,7 +834,15 @@ export default {
         },
         async deleteExamForm(){
             const _this = this;
-            _this.isExam = false;
+            _this
+				.$confirm(`Bạn có chắc muốn hủy phiếu khám?`, 'Xác nhận', {
+					confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+					type: 'confirm',
+				})
+                .then(async () => {
+                    _this.isExam = false;
+                });
         },
         addDesignation(){
             const _this = this;
@@ -646,6 +949,7 @@ export default {
             }
             _this.tableData.push(_this.diagnosisTreatment.data);
             _this.resetDiagnosisTreatment();
+            console.log(_this.tableData)
             //#endregion
             setTimeout(async function () {
                 _this.calculateAmount();
@@ -793,28 +1097,40 @@ export default {
         },
         submitForm: debounce(async function (isPrint) {
             const _this = this;
-            _this.dataLoading = true;
-            _this.formData.createdBy = _this.userInfo.data.username;
-            _this.formData.anamnesis = _.filter(_this.anamnesisData, ['isCheck', true]);
-            _this.formData.diagnosisTreatment = _this.tableData;
-            _this.formData.customerId = _this.$route.params.id;
-            var oldData = cloneDeep(_this.formData);
-            var newData = new FormData();
-            buildFormData(newData, oldData);
-            const data = await _this.$axios.$post('/api/customer/createExamination', newData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            if (data.success) {
-                console.log(data.data)
-                _this.$message({
-                    message: data.message,
-                    type: 'success',
+            _this
+                .$confirm(`Bạn có chắc muốn tạo phiếu khám?`, 'Xác nhận', {
+					confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+					type: 'confirm',
+				})
+                .then(async () => {
+                    _this.dataLoading = true;
+                    _this.formData.createdBy = _this.userInfo.data.username;
+                    _this.formData.anamnesis = _.filter(_this.anamnesisData, ['isCheck', true]);
+                    _this.formData.diagnosisTreatment = _this.tableData;
+                    _this.formData.customerId = _this.$route.params.id;
+                    var oldData = cloneDeep(_this.formData);
+                    var newData = new FormData();
+                    buildFormData(newData, oldData);
+                    const data = await _this.$axios.$post('/api/customer/createExamination', newData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                    if (data.success) {
+                        _this.$message({
+                            message: data.message,
+                            type: 'success',
+                        });
+                        _this.formData._id = data.data._id;
+                        _this.formData.code = data.data.code;
+                        setTimeout(async() => {
+                            _this.dataLoading = false;
+                            await _this.exportPDF();
+                        }, 200);
+                    } else {
+                        _this.$message.error(data.error);
+                        _this.dataLoading = false;
+                    }
                 });
-                // _this.$router.push(`/customer/${data.data.customerId}/profile`);
-            } else {
-                _this.$message.error(data.error);
-            }
-            _this.dataLoading = false;
         }),
         calculateAmount(){
             const _this = this;
@@ -856,7 +1172,26 @@ export default {
                 _this.formData.allergy.other = '';
                 _this.anamnesisData = _this.anamnesisList;
             }
-        }
+        },
+        async exportPDF(){
+            const _this = this;
+            _this.$refs.html2Pdf.generatePdf();
+        },
+        getAllergyName(value){
+            const _this = this;
+            let data = _.find(_this.allergyData, { value: value });
+			return data ? data.label : '';
+        },
+        getXquangName(value){
+            const _this = this;
+            let data = _.find(_this.xquangData, { value: value });
+			return data ? data.label : '';
+        },
+        getTestName(value){
+            const _this = this;
+            let data = _.find(_this.testData, { value: value });
+			return data ? data.label : '';
+        },
     }
 }
 </script>
@@ -872,7 +1207,6 @@ icon-add-schedule {
 	right: 0px;
 	bottom: 0px;
 }
-
 .table-column {
 	display: flex;
 	justify-content: center;
@@ -885,18 +1219,15 @@ icon-add-schedule {
     background-color: #f1f7fd;
     color: #909399;
 }
-
 .table-column:first-child {
 	border-left: 1px solid #EBEEF5;
 }
-
 .tooth-content{
     width: 20px;
     height: 20px;
     overflow: hidden;
     position: relative;
 }
-
 .tooth-content .tooth-img{
     width: 100%;
     min-width: 100%;

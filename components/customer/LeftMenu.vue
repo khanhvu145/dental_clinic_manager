@@ -24,6 +24,26 @@
                                 <span>Khám và điều trị</span>
                             </a>
                         </nuxt-link>
+                        <nuxt-link
+                            tag="li"
+                            :to="`/customer/${$route.params.id}/examination`"
+                            :class="{ 'submenu-active': isRouteActive('payment') }"
+                            class="list-group-item list-group-item-action border-0"
+                        >
+                            <a href="javascript:void(0)">
+                                <span>Thanh toán</span>
+                            </a>
+                        </nuxt-link>
+                        <nuxt-link
+                            tag="li"
+                            :to="`/customer/${$route.params.id}/examination`"
+                            :class="{ 'submenu-active': isRouteActive('history') }"
+                            class="list-group-item list-group-item-action border-0"
+                        >
+                            <a href="javascript:void(0)">
+                                <span>Lịch sử</span>
+                            </a>
+                        </nuxt-link>
                     </ul>
                 </div>
                 <div class="col-md-9 col-xl-10">

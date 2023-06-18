@@ -38,6 +38,7 @@ export default {
     '@/plugins/lodash',
     '@/plugins/async-computed',
     '@/plugins/icons',
+    { src: '@/plugins/vue-html2pdf', mode: 'client' }
   ],
 
   router: {

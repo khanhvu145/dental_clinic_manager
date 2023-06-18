@@ -16,4 +16,5 @@ export default function() {
     this.treatmentAmount = 0;
     this.totalDiscountAmount = 0;
     this.totalAmount = 0;
+    this.note = '';
 }
