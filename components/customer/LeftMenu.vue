@@ -36,7 +36,7 @@
                         </nuxt-link>
                         <nuxt-link
                             tag="li"
-                            :to="`/customer/${$route.params.id}/examination`"
+                            :to="`/customer/${$route.params.id}/history`"
                             :class="{ 'submenu-active': isRouteActive('history') }"
                             class="list-group-item list-group-item-action border-0"
                         >

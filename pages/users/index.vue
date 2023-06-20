@@ -250,6 +250,7 @@ export default {
         },
         async getData(searchQuery){
             const _this = this;
+            _this.dataLoading = true;
             await _this.$axios.$post('/api/user/getByQuery', searchQuery).then(
                 (response) => {
 					_this.data = response;

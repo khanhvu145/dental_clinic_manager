@@ -209,6 +209,7 @@ export default {
         },
         async getData(searchQuery){
             const _this = this;
+            _this.dataLoading = true;
             await _this.$axios.$post('/api/accessgroup/getByQuery', searchQuery).then(
                 (response) => {
 					_this.data = response;

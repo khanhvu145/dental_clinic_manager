@@ -325,6 +325,7 @@ export default {
         }),
         async getData(searchQueryGroup){
             const _this = this;
+            _this.dataLoading = true;
             await _this.$axios.$post('/api/service/groupGetByQuery', searchQueryGroup).then(
                 (response) => {
 					_this.data = response;

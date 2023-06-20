@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <FullCalendar ref="workingCalendar" :options="options" />
+            <FullCalendar v-loading="dataLoading" ref="workingCalendar" :options="options" />
 
             <!-- Dialog working calendar detail -->
             <el-dialog :visible.sync="dialogWorkingCalendarDetail" :close-on-click-modal="false" width="45%">
@@ -189,7 +189,8 @@ export default {
             districtByProvince: [],
             wardByDistrict: [],
             appointmentType: [],
-            appointmentStatus: appointmentStatus
+            appointmentStatus: appointmentStatus,
+            dataLoading: true,
         }
     },
     async created() { 
@@ -222,6 +223,7 @@ export default {
     methods: {
         async getData(){
             const _this = this;
+            _this.dataLoading = true;
             if(_this.listAppointments.length > 0){
                 _this.options.events = _this.listAppointments.map(item => {
                     return {
@@ -238,6 +240,7 @@ export default {
             else{
                 _this.options.events = [];
             }
+            _this.dataLoading = false;
         },
         async handleEventClick(eventInfo){
             const _this = this;

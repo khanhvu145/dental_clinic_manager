@@ -771,9 +771,10 @@ export default {
 		},
         async getData(searchQuery){
             const _this = this;
-            if(searchQuery.filters.dateF == null || searchQuery.filters.dateF == ''){
-                searchQuery.filters.dateF = [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))];
-            }
+            // if(searchQuery.filters.dateF == null || searchQuery.filters.dateF == ''){
+            //     searchQuery.filters.dateF = [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))];
+            // }
+            _this.dataLoading = true;
             await _this.$axios.$post('/api/appointment/getByQuery', searchQuery).then(
                 (response) => {
                     _this.data = response;

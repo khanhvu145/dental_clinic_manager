@@ -258,11 +258,10 @@ export default {
         },
         async getData(searchQuery){
             const _this = this;
-            console.log(searchQuery)
+            _this.dataLoading = true;
             await _this.$axios.$post('/api/customer/getByQuery', searchQuery).then(
                 (response) => {
 					_this.data = response;
-                    _this.dataLoading = false;
 				},
 				(error) => {
 					console.log('Error: ', error);
@@ -270,9 +269,9 @@ export default {
 						type: 'error',
 						message: 'Có lỗi xảy ra',
 					});
-                    _this.dataLoading = false;
 				}
             );
+            _this.dataLoading = false;
         },
         refreshData(){
             const _this = this;
