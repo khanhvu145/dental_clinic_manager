@@ -16,15 +16,18 @@
                             <span>NGÀY KHÁM: {{ $moment().format('DD/MM/YYYY') }}</span>
                             <div v-if="formData._id" class="">
                                 <a  class="btn control-btn gray" @click="isExam = false">
-                                    Đóng
+                                    <i class='bx bx-x'></i>
+                                    <span>Đóng</span>
                                 </a>
                                 <a class="btn control-btn blue" @click="addExamForm">
-                                    Tạo phiếu khám mới
+                                    <i class='bx bx-plus' ></i>
+                                    <span>Tạo phiếu khám mới</span>
                                 </a>
                             </div>
                             <div v-else class="">
                                 <a class="btn control-btn red" @click="deleteExamForm">
-                                    Hủy
+                                    <i class='bx bx-x'></i>
+                                    <span>Hủy</span>
                                 </a>
                             </div>
                         </div>
@@ -237,6 +240,7 @@
                                                         </div>
                                                         <span slot="footer" class="dialog-footer">
                                                             <button type="button" class="control-btn gray" @click="resetDiagnosisTreatment">
+                                                                <i class='bx bx-x'></i>
                                                                 <span>Đóng</span>
                                                             </button>
                                                             <button
@@ -245,6 +249,7 @@
                                                                 class="control-btn green"
                                                                 @click="addExamination()"
                                                             >
+                                                                <i class='bx bx-list-plus'></i>
                                                                 <span>Thêm</span>
                                                             </button>
                                                             <button

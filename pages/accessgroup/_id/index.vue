@@ -206,6 +206,22 @@ export default {
 											name: 'In phiếu khám',
 											value: 'printExamination',
 										},
+                                        {
+											name: 'Xem lịch sử',
+											value: 'viewHistory',
+										},
+                                        {
+											name: 'Theo dõi thanh toán',
+											value: 'viewPayment',
+										},
+                                        {
+											name: 'Xác nhận thanh toán',
+											value: 'confirmPayment',
+										},
+                                        {
+											name: 'In phiếu thu',
+											value: 'printPayment',
+										},
                                     ],
                                     hideDefaultRights: false,
 								},

@@ -245,6 +245,7 @@
                 </form>
                 <span slot="footer" class="dialog-footer">
                     <button type="button" class="control-btn gray" @click="dialogCreateService = false">
+                        <i class='bx bx-x'></i>
                         <span>Đóng</span>
                     </button>
                     <button
@@ -252,6 +253,7 @@
                         class="control-btn green"
                         @click="submitCreateService"
                     >
+                        <i class='bx bx-save' ></i>
                         <span>Lưu</span>
                     </button>
                 </span>
@@ -353,6 +355,7 @@
                 </form>
                 <span slot="footer" class="dialog-footer">
                     <button type="button" class="control-btn gray" @click="dialogUpdateService = false">
+                        <i class='bx bx-x'></i>
                         <span>Đóng</span>
                     </button>
                     <button
@@ -361,6 +364,7 @@
                         @click="submitUpdateService"
                         v-if="(checkRight('update'))"
                     >
+                        <i class='bx bx-save' ></i>
                         <span>Lưu</span>
                     </button>
                 </span>

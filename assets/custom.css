@@ -275,3 +275,11 @@
 .el-upload--picture-card:hover i, .el-upload:focus i {
     color: #74bc20;
 }
+.el-table__footer-wrapper tbody td{
+    color: #fff !important;
+    background-color: #34679a!important;
+    font-weight: bold !important;
+}
+.el-upload-dragger:hover {
+    border-color: #74bc20;
+}

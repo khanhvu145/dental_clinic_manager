@@ -1,6 +1,6 @@
 <template>
     <LeftMenu>
-        <div class="">
+        <div v-if="checkRight('viewHistory')">
             <div class="row mt-4">
                 <div class="col-md-12" style="text-align: right;">
                     <button type="button" class="control-btn gray" @click="$router.push('/customer')">
@@ -48,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-4">
+            <!-- <div class="row mt-4">
                 <div class="col-md-12">
                     <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
                         <el-table-column label="Mã" min-width="80">
@@ -68,7 +68,7 @@
                         </el-table-column>
                         <el-table-column label="Chi phí điều trị" min-width="100">
                             <template slot-scope="scope">
-                                {{ (scope.row.totalAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                {{ (scope.row.totalAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
                             </template>
                         </el-table-column>
                         <el-table-column label="Thao tác" min-width="60">
@@ -80,8 +80,40 @@
                         </el-table-column>
                     </el-table>
                 </div>
+            </div> -->
+            <div class="row mt-4" v-loading="dataLoading">
+                <div v-if="data.total > 0" class="col-md-12">
+                    <el-timeline>
+                        <el-timeline-item v-for="(item, index) in data.data" :key="index" color="#64dd17" size="large">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a @click="viewExamination(item)" style="font-weight:bold;color:#60c248;cursor:pointer;">
+                                                {{ item.code }} 
+                                                <i class='bx bxs-edit-alt'></i>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            Chi phí điều trị: 
+                                            <span style="font-weight:bold;">
+                                                {{ (item.totalAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND
+                                            </span> 
+                                        </div>
+                                        <div class="col-md-12 text-muted mt-3">
+                                            Ns.{{ item.dentistName }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY hh:mm') }})
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-timeline-item>
+                    </el-timeline>
+                </div>
+                <div v-else class="col-md-12">
+                    <el-empty description="Không có dữ liệu"></el-empty>
+                </div>
             </div>
-             <div class="row mt-4 mb-4">
+            <div class="row mb-4">
                 <div class="col-md-12">
                     <el-pagination
                         @size-change="handleSizeChange"
@@ -381,15 +413,18 @@
                     </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
+                    <button type="button" class="control-btn gray" @click="viewDialog.visible = false">
+                        <i class='bx bx-x'></i>
+                        <span>Đóng</span>
+                    </button>
                     <button
+                        v-if="checkRight('printExamination')"
                         type="button" 
                         class="control-btn yellow"
                         @click="printExamination()"
                     >
+                        <i class='bx bxs-printer' ></i>
                         <span>In phiếu khám</span>
-                    </button>
-                    <button type="button" class="control-btn gray" @click="viewDialog.visible = false">
-                        <span>Đóng</span>
                     </button>
                 </span>
             </el-dialog>
@@ -687,6 +722,9 @@
                 </section>
             </vue-html2pdf>
         </div>
+        <div v-else>
+            <el-empty description="Bạn không có quyền !!"></el-empty>
+        </div>
     </LeftMenu>
 </template>
 
@@ -695,6 +733,7 @@ import { mapState } from 'vuex';
 import LeftMenu from '@/components/customer/LeftMenu';
 import Customer from '@/models/tw_Customer';
 import Examination from '@/models/tw_Examination';
+import { cloneDeep, debounce, intersection, remove } from 'lodash';
 export default {
     components: {
 		LeftMenu,
@@ -809,21 +848,21 @@ export default {
         async getData(searchQuery){
             const _this = this;
             _this.dataLoading = true;
-             if (_this.$route.params.id) {
-                searchQuery.filters.customerF = _this.$route.params.id;
-                await _this.$axios.$post('/api/customer/getByQueryExamination', searchQuery).then(
-                    (response) => {
-                        _this.data = response;
-                    },
-                    (error) => {
-                        console.log('Error: ', error);
-                        _this.$message({
-                            type: 'error',
-                            message: 'Có lỗi xảy ra',
-                        });
-                    }
-                );
-             }
+            if (_this.$route.params.id) {
+            searchQuery.filters.customerF = _this.$route.params.id;
+            await _this.$axios.$post('/api/customer/getByQueryExamination', searchQuery).then(
+                (response) => {
+                    _this.data = response;
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            }
             _this.dataLoading = false;
         },
         handleSizeChange(val) {
