@@ -220,7 +220,7 @@ export default {
 										},
                                         {
 											name: 'In phiếu thu',
-											value: 'printPayment',
+											value: 'printReceipt',
 										},
                                     ],
                                     hideDefaultRights: false,

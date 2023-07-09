@@ -375,7 +375,7 @@
                                     <span>Lưu phiếu khám</span>
                                 </button>
                                 <button
-                                    
+                                    v-if="(checkRight('printExamination') && (formData._id != null && formData._id != ''))"
                                     type="button" 
                                     class="control-btn yellow" 
                                     @click="exportPDF"

@@ -87,13 +87,13 @@
                                             </a>
                                         </el-tooltip>
                                     </div>
-                                    <!-- <div v-if="checkRight('printPayment')">
+                                    <div>
                                         <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
-                                            <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printPayment(scope.row)">
+                                            <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipt(scope.row)">
                                             <i class='bx bxs-printer'></i>
                                             </a>
                                         </el-tooltip>
-                                    </div> -->
+                                    </div>
                                 </div>
                             </template>
                         </el-table-column>
@@ -120,7 +120,7 @@
                 :close-on-click-modal="false"
                 width="65%"
             >
-                <div v-if="paymentDialog.data" class="container">
+                <form v-if="paymentDialog.data" class="container" v-on:submit.prevent="confirmPayment" v-loading="dataLoading">
                     <div class="row">
                         <div style="font-weight:bold;font-size:16px;">Thông tin chung</div>
                         <div class="col-md-12 mt-3" style="background-color: #f8f8f8;">
@@ -137,7 +137,7 @@
                                     Khách hàng
                                 </div>
                                 <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
-                                    {{'(' + customerInfo.code + ') ' + customerInfo.name}}
+                                    {{'(' + paymentDialog.data.customerCode + ') ' + paymentDialog.data.customerName}}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
@@ -174,10 +174,12 @@
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
                                 <div class="col-md-4 pt-2 pb-2">
-                                    Ghi chú
+                                    Trạng thái thanh toán
                                 </div>
                                 <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
-                                    {{ paymentDialog.data.note }}
+                                    <div v-if="paymentDialog.data.status == 'unpaid'">Chưa thanh toán</div>
+                                    <div v-if="paymentDialog.data.status == 'partialPaid'">Thanh toán một phần</div>
+                                    <div v-if="paymentDialog.data.status == 'paid'">Đã thanh toán</div>
                                 </div>
                             </div>
                         </div>
@@ -190,35 +192,59 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="col-form-label">Số tiền còn lại</div>
-                                            <el-input 
-                                                name="remainAmount"
-                                                placeholder="Số tiền còn lại"
-                                                v-model="paymentDialog.data.remainAmount"
-                                                readonly
-                                            >
-                                                <template slot="append">VND</template>
-                                            </el-input>
+                                            <div class="inputTextRight">
+                                                <vue-autonumeric
+                                                    v-model="paymentDialog.receiptData.remainAmount"
+                                                    class="el-input__inner"
+                                                    placeholder="Số tiền còn lại"
+                                                    readonly
+                                                    :options="{
+                                                        decimalPlaces: 0,
+                                                        digitGroupSeparator: ',',
+                                                        decimalCharacter: '.',
+                                                        decimalCharacterAlternative: '.',
+                                                        currencySymbol: '\u00a0VND',
+                                                        currencySymbolPlacement: 's',
+                                                        roundingMethod: 'U',
+                                                        minimumValue: '0',
+                                                        emptyInputBehavior: '0'
+                                                    }"
+                                                ></vue-autonumeric>
+                                            </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="col-form-label">Số tiền thanh toán *</div>
-                                            <el-input 
-                                                name="receiptAmount"
-                                                placeholder="Số tiền thanh toán"
-                                                v-model="paymentDialog.data.receiptAmount"
-                                            >
-                                                <template slot="append">VND</template>
-                                            </el-input>
+                                            <div class="inputTextRight">
+                                                <vue-autonumeric
+                                                    class="el-input__inner"
+                                                    name="receiptAmount"
+                                                    placeholder="Số tiền thanh toán"
+                                                    v-model="paymentDialog.receiptData.paidAmount"
+                                                    @change.native="handleChangeReceiptAmount"
+                                                    :options="{
+                                                        decimalPlaces: 0,
+                                                        digitGroupSeparator: ',',
+                                                        decimalCharacter: '.',
+                                                        decimalCharacterAlternative: '.',
+                                                        currencySymbol: '\u00a0VND',
+                                                        currencySymbolPlacement: 's',
+                                                        roundingMethod: 'U',
+                                                        minimumValue: '0',
+                                                        emptyInputBehavior: '0'
+                                                    }"
+                                                ></vue-autonumeric>
+                                            </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="col-form-label">Hình thức thanh toán *</div>
-                                            <el-select v-model="paymentDialog.data.methodFee" placeholder="Hình thức thanh toán" name="methodFee">
+                                            <el-select v-model="paymentDialog.receiptData.methodFee" placeholder="Hình thức thanh toán" name="methodFee">
                                                 <el-option label="Tiền mặt" value="cash"></el-option>
                                                 <el-option label="Chuyển khoản" value="transfer"></el-option>
                                             </el-select>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="col-form-label">Ghi chú</div>
-                                            <el-input type="textarea" :rows="4" placeholder="Ghi chú" v-model="paymentDialog.data.note"></el-input>
+                                            <el-input type="textarea" :rows="4" placeholder="Ghi chú" v-model="paymentDialog.receiptData.note"></el-input>
                                         </div>
                                     </div>
                                 </div>
@@ -249,7 +275,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
                 <span slot="footer" class="dialog-footer">
                     <button type="button" class="control-btn gray" @click="paymentDialog.visible = false">
                         <i class='bx bx-x'></i>
@@ -266,6 +292,180 @@
                     </button>
                 </span>
             </el-dialog>
+
+            <vue-html2pdf 
+                class="print-content"
+                id="print-content-pdf"
+                :show-layout="false"
+                :float-layout="true"
+                :preview-modal="true"
+                :enable-download="false"
+                :paginate-elements-by-height="1500"
+                :filename="'test'"
+                :pdf-quality="2"
+                :manual-pagination="false"
+                pdf-format="a5"
+                pdf-orientation="landscape"
+                pdf-content-width="100%"
+                ref="html2Pdf_receipt"
+            >
+                <section slot="pdf-content">
+                    <div v-if="receiptsData" class="container mt-3" style="color:#000;font-size:13px;">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <el-image
+                                    style="width: 100%; height: auto"
+                                    src="/images/logoclinic.png"
+                                    fit="cover">
+                                </el-image>
+                            </div>
+                            <div class="col-md-10">
+                                <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="mt-3">
+                                            <span style="font-weight:bold;">Địa chỉ:</span>
+                                            <span>Quận 3, HCM</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Số điện thoại:</span>
+                                            <span>0703260457</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Email:</span>
+                                            <span>dentalclinic@gmail.com</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Website:</span>
+                                            <span>https://www.google.com</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div style="font-weight:bold;font-size:20px;">PHIẾU THU</div>
+                            </div>
+                            <div class="col-md-12 mt-2 text-center">
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4 text-center">Ngày {{$moment(receiptsData.createdAt).format('DD')}} tháng {{$moment(receiptsData.createdAt).format('MM')}} năm {{$moment(receiptsData.createdAt).format('YYYY')}}</div>
+                                    <div class="col-md-4 text-right">Mã: {{receiptsData.code}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Mã khách hàng: </span>
+                                {{ receiptsData.customerCode || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Họ và tên: </span>
+                                {{ receiptsData.customerName || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Ngày sinh: </span>
+                                {{ $moment(receiptsData.customerBirthday).format('DD/MM/YYYY') || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Giới tính: </span>
+                                {{ receiptsData.customerGender == 'male' ? 'Nam' : 'Nữ' || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">CMND/CCCD: </span>
+                                {{ receiptsData.customerPhysicalId || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                    <span style="font-weight: bold;">Số điện thoại: </span>
+                                {{ receiptsData.customerPhone || '' }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" style="font-size:14px;font-weight:bold;">
+                                <i class='bx bx-check-circle' style="font-size:18px;" ></i>
+                                NỘI DUNG
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <table class="table table-bordered" style="margin-bottom:0;">
+                                    <thead>
+                                        <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Răng/hàm</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Điều trị</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Đơn giá</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">SL</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Giảm giá</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in receiptsData.diagnosisTreatment" :key="item.key">
+                                            <td style="padding-top:4px;padding-bottom:4px;">
+                                                <!-- {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }} -->
+                                            </td>
+                                            <td style="padding-top:4px;padding-bottom:4px;">
+                                                <!-- {{ getServiceName(item.serviceId) }} -->
+                                            </td>
+                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
+                                                <!-- {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }} -->
+                                            </td>
+                                            <td style="text-align:center;padding-top:4px;padding-bottom:4px;">
+                                                <!-- {{ item.isJaw ? item.quantityJaw : item.quantity }} -->
+                                            </td>
+                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
+                                                <!-- {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }} -->
+                                            </td>
+                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
+                                                <!-- {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }} -->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-md-12" style="font-size:14px;font-weight:bold;">
+                                <i class='bx bx-check-circle' style="font-size:18px;" ></i>
+                                THANH TOÁN
+                            </div>
+                            <div class="col-md-12 ml-2 mt-1">
+                                <table class="table table-borderless" style="font-size:14px;margin-bottom:0;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:22%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Tổng chi phí</td>
+                                            <td style="width:4%;padding-top:4px;padding-bottom:4px;">:</td>
+                                            <td style="text-align:right;width:74%;padding-top:4px;padding-bottom:4px;">
+                                                <!-- <span>{{ receiptsData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span> -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:22%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Hình thức thanh toán</td>
+                                            <td style="width:4%;padding-top:4px;padding-bottom:4px;">:</td>
+                                            <td style="text-align:right;width:74%;padding-top:4px;padding-bottom:4px;">
+                                                
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6" style="text-align:center;">
+                                <div>Người thu</div>
+                                <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                            </div>
+                            <div class="col-md-6" style="text-align:center;">
+                                <div>Người nộp</div>
+                                <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </vue-html2pdf>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -279,9 +479,12 @@ import LeftMenu from '@/components/customer/LeftMenu';
 import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import Customer from '@/models/tw_Customer';
 import Payment from '@/models/tw_Payment';
+import VueAutonumeric from 'vue-autonumeric';
+import buildFormData from '@/utils/buildFormData';
 export default {
     components: {
 		LeftMenu,
+        'vue-autonumeric': VueAutonumeric,
 	},
     computed: {
 		...mapState({
@@ -310,7 +513,9 @@ export default {
             paymentDialog: {
                 visible: false,
                 data: null,
-            }
+                receiptData: null,
+            },
+            receiptsData: {}
         }
     },
     async created(){
@@ -354,64 +559,19 @@ export default {
             const _this = this;
             _this.dataLoading = true;
             if (_this.$route.params.id) {
-                _this.data.data = [
-                    {
-                        examinationCode: 'A001',
-                        createdAt: new Date(),
-                        amount: 2500000,
-                        paidAmount: 0,
-                        remainAmount: 2500000,
-                        status: 'unpaid',
+                searchQuery.filters.customerF = _this.$route.params.id;
+                await _this.$axios.$post('/api/payment/getByQuery', searchQuery).then(
+                    (response) => {
+                        _this.data = response;
                     },
-                    {
-                        examinationCode: 'A002',
-                        createdAt: new Date(),
-                        amount: 3000000,
-                        paidAmount: 2000000,
-                        remainAmount: 1000000,
-                        status: 'partialPaid',
-                    },
-                    {
-                        examinationCode: 'A003',
-                        createdAt: new Date(),
-                        amount: 1800000,
-                        paidAmount: 1800000,
-                        remainAmount: 0,
-                        status: 'paid',
-                    },
-                    {
-                        examinationCode: 'A003',
-                        createdAt: new Date(),
-                        amount: 1800000,
-                        paidAmount: 1800000,
-                        remainAmount: 0,
-                        status: 'paid',
-                    },
-                    {
-                        examinationCode: 'A003',
-                        createdAt: new Date(),
-                        amount: 1800000,
-                        paidAmount: 1800000,
-                        remainAmount: 0,
-                        status: 'paid',
-                    },
-                    {
-                        examinationCode: 'A003',
-                        createdAt: new Date(),
-                        amount: 1800000,
-                        paidAmount: 1800000,
-                        remainAmount: 0,
-                        status: 'paid',
-                    },
-                    {
-                        examinationCode: 'A003',
-                        createdAt: new Date(),
-                        amount: 1800000,
-                        paidAmount: 1800000,
-                        remainAmount: 0,
-                        status: 'paid',
-                    },
-                ];
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
             }
             _this.dataLoading = false;
         },
@@ -427,13 +587,52 @@ export default {
         },
         viewPayment(data){
             const _this = this;
+            if (_this.$refs.uploadFiles) {
+                _this.$refs.uploadFiles.clearFiles();
+            }
             _this.paymentDialog.data = data;
+            _this.paymentDialog.receiptData = {
+                paidAmount: 0,
+                remainAmount: data.remainAmount,
+                methodFee: '',
+                note: '',
+                files: [],
+            };
             _this.paymentDialog.visible = true;
         },
         async confirmPayment(){
             const _this = this;
+            _this.dataLoading = true;
             const files = _this.$refs.uploadFiles.uploadFiles;
-            console.log(files)
+            var receiptData = _this.paymentDialog.receiptData;
+            if (files && files.length > 0) {
+                files.forEach(element => {
+                    receiptData.files.push(element.raw);
+				});
+            }
+            receiptData.paymentId = _this.paymentDialog.data._id;
+            receiptData.updatedBy = _this.userInfo.data.username;
+            var oldData = cloneDeep(receiptData);
+            var newData = new FormData();
+            buildFormData(newData, oldData);
+            const data = await _this.$axios.$post('/api/payment/confirmPayment', newData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (data.success) {
+                _this.paymentDialog.visible = false;
+                _this.receiptsData = data.receiptsData;
+                if (_this.$refs.uploadFiles) {
+                    _this.$refs.uploadFiles.clearFiles();
+                }
+                await _this.getData(_this.searchQuery);
+                _this.$message({
+                    message: data.message,
+                    type: 'success',
+                });
+            } else {
+                _this.$message.error(data.error);
+            }
+            _this.dataLoading = false;
         },
         getSummaries(param){
             const { columns, data } = param;
@@ -474,6 +673,17 @@ export default {
         handleRemove(file, fileList) {
 			console.log(file, fileList);
 		},
+        handleChangeReceiptAmount(){
+            const _this = this;
+            if(_this.paymentDialog.receiptData.paidAmount > _this.paymentDialog.data.remainAmount){
+                _this.paymentDialog.receiptData.paidAmount = _this.paymentDialog.data.remainAmount;
+            }
+            _this.paymentDialog.receiptData.remainAmount = _this.paymentDialog.data.remainAmount - _this.paymentDialog.receiptData.paidAmount;
+        },
+        printReceipt(id){
+            const _this = this;
+            _this.$refs.html2Pdf_receipt.generatePdf();
+        },
     }
 }
 </script>

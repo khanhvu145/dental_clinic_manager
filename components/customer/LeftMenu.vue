@@ -41,7 +41,7 @@
                             class="list-group-item list-group-item-action border-0"
                         >
                             <a href="javascript:void(0)">
-                                <span>Lịch sử</span>
+                                <span>Nhật ký</span>
                             </a>
                         </nuxt-link>
                     </ul>

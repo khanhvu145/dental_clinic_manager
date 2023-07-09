@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="row mt-4">
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <div class="col-form-label">Mã phiếu</div>
                     <el-input placeholder="Mã..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
                 </div>
@@ -24,9 +24,17 @@
                             :value="item._id"
                         ></el-option>
                     </el-select>
+                </div> -->
+                <div class="col-md-3">
+                    <div class="col-form-label">Loại</div>
+                    <el-select v-model="searchQuery.filters.typeF" placeholder="Loại..." name="typeF" filterable>
+                        <el-option label="Tất cả" value="all"></el-option>
+                        <el-option label="Khám và điều trị" value="examination"></el-option>
+                        <el-option label="Thanh toán" value="payment"></el-option>
+                    </el-select>
                 </div>
                 <div class="col-md-3">
-                    <div class="col-form-label">Ngày khám</div>
+                    <div class="col-form-label">Ngày</div>
                     <el-date-picker
                         v-model="searchQuery.filters.dateF"
                         type="daterange"
@@ -86,24 +94,22 @@
                     <el-timeline>
                         <el-timeline-item v-for="(item, index) in data.data" :key="index" color="#64dd17" size="large">
                             <div class="row">
-                                <div class="col-12">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <a @click="viewExamination(item)" style="font-weight:bold;color:#60c248;cursor:pointer;">
-                                                {{ item.code }} 
-                                                <i class='bx bxs-edit-alt'></i>
-                                            </a>
+                                <div class="col-md-12">
+                                     <a v-if="item.type == 'examination'" @click="viewExamination(item)" style="font-weight:bold;color:#60c248;cursor:pointer;">
+                                        <div>
+                                            Khám và điều trị
+                                            <i class='bx bxs-edit-alt'></i>
                                         </div>
-                                        <div class="col-md-12 mt-3">
-                                            Chi phí điều trị: 
-                                            <span style="font-weight:bold;">
-                                                {{ (item.totalAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND
-                                            </span> 
+                                    </a>
+                                    <a v-else-if="item.type == 'payment'" @click="viewPayment(item)" style="font-weight:bold;color:#60c248;cursor:pointer;">
+                                        <div>
+                                            Thanh toán
+                                            <i class='bx bxs-edit-alt'></i>
                                         </div>
-                                        <div class="col-md-12 text-muted mt-3">
-                                            Ns.{{ item.dentistName }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY hh:mm') }})
-                                        </div>
-                                    </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-12 mt-3" style="font-style: italic;color:#98a6ad;">
+                                    {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
                                 </div>
                             </div>
                         </el-timeline-item>
@@ -436,7 +442,7 @@
                 :preview-modal="true"
                 :enable-download="false"
                 :paginate-elements-by-height="1500"
-                :filename="'test'"
+                filename="test"
                 :pdf-quality="2"
                 :manual-pagination="false"
                 pdf-format="a4"
@@ -721,6 +727,227 @@
                     </div>
                 </section>
             </vue-html2pdf>
+
+            <el-dialog
+                :visible.sync='viewReceiptDialog.visible'
+                width='794px'
+                :title="`Phiếu thu ${viewReceiptDialog.data ? viewReceiptDialog.data.code : ''}`"
+                :close-on-click-modal="false"
+            >
+                <span slot="footer" class="dialog-footer">
+                    <button type="button" class="control-btn gray" @click="viewReceiptDialog.visible = false">
+                        <i class='bx bx-x'></i>
+                        <span>Đóng</span>
+                    </button>
+                    <button
+                        v-if="checkRight('printReceipt')"
+                        type="button" 
+                        class="control-btn yellow"
+                        @click="printReceipt()"
+                    >
+                        <i class='bx bxs-printer' ></i>
+                        <span>In phiếu thu</span>
+                    </button>
+                </span>
+            </el-dialog>
+
+            <vue-html2pdf 
+                class="print-content"
+                id="print-content-pdf"
+                :show-layout="false"
+                :float-layout="true"
+                :preview-modal="true"
+                :enable-download="false"
+                :paginate-elements-by-height="1500"
+                :filename="'test'"
+                :pdf-quality="2"
+                :manual-pagination="false"
+                pdf-format="a5"
+                pdf-orientation="landscape"
+                pdf-content-width="100%"
+                ref="html2Pdf_receipt"
+            >
+                <section slot="pdf-content">
+                    <div v-if="viewReceiptDialog.data" class="container mt-3" style="color:#000;font-size:13px;">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <el-image
+                                    style="width: 100%; height: auto"
+                                    src="/images/logoclinic.png"
+                                    fit="cover">
+                                </el-image>
+                            </div>
+                            <div class="col-md-10">
+                                <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="mt-3">
+                                            <span style="font-weight:bold;">Địa chỉ:</span>
+                                            <span>Quận 3, HCM</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Số điện thoại:</span>
+                                            <span>0703260457</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Email:</span>
+                                            <span>dentalclinic@gmail.com</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Website:</span>
+                                            <span>https://www.google.com</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div style="font-weight:bold;font-size:20px;">PHIẾU THU</div>
+                            </div>
+                            <div class="col-md-12 mt-2 text-center">
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4 text-center">Ngày {{$moment(viewReceiptDialog.data.createdAt).format('DD')}} tháng {{$moment(viewReceiptDialog.data.createdAt).format('MM')}} năm {{$moment(viewReceiptDialog.data.createdAt).format('YYYY')}}</div>
+                                    <div class="col-md-4 text-right">Mã: {{viewReceiptDialog.data.code}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Mã khách hàng: </span>
+                                {{ viewReceiptDialog.data.customerCode || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Họ và tên: </span>
+                                {{ viewReceiptDialog.data.customerName || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Ngày sinh: </span>
+                                {{ $moment(viewReceiptDialog.data.customerBirthday).format('DD/MM/YYYY') || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">Giới tính: </span>
+                                {{ viewReceiptDialog.data.customerGender == 'male' ? 'Nam' : 'Nữ' || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <span style="font-weight: bold;">CMND/CCCD: </span>
+                                {{ viewReceiptDialog.data.customerPhysicalId || '' }}
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                    <span style="font-weight: bold;">Số điện thoại: </span>
+                                {{ viewReceiptDialog.data.customerPhone || '' }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" style="font-size:14px;font-weight:bold;">
+                                <i class='bx bx-check-circle' style="font-size:18px;" ></i>
+                                NỘI DUNG
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <table class="table table-bordered" style="margin-bottom:0;">
+                                    <thead>
+                                        <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Răng/hàm</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Điều trị</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Đơn giá</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">SL</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Giảm giá</th>
+                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in viewReceiptDialog.data.diagnosisTreatment" :key="item.key">
+                                            <td style="padding-top:4px;padding-bottom:4px;">
+                                                {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }}
+                                            </td>
+                                            <td style="padding-top:4px;padding-bottom:4px;">
+                                                {{ getServiceName(item.serviceId) }}
+                                            </td>
+                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
+                                                {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                            </td>
+                                            <td style="text-align:center;padding-top:4px;padding-bottom:4px;">
+                                                {{ item.isJaw ? item.quantityJaw : item.quantity }}
+                                            </td>
+                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
+                                                {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                            </td>
+                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
+                                                {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-md-12" style="font-size:14px;font-weight:bold;">
+                                <i class='bx bx-check-circle' style="font-size:18px;" ></i>
+                                THANH TOÁN
+                            </div>
+                            <div class="col-md-12 ml-2 mt-1">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless" style="font-size:14px;margin-bottom:0;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width:45%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Tổng chi phí</td>
+                                                    <td style="width:5%;padding-top:4px;padding-bottom:4px;">:</td>
+                                                    <td style="text-align:right;width:50%;padding-top:4px;padding-bottom:4px;">
+                                                        <span>{{ viewReceiptDialog.data.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:45%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Số tiền thanh toán</td>
+                                                    <td style="width:5%;padding-top:4px;padding-bottom:4px;">:</td>
+                                                    <td style="text-align:right;width:50%;padding-top:4px;padding-bottom:4px;">
+                                                        <span>{{ viewReceiptDialog.data.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless" style="font-size:14px;margin-bottom:0;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width:45%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Hình thức thanh toán</td>
+                                                    <td style="width:5%;padding-top:4px;padding-bottom:4px;">:</td>
+                                                    <td style="width:50%;padding-top:4px;padding-bottom:4px;">
+                                                        <span>{{ viewReceiptDialog.data.methodFee == 'cash' ? 'Tiền mặt' : 'Chuyển khoản' }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="width:45%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Ghi chú</td>
+                                                    <td style="width:5%;padding-top:4px;padding-bottom:4px;">:</td>
+                                                    <td style="width:50%;padding-top:4px;padding-bottom:4px;">
+                                                        <span>{{ viewReceiptDialog.data.note || '' }}</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6" style="text-align:center;">
+                                <div>Người thu</div>
+                                <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                            </div>
+                            <div class="col-md-6" style="text-align:center;">
+                                <div>Người nộp</div>
+                                <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </vue-html2pdf>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -748,11 +975,12 @@ export default {
         return{
             searchQuery: {
                 filters: {
-                    codeF: '',
-                    dentistsF: [],
+                    // codeF: '',
+                    // dentistsF: [],
+                    typeF: 'all',
                     dateF: [],
                 },
-                sorts: -1,
+                sorts: 'createdAt&&-1',
                 pages:{
                     from: 0,
                     size: 10
@@ -768,10 +996,19 @@ export default {
                 data: null,
                 width: '60%'
             },
+            viewDialog: {
+                visible: false,
+                data: null,
+                width: '60%'
+            },
             xquangData: [],
             testData: [],
             allergyData: [],
             serviceData: [],
+            viewReceiptDialog: {
+                visible: false,
+                data: null,
+            },
         }
     },
     async created(){
@@ -839,8 +1076,9 @@ export default {
         refreshData(){
             const _this = this;
             _this.searchQuery.filters = {
-                codeF: '',
-                dentistsF: [],
+                // codeF: '',
+                // dentistsF: [],
+                typeF: 'all',
                 dateF: []
             }
             _this.getData(_this.searchQuery);
@@ -849,19 +1087,19 @@ export default {
             const _this = this;
             _this.dataLoading = true;
             if (_this.$route.params.id) {
-            searchQuery.filters.customerF = _this.$route.params.id;
-            await _this.$axios.$post('/api/customer/getByQueryExamination', searchQuery).then(
-                (response) => {
-                    _this.data = response;
-                },
-                (error) => {
-                    console.log('Error: ', error);
-                    _this.$message({
-                        type: 'error',
-                        message: 'Có lỗi xảy ra',
-                    });
-                }
-            );
+                searchQuery.filters.customerF = _this.$route.params.id;
+                await _this.$axios.$post('/api/customer/getByQueryDiary', searchQuery).then(
+                    (response) => {
+                        _this.data = response;
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
             }
             _this.dataLoading = false;
         },
@@ -875,8 +1113,9 @@ export default {
             _this.searchQuery.pages.from = (_this.currentPage - 1) * _this.searchQuery.pages.size;
             _this.getData(_this.searchQuery);
         },
-        viewExamination(data){
+        async viewExamination(data){
             const _this = this;
+            //#region Set độ rộng dialog
             var w = window.innerWidth;
             if(w >= 1200 && w <= 1500){
                 _this.viewDialog.width = '60%'
@@ -893,8 +1132,22 @@ export default {
             else{
                 _this.viewDialog.width = '50%'
             }
-            _this.viewDialog.data = data;
-            _this.viewDialog.visible = true;
+            //#endregion
+            if (data && data.targetId) {
+                await _this.$axios.$get(`/api/customer/getExaminationById/${data.targetId}`).then(
+                    async (response) => {
+                        _this.viewDialog.data = response.data[0];
+                        _this.viewDialog.visible = true;
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
+            }
         },
         printExamination(id){
             const _this = this;
@@ -948,6 +1201,29 @@ export default {
             const _this = this;
             let data = _.find(_this.serviceData, { _id: serviceId });
 			return data ? data.name : '';
+        },
+        async viewPayment(data){
+            const _this = this;
+            if (data && data.targetId) {
+                await _this.$axios.$get(`/api/payment/getReceiptsById/${data.targetId}`).then(
+                    async (response) => {
+                        _this.viewReceiptDialog.data = response.data[0];
+                        _this.viewReceiptDialog.visible = true;
+                        console.log(_this.viewReceiptDialog.data)
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
+            }
+        },
+        printReceipt(id){
+            const _this = this;
+            _this.$refs.html2Pdf_receipt.generatePdf();
         },
     }
 }

@@ -318,6 +318,9 @@ export default {
             const _this = this;
             _this.data.totalPrice = 0;
             var quantity = _this.data.isJaw ? _this.data.quantityJaw : _this.data.quantity;
+            if(_this.data.discount > (_this.data.unitPrice*quantity)){
+                _this.data.discount = _this.data.unitPrice*quantity
+            }
             _this.data.totalPrice = (_this.data.unitPrice*quantity) - _this.data.discount;
         },
     }
