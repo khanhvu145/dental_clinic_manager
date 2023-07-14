@@ -207,8 +207,8 @@ export default {
 											value: 'printExamination',
 										},
                                         {
-											name: 'Xem lịch sử',
-											value: 'viewHistory',
+											name: 'Xem nhật ký',
+											value: 'viewDiary',
 										},
                                         {
 											name: 'Theo dõi thanh toán',
@@ -221,6 +221,10 @@ export default {
                                         {
 											name: 'In phiếu thu',
 											value: 'printReceipt',
+										},
+                                        {
+											name: 'Xem phiếu khám',
+											value: 'viewExaminationForm',
 										},
                                     ],
                                     hideDefaultRights: false,

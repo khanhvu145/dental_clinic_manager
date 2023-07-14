@@ -36,8 +36,18 @@
                         </nuxt-link>
                         <nuxt-link
                             tag="li"
-                            :to="`/customer/${$route.params.id}/history`"
-                            :class="{ 'submenu-active': isRouteActive('history') }"
+                            :to="`/customer/${$route.params.id}/examinationForm`"
+                            :class="{ 'submenu-active': isRouteActive('examinationForm') }"
+                            class="list-group-item list-group-item-action border-0"
+                        >
+                            <a href="javascript:void(0)">
+                                <span>Phiếu khám</span>
+                            </a>
+                        </nuxt-link>
+                        <nuxt-link
+                            tag="li"
+                            :to="`/customer/${$route.params.id}/diary`"
+                            :class="{ 'submenu-active': isRouteActive('diary') }"
                             class="list-group-item list-group-item-action border-0"
                         >
                             <a href="javascript:void(0)">
