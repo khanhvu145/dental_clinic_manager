@@ -25,18 +25,6 @@
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>
-            <!-- <nuxt-link to="/appointment" class="sidebar-nav-link">
-                <el-menu-item index="appointment">
-                    <i class='bx bxs-calendar-plus'></i>
-                    <span slot="title">Lịch hẹn</span>
-                </el-menu-item>
-            </nuxt-link> -->
-            <!-- <nuxt-link to="/calendar" class="sidebar-nav-link">
-                <el-menu-item index="calendar">
-                    <i class='bx bxs-calendar' ></i>
-                    <span slot="title">Lịch làm việc</span>
-                </el-menu-item>
-            </nuxt-link> -->
             <nuxt-link to="/customer" class="sidebar-nav-link">
                 <el-menu-item index="customer">
                     <i class='bx bxs-user-badge'></i>
@@ -65,6 +53,12 @@
                 <el-menu-item index="service">
                     <i class='bx bxs-category-alt'></i>
                     <span slot="title">Loại hình dịch vụ</span>
+                </el-menu-item>
+            </nuxt-link>
+            <nuxt-link to="/receipts" class="sidebar-nav-link">
+                <el-menu-item index="receipts">
+                    <i class='bx bxs-receipt'></i>
+                    <span slot="title">Phiếu thu</span>
                 </el-menu-item>
             </nuxt-link>
             <el-submenu index="2">

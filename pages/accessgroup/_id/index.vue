@@ -242,6 +242,12 @@ export default {
                                     hideDefaultRights: false,
 								},
                                 {
+									name: 'Phiếu thu',
+									value: 'receipts',
+									customRights: [],
+                                    hideDefaultRights: false,
+								},
+                                {
 									name: 'Cấu hình chung',
 									value: 'generalconfig',
 									customRights: [],
