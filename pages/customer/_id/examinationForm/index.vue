@@ -268,8 +268,18 @@
                             <i class='bx bx-check-circle' style="font-size:20px;" ></i>
                             FIlE VÀ HÌNH ẢNH CHỈ ĐỊNH
                         </div>
-                        <div class="col-md-12 mt-2">
-
+                        <div v-for="item in viewDialog.data.attachFiles" :key="item.key" class="col-md-6 mt-2">
+                            <el-card class="box-card">
+                                <div slot="header" class="clearfix">
+                                    <span style="font-weight:bold;">{{ getDesignationTypeName(item.type) }}</span>
+                                </div>
+                                <div class="row">
+                                     <div v-for="(file, index) in item.files" :key="index" class="col-6">
+                                        <span style="font-family:Wingdings">&#119;</span>
+                                        <a :href="file" target="_blank" style="font-style:italic;text-decoration:underline!important;">{{ 'File chỉ định ' + (index + 1) }}</a> 
+                                     </div>
+                                </div>
+                            </el-card>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -401,7 +411,7 @@
                 ref="html2Pdf_examinationForm"
             >
                 <section slot="pdf-content">
-                    <div v-if="printData && isPrint" class="container mt-3" style="color:#000;font-size:13px;">
+                    <div v-if="printData && printData._id" class="container mt-3" style="color:#000;font-size:13px;">
                         <div class="row">
                             <div class="col-md-3">
                                 <el-image
@@ -721,7 +731,6 @@ export default {
             currentPage: 1,
             designationTypeData: [],
             printData: {},
-            isPrint: false,
             xquangData: [],
             testData: [],
             allergyData: [],
@@ -829,7 +838,6 @@ export default {
             const _this = this;
             if(data){
                 _this.printData = data;
-                _this.isPrint = true;
                 _this.$refs.html2Pdf_examinationForm.generatePdf();
             }
         },

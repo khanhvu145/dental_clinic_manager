@@ -10,25 +10,11 @@
                 </div>
             </div>
             <div class="row mt-4">
-                <!-- <div class="col-md-3">
-                    <div class="col-form-label">Mã phiếu</div>
-                    <el-input placeholder="Mã..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
-                </div>
-                <div class="col-md-3">
-                    <div class="col-form-label">Nha sĩ</div>
-                    <el-select v-model="searchQuery.filters.dentistsF" placeholder="Chọn nha sĩ..." name="dentistsF" multiple clearable filterable>
-                        <el-option
-                            v-for="item in dentistsData"
-                            :key="item._id"
-                            :label="`Ns ${item.name}`"
-                            :value="item._id"
-                        ></el-option>
-                    </el-select>
-                </div> -->
                 <div class="col-md-3">
                     <div class="col-form-label">Loại</div>
                     <el-select v-model="searchQuery.filters.typeF" placeholder="Loại..." name="typeF" filterable>
                         <el-option label="Tất cả" value="all"></el-option>
+                        <el-option label="Đặt hẹn" value="booking"></el-option>
                         <el-option label="Khám và điều trị" value="examination"></el-option>
                         <el-option label="Thanh toán" value="payment"></el-option>
                     </el-select>
@@ -56,54 +42,21 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="row mt-4">
-                <div class="col-md-12">
-                    <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
-                        <el-table-column label="Mã" min-width="80">
-                            <template slot-scope="scope">
-                                {{scope.row.code}}
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="Ngày khám" min-width="80">
-                            <template slot-scope="scope">
-                                {{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="Nha sĩ phụ trách" min-width="100">
-                            <template slot-scope="scope">
-                                Ns. {{scope.row.dentistName}}
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="Chi phí điều trị" min-width="100">
-                            <template slot-scope="scope">
-                                {{ (scope.row.totalAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="Thao tác" min-width="60">
-                             <template slot-scope="scope">
-                                <a class="btn control-btn blue2" style="padding: 4px 6px;" @click="viewExamination(scope.row)">
-                                    <i class='bx bx-show'></i>
-                                </a>
-                             </template>
-                        </el-table-column>
-                    </el-table>
-                </div>
-            </div> -->
             <div class="row mt-4" v-loading="dataLoading">
                 <div v-if="data.total > 0" class="col-md-12">
                     <el-timeline>
                         <el-timeline-item v-for="(item, index) in data.data" :key="index" color="#64dd17" size="large">
                             <div class="row">
                                 <div class="col-md-12">
-                                     <a v-if="item.type == 'examination'" @click="viewExamination(item)" style="font-weight:bold;color:#60c248;cursor:pointer;">
+                                     <a v-if="item.type == 'examination'" style="font-weight:bold;color:#60c248;cursor:pointer;">
                                         <div>
-                                            Khám và điều trị
+                                            Khám và điều trị ({{ item.code }})
                                             <i class='bx bxs-edit-alt'></i>
                                         </div>
                                     </a>
-                                    <a v-else-if="item.type == 'payment'" @click="viewPayment(item)" style="font-weight:bold;color:#60c248;cursor:pointer;">
+                                    <a v-else-if="item.type == 'payment'" style="font-weight:bold;color:#60c248;cursor:pointer;">
                                         <div>
-                                            Thanh toán
+                                            Thanh toán ({{ item.code }})
                                             <i class='bx bxs-edit-alt'></i>
                                         </div>
                                     </a>
@@ -132,7 +85,7 @@
                     </el-pagination>
                 </div>
             </div>
-            <el-dialog
+            <!-- <el-dialog
                 :visible.sync='viewDialog.visible'
                 :width='viewDialog.width'
                 :title="`Phiếu khám ${viewDialog.data ? viewDialog.data.code : ''}`"
@@ -433,8 +386,8 @@
                         <span>In phiếu khám</span>
                     </button>
                 </span>
-            </el-dialog>
-            <vue-html2pdf 
+            </el-dialog> -->
+            <!-- <vue-html2pdf 
                 class="print-content"
                 id="print-content-pdf"
                 :show-layout="false"
@@ -726,9 +679,9 @@
                         </div>
                     </div>
                 </section>
-            </vue-html2pdf>
+            </vue-html2pdf> -->
 
-            <el-dialog
+            <!-- <el-dialog
                 :visible.sync='viewReceiptDialog.visible'
                 width='794px'
                 :title="`Phiếu thu ${viewReceiptDialog.data ? viewReceiptDialog.data.code : ''}`"
@@ -749,9 +702,9 @@
                         <span>In phiếu thu</span>
                     </button>
                 </span>
-            </el-dialog>
+            </el-dialog> -->
 
-            <vue-html2pdf 
+            <!-- <vue-html2pdf 
                 class="print-content"
                 id="print-content-pdf"
                 :show-layout="false"
@@ -947,7 +900,7 @@
                         </div>
                     </div>
                 </section>
-            </vue-html2pdf>
+            </vue-html2pdf> -->
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
