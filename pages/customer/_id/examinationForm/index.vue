@@ -1,6 +1,6 @@
 <template>
     <LeftMenu>
-        <div v-if="checkRight('viewExaminationForm')">
+        <div v-if="checkRight('viewExamination')">
             <div class="row mt-4">
                 <div class="col-md-12" style="text-align: right;">
                     <button type="button" class="control-btn gray" @click="$router.push('/customer')">
@@ -81,23 +81,23 @@
                                 </div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Thao tác" min-width="50">
+                        <el-table-column label="Thao tác" min-width="40">
                              <template slot-scope="scope">
                                 <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                                    <div v-if="checkRight('viewExaminationForm')">
+                                    <div v-if="checkRight('viewExamination')">
                                         <el-tooltip class="item" effect="dark" content="Chi tiết phiếu khám" placement="top">
                                             <a class="btn control-btn blue2" style="padding: 4px 6px;" @click="viewExamination(scope.row)">
-                                                <i class='bx bx-show'></i>
+                                                <i class='bx bxs-edit'></i>
                                             </a>
                                         </el-tooltip>
                                     </div>
-                                    <div v-if="checkRight('printExamination')">
+                                    <!-- <div v-if="checkRight('printExamination')">
                                         <el-tooltip class="item" effect="dark" content="In phiếu khám" placement="top">
                                             <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printExamination(scope.row)">
                                             <i class='bx bxs-printer'></i>
                                             </a>
                                         </el-tooltip>
-                                    </div>
+                                    </div> -->
                                 </div>
                              </template>
                         </el-table-column>
@@ -381,6 +381,15 @@
                     <button type="button" class="control-btn gray" @click="viewDialog.visible = false">
                         <i class='bx bx-x'></i>
                         <span>Đóng</span>
+                    </button>
+                    <button
+                        v-if="checkRight('cancelExamination')"
+                        type="button" 
+                        class="control-btn red"
+                        @click="cancelExamination(viewDialog.data)"
+                    >
+                        <i class='bx bx-task-x'></i>
+                        <span>Hủy phiếu khám</span>
                     </button>
                     <button
                         v-if="checkRight('printExamination')"
@@ -781,6 +790,9 @@ export default {
         });
         _this.serviceData = services.data;
         //Lấy danh sách dữ liệu
+        if(_this.$route.query.code){
+            _this.searchQuery.filters.codeF = _this.$route.query.code;
+        }
         await _this.getData(_this.searchQuery);
     },
     methods: {
@@ -915,6 +927,39 @@ export default {
                 _this.viewDialog.visible = true;
             }
         },
+        async cancelExamination(data){
+            const _this = this;
+            _this
+				.$confirm(`Bạn có chắc muốn hủy phiếu khám ${data.code}?`, 'Xác nhận', {
+					confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+					type: 'confirm',
+				})
+                .then(async () => {
+                    await _this.$axios.$delete(`/api/customer/cancelExamination/${data._id}`).then(
+                        async (response) => {
+                            if (response.success) {
+                                _this.viewDialog.visible = false;
+                                await _this.getData(_this.searchQuery);
+                                _this.$message({
+                                    message: `Phiếu khám ${data.code} được hủy thành công`,
+                                    type: 'success',
+                                });
+                            }
+                            else {
+                                _this.$message.error(response.error);
+                            }
+                        },
+                        (error) => {
+                            console.log('Error: ', error);
+                            _this.$message({
+                                type: 'error',
+                                message: 'Có lỗi xảy ra',
+                            });
+                        }
+                    );
+                });
+        }
     }
 }
 </script>

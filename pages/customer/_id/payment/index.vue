@@ -42,7 +42,7 @@
             </div>
             <div class="row mt-4">
                 <div class="col-md-12">
-                    <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" max-height="385" stripe border show-summary :summary-method="getSummaries">
+                    <el-table :data="data.data" v-loading="dataLoading" style="width:100%" max-height="385" stripe border show-summary :summary-method="getSummaries">
                         <el-table-column label="Mã phiếu khám" min-width="80">
                             <template slot-scope="scope">
                                 {{scope.row.examinationCode}}
@@ -88,9 +88,9 @@
                                         </el-tooltip>
                                     </div>
                                     <div>
-                                        <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
-                                            <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipt(scope.row)">
-                                            <i class='bx bxs-printer'></i>
+                                        <el-tooltip class="item" effect="dark" content="Chi tiết thanh toán" placement="top">
+                                            <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="viewDetailPayment(scope.row)">
+                                            <i class='bx bxs-detail'></i>
                                             </a>
                                         </el-tooltip>
                                     </div>
@@ -293,6 +293,131 @@
                 </span>
             </el-dialog>
 
+            <el-dialog
+                :visible.sync='detailPaymentDialog.visible'
+                title="Thông tin chi tiết thanh toán"
+                :close-on-click-modal="false"
+                width="65%"
+            >
+                <div v-if="detailPaymentDialog.data" class="container">
+                    <div class="row">
+                        <div style="font-weight:bold;font-size:16px;">Thông tin chung</div>
+                        <div class="col-md-12 mt-3" style="background-color: #f8f8f8;">
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Mã phiếu khám
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    {{detailPaymentDialog.data.examinationCode}}
+                                </div>
+                            </div>
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Khách hàng
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    {{'(' + detailPaymentDialog.data.customerCode + ') ' + detailPaymentDialog.data.customerName}}
+                                </div>
+                            </div>
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Ngày lập phiếu thu
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    {{ detailPaymentDialog.data.createdAt ? $moment(detailPaymentDialog.data.createdAt).format('DD/MM/YYYY') : '' }}
+                                </div>
+                            </div>
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Số tiền
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    {{ (detailPaymentDialog.data.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
+                                </div>
+                            </div>
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Đã thanh toán
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    {{ (detailPaymentDialog.data.paidAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
+                                </div>
+                            </div>
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Còn lại
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    {{ (detailPaymentDialog.data.remainAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
+                                </div>
+                            </div>
+                            <div class="row" style="border-bottom: dotted 1px #ddd;">
+                                <div class="col-md-4 pt-2 pb-2">
+                                    Trạng thái thanh toán
+                                </div>
+                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                    <div v-if="detailPaymentDialog.data.status == 'unpaid'">Chưa thanh toán</div>
+                                    <div v-if="detailPaymentDialog.data.status == 'partialPaid'">Thanh toán một phần</div>
+                                    <div v-if="detailPaymentDialog.data.status == 'paid'">Đã thanh toán</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div style="font-weight:bold;font-size:16px;">Chi tiết thanh toán</div>
+                        <div class="col-md-12 mt-3 pl-0 pr-0">
+                            <el-table :data="detailPaymentDialog.receiptsData" style="width: 100%" stripe border show-summary :summary-method="getSummariesForDetail">
+                                <el-table-column label="Ngày thanh toán" min-width="100">
+                                    <template slot-scope="scope">
+                                        <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}</div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Số tiền thanh toán" min-width="100" prop="amount" align="right">
+                                    <template slot-scope="scope">
+                                        {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Hình thức thanh toán" min-width="100">
+                                    <template slot-scope="scope">
+                                        <div style="text-align:center;">
+                                            <el-tag v-if="scope.row.methodFee == 'transfer'" type="success">Chuyển khoản</el-tag>
+                                            <el-tag v-if="scope.row.methodFee == 'cash'" type="warning">Tiền mặt</el-tag>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Tệp đính kèm" min-width="120">
+                                    <template slot-scope="scope">
+                                        <div v-for="(item, index) in scope.row.attachFiles" :key="index">
+                                            <a :href="item" target="_blank" style="font-style:italic;text-decoration:underline!important;">{{ 'Tệp đính kèm ' + (index + 1) }}</a> 
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Ghi chú" min-width="100">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.note || '' }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Thao tác" min-width="50">
+                                    <template slot-scope="scope">
+                                        <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
+                                            <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipts(scope.row)">
+                                                <i class='bx bxs-printer'></i>
+                                            </a>
+                                        </el-tooltip>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <button type="button" class="control-btn gray" @click="detailPaymentDialog.visible = false">
+                        <i class='bx bx-x'></i>
+                        <span>Đóng</span>
+                    </button>
+                </span>
+            </el-dialog>
+
             <vue-html2pdf 
                 class="print-content"
                 id="print-content-pdf"
@@ -310,7 +435,7 @@
                 ref="html2Pdf_receipt"
             >
                 <section slot="pdf-content">
-                    <div v-if="receiptsData" class="container mt-3" style="color:#000;font-size:13px;">
+                    <div v-if="receiptsData && receiptsData._id" class="container mt-3" style="color:#000;font-size:13px;">
                         <div class="row">
                             <div class="col-md-2">
                                 <el-image
@@ -390,43 +515,12 @@
                                 NỘI DUNG
                             </div>
                             <div class="col-md-12 mt-2">
-                                <table class="table table-bordered" style="margin-bottom:0;">
-                                    <thead>
-                                        <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
-                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Răng/hàm</th>
-                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Điều trị</th>
-                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Đơn giá</th>
-                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">SL</th>
-                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Giảm giá</th>
-                                            <th scope="col" style="padding-top:4px;padding-bottom:4px;">Thành tiền</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="item in receiptsData.diagnosisTreatment" :key="item.key">
-                                            <td style="padding-top:4px;padding-bottom:4px;">
-                                                <!-- {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }} -->
-                                            </td>
-                                            <td style="padding-top:4px;padding-bottom:4px;">
-                                                <!-- {{ getServiceName(item.serviceId) }} -->
-                                            </td>
-                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
-                                                <!-- {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }} -->
-                                            </td>
-                                            <td style="text-align:center;padding-top:4px;padding-bottom:4px;">
-                                                <!-- {{ item.isJaw ? item.quantityJaw : item.quantity }} -->
-                                            </td>
-                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
-                                                <!-- {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }} -->
-                                            </td>
-                                            <td style="text-align:right;padding-top:4px;padding-bottom:4px;">
-                                                <!-- {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }} -->
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <ul class="ml-3">
+                                    <li>- Thu phí khám & điều trị theo phiếu khám <span style="font-weight:bold;">{{ receiptsData.code || 'N/A' }}</span></li>
+                                </ul>
                             </div>
                         </div>
-                        <div class="row mt-1">
+                        <div class="row mt-2">
                             <div class="col-md-12" style="font-size:14px;font-weight:bold;">
                                 <i class='bx bx-check-circle' style="font-size:18px;" ></i>
                                 THANH TOÁN
@@ -435,17 +529,25 @@
                                 <table class="table table-borderless" style="font-size:14px;margin-bottom:0;">
                                     <tbody>
                                         <tr>
-                                            <td style="width:22%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Tổng chi phí</td>
+                                            <td style="width:22%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Số tiền thành toán</td>
                                             <td style="width:4%;padding-top:4px;padding-bottom:4px;">:</td>
-                                            <td style="text-align:right;width:74%;padding-top:4px;padding-bottom:4px;">
-                                                <!-- <span>{{ receiptsData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span> -->
+                                            <td style="width:74%;padding-top:4px;padding-bottom:4px;">
+                                                <span>{{ receiptsData.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
+                                                <span style="font-style: italic;">{{ `(${convertAmountToWord(receiptsData.amount)})` }}</span>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td style="width:22%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Hình thức thanh toán</td>
                                             <td style="width:4%;padding-top:4px;padding-bottom:4px;">:</td>
-                                            <td style="text-align:right;width:74%;padding-top:4px;padding-bottom:4px;">
-                                                
+                                            <td style="width:74%;padding-top:4px;padding-bottom:4px;">
+                                                {{ receiptsData.methodFee == 'transfer' ? 'Chuyển khoản' : 'Tiền mặt' }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:22%;font-weight:bold;padding-top:4px;padding-bottom:4px;">Ghi chú</td>
+                                            <td style="width:4%;padding-top:4px;padding-bottom:4px;">:</td>
+                                            <td style="width:74%;padding-top:4px;padding-bottom:4px;">
+                                                {{ receiptsData.note || '' }}
                                             </td>
                                         </tr>
                                     </tbody>
@@ -481,6 +583,7 @@ import Customer from '@/models/tw_Customer';
 import Payment from '@/models/tw_Payment';
 import VueAutonumeric from 'vue-autonumeric';
 import buildFormData from '@/utils/buildFormData';
+import readAmountByWord from '@/utils/functions/readAmountByWord';
 export default {
     components: {
 		LeftMenu,
@@ -515,7 +618,12 @@ export default {
                 data: null,
                 receiptData: null,
             },
-            receiptsData: {}
+            receiptsData: {},
+            detailPaymentDialog: {
+                visible: false,
+                data: null,
+                receiptsData: []
+            },
         }
     },
     async created(){
@@ -620,7 +728,6 @@ export default {
             });
             if (data.success) {
                 _this.paymentDialog.visible = false;
-                _this.receiptsData = data.receiptsData;
                 if (_this.$refs.uploadFiles) {
                     _this.$refs.uploadFiles.clearFiles();
                 }
@@ -629,6 +736,11 @@ export default {
                     message: data.message,
                     type: 'success',
                 });
+                setTimeout(async() => {
+                    if(data.receiptsData) {
+                        await _this.printReceipts(data.receiptsData);
+                    }
+                }, 200);
             } else {
                 _this.$message.error(data.error);
             }
@@ -680,10 +792,52 @@ export default {
             }
             _this.paymentDialog.receiptData.remainAmount = _this.paymentDialog.data.remainAmount - _this.paymentDialog.receiptData.paidAmount;
         },
-        printReceipt(id){
+        async printReceipts(data){
             const _this = this;
+            _this.receiptsData = data;
             _this.$refs.html2Pdf_receipt.generatePdf();
         },
+        async viewDetailPayment(data){
+            const _this = this;
+            if(data && data._id){
+                await _this.$axios.$get(`/api/receipts/getReceiptsByPaymentId/${data._id}`).then(
+                    async (response) => {
+                        _this.detailPaymentDialog.receiptsData = response.data || [];
+                        _this.detailPaymentDialog.data = data;
+                        _this.detailPaymentDialog.visible = true;
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
+            }
+        },
+        getSummariesForDetail(param){
+            const { columns, data } = param;
+			const _this = this;
+            let sums = [];
+            columns.forEach((column, index) => {
+                if (index === 0) {
+                    sums[index] = 'Tổng';
+                    return;
+                }
+                if (index === 1) {
+                    const values = data.map(item => Number(item[column.property]));
+                    var total = values.reduce((partialSum, a) => partialSum + a, 0);
+                    var totalString = (total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0';
+                    sums[index] = totalString;
+                    return;
+                }
+            });
+            return sums;
+        },
+        convertAmountToWord(number){
+            return readAmountByWord(number);
+        }
     }
 }
 </script>

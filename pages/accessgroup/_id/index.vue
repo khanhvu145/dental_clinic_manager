@@ -203,8 +203,16 @@ export default {
 											value: 'createExamination',
 										},
                                         {
+											name: 'Xem phiếu khám',
+											value: 'viewExamination',
+										},
+                                        {
 											name: 'In phiếu khám',
 											value: 'printExamination',
+										},
+                                        {
+											name: 'Hủy phiếu khám',
+											value: 'cancelExamination',
 										},
                                         {
 											name: 'Xem nhật ký',
@@ -221,10 +229,6 @@ export default {
                                         {
 											name: 'In phiếu thu',
 											value: 'printReceipt',
-										},
-                                        {
-											name: 'Xem phiếu khám',
-											value: 'viewExaminationForm',
 										},
                                     ],
                                     hideDefaultRights: false,

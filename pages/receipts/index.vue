@@ -61,50 +61,69 @@
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border show-summary :summary-method="getSummaries">
-                            <el-table-column label="Mã phiếu thu" min-width="100">
+                            <el-table-column label="Mã phiếu thu" min-width="80">
                                 <template slot-scope="scope">
                                     {{ scope.row.code || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Ngày thanh toán" min-width="100">
+                            <el-table-column label="Ngày thanh toán" min-width="80">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}</div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Số tiền thanh toán" min-width="100" prop="amount" align="right">
+                            <el-table-column label="Số tiền thanh toán" min-width="80" prop="amount" align="right">
                                 <template slot-scope="scope">
                                     {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Mã phiếu khám" min-width="100">
+                             <el-table-column label="Hình thức thanh toán" min-width="100">
+                                <template slot-scope="scope">
+                                    <div style="text-align:center;">
+                                        <el-tag v-if="scope.row.methodFee == 'transfer'" type="success">Chuyển khoản</el-tag>
+                                        <el-tag v-if="scope.row.methodFee == 'cash'" type="warning">Tiền mặt</el-tag>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Mã phiếu khám" min-width="80">
                                 <template slot-scope="scope">
                                     {{ scope.row.examinationCode || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Khách hàng" min-width="150">
+                            <el-table-column label="Khách hàng" min-width="120">
                                 <template slot-scope="scope">
                                     {{ `(${scope.row.customerCode})` || 'N/A' }} {{ scope.row.customerName || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Tệp đính kèm" min-width="120">
+                            <el-table-column label="Tệp đính kèm" min-width="80">
                                 <template slot-scope="scope">
                                     <div v-for="(item, index) in scope.row.attachFiles" :key="index">
                                         <a :href="item" target="_blank" style="font-style:italic;text-decoration:underline!important;">{{ 'Tệp đính kèm ' + (index + 1) }}</a> 
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Ghi chú" min-width="100">
+                            <el-table-column label="Ghi chú" min-width="80">
                                 <template slot-scope="scope">
                                     {{ scope.row.note || '' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Thao tác" min-width="50">
+                            <el-table-column label="Thao tác" min-width="60">
                                 <template slot-scope="scope">
-                                    <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
-                                        <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipts(scope.row)">
-                                            <i class='bx bxs-printer'></i>
-                                        </a>
-                                    </el-tooltip>
+                                    <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
+                                        <div v-if="checkRight('printReceipts')">
+                                            <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
+                                                <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipts(scope.row)">
+                                                    <i class='bx bxs-printer'></i>
+                                                </a>
+                                            </el-tooltip>
+                                        </div>
+                                        <div v-if="checkRight('cancelReceipts')">
+                                            <el-tooltip class="item" effect="dark" content="Hủy phiếu thu" placement="top">
+                                                <a class="btn control-btn red" style="padding: 4px 6px;" @click="cancelReceipts(scope.row)">
+                                                    <i class='bx bx-x'></i>
+                                                </a>
+                                            </el-tooltip>
+                                        </div>
+                                    </div>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -404,6 +423,39 @@ export default {
         },
         convertAmountToWord(number){
             return readAmountByWord(number);
+        },
+        async cancelExamination(data){
+            const _this = this;
+            // _this
+			// 	.$confirm(`Bạn có chắc muốn hủy phiếu khám ${data.code}?`, 'Xác nhận', {
+			// 		confirmButtonText: 'Xác nhận',
+			// 		cancelButtonText: 'Hủy',
+			// 		type: 'confirm',
+			// 	})
+            //     .then(async () => {
+            //         await _this.$axios.$delete(`/api/customer/cancelExamination/${data._id}`).then(
+            //             async (response) => {
+            //                 if (response.success) {
+            //                     _this.viewDialog.visible = false;
+            //                     await _this.getData(_this.searchQuery);
+            //                     _this.$message({
+            //                         message: `Phiếu khám ${data.code} được hủy thành công`,
+            //                         type: 'success',
+            //                     });
+            //                 }
+            //                 else {
+            //                     _this.$message.error(response.error);
+            //                 }
+            //             },
+            //             (error) => {
+            //                 console.log('Error: ', error);
+            //                 _this.$message({
+            //                     type: 'error',
+            //                     message: 'Có lỗi xảy ra',
+            //                 });
+            //             }
+            //         );
+            //     });
         }
     }
 }
