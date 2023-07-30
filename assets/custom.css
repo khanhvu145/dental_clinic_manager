@@ -196,7 +196,7 @@
   #custome-el-colapse .el-collapse-item__arrow {
     font-size: 20px;
   }
-  .el-checkbox__input.is-checked .el-checkbox__inner {
+.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
 	background-color: #74bc20;
 	border-color: #74bc20;
 }
@@ -285,4 +285,17 @@
 }
 .el-upload-dragger .el-upload__text em{
     color: #74bc20;
+}
+.el-upload-list{
+    text-align: left!important;
+}
+.el-upload-list__item{
+    cursor: pointer;
+}
+.el-upload-list__item:hover {
+    background-color: rgb(201 255 180 / 22%);
+}
+.el-upload-list__item.is-success .el-upload-list__item-name:focus, .el-upload-list__item.is-success .el-upload-list__item-name:hover {
+    color: #7fc362;
+    cursor: pointer;
 }

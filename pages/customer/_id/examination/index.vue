@@ -735,7 +735,7 @@ export default {
             customerInfo: new Customer(),
             anamnesisData: [],
             anamnesisList: [],
-            allergyData: anamnesisList,
+            allergyData: [],
             xquangData: xquangList,
             testData: testList,
             formData: new Examination(),
@@ -1114,37 +1114,33 @@ export default {
 					type: 'confirm',
 				})
                 .then(async () => {
-                    _this.$router.push({
-                        path: `/customer/${_this.$route.params.id}/examinationForm`,
-                        query: { code: 'EXAM-0C89C' }
+                    _this.dataLoading = true;
+                    _this.formData.dentistId = _this.userInfo.data._id;
+                    _this.formData.createdBy = _this.userInfo.data.username;
+                    _this.formData.anamnesis = _.filter(_this.anamnesisData, ['isCheck', true]);
+                    _this.formData.diagnosisTreatment = _this.tableData;
+                    _this.formData.customerId = _this.$route.params.id;
+                    var oldData = cloneDeep(_this.formData);
+                    var newData = new FormData();
+                    buildFormData(newData, oldData);
+                    const data = await _this.$axios.$post('/api/customer/createExamination', newData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
                     });
-                    // _this.dataLoading = true;
-                    // _this.formData.dentistId = _this.userInfo.data._id;
-                    // _this.formData.createdBy = _this.userInfo.data.username;
-                    // _this.formData.anamnesis = _.filter(_this.anamnesisData, ['isCheck', true]);
-                    // _this.formData.diagnosisTreatment = _this.tableData;
-                    // _this.formData.customerId = _this.$route.params.id;
-                    // var oldData = cloneDeep(_this.formData);
-                    // var newData = new FormData();
-                    // buildFormData(newData, oldData);
-                    // const data = await _this.$axios.$post('/api/customer/createExamination', newData, {
-                    //     headers: { 'Content-Type': 'multipart/form-data' },
-                    // });
-                    // if (data.success) {
-                    //     _this.$message({
-                    //         message: data.message,
-                    //         type: 'success',
-                    //     });
-                    //     _this.formData._id = data.data._id;
-                    //     _this.formData.code = data.data.code;
-                    //     setTimeout(async() => {
-                    //         _this.dataLoading = false;
-                    //         // await _this.exportPDF();
-                    //     }, 200);
-                    // } else {
-                    //     _this.$message.error(data.error);
-                    //     _this.dataLoading = false;
-                    // }
+                    if (data.success) {
+                        _this.$message({
+                            message: data.message,
+                            type: 'success',
+                        });
+                        _this.formData._id = data.data._id;
+                        _this.formData.code = data.data.code;
+                        setTimeout(async() => {
+                            _this.dataLoading = false;
+                            // await _this.exportPDF();
+                        }, 200);
+                    } else {
+                        _this.$message.error(data.error);
+                        _this.dataLoading = false;
+                    }
                 });
         }),
         calculateAmount(){

@@ -199,12 +199,16 @@ export default {
 									value: 'customer',
 									customRights: [
                                         {
+											name: 'Xem phiếu khám',
+											value: 'viewExamination',
+										},
+                                        {
 											name: 'Tạo phiếu khám',
 											value: 'createExamination',
 										},
                                         {
-											name: 'Xem phiếu khám',
-											value: 'viewExamination',
+											name: 'Cập nhật phiếu khám',
+											value: 'updateExamination',
 										},
                                         {
 											name: 'In phiếu khám',

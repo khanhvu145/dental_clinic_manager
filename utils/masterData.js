@@ -331,35 +331,35 @@ export const permanentTeeth = [
     tooths: [
       {
         label: 'R18',
-        value: 18,
+        value: '18',
       },
       {
         label: 'R17',
-        value: 17,
+        value: '17',
       },
       {
         label: 'R16',
-        value: 16,
+        value: '16',
       },
       {
         label: 'R15',
-        value: 15,
+        value: '15',
       },
       {
         label: 'R14',
-        value: 14,
+        value: '14',
       },
       {
         label: 'R13',
-        value: 13,
+        value: '13',
       },
       {
         label: 'R12',
-        value: 12,
+        value: '12',
       },
       {
         label: 'R11',
-        value: 11,
+        value: '11',
       },
     ]
   },
@@ -369,35 +369,35 @@ export const permanentTeeth = [
     tooths: [
       {
         label: 'R21',
-        value: 21,
+        value: '21',
       },
       {
         label: 'R22',
-        value: 22,
+        value: '22',
       },
       {
         label: 'R23',
-        value: 23,
+        value: '23',
       },
       {
         label: 'R24',
-        value: 24,
+        value: '24',
       },
       {
         label: 'R25',
-        value: 25,
+        value: '25',
       },
       {
         label: 'R26',
-        value: 26,
+        value: '26',
       },
       {
         label: 'R27',
-        value: 27,
+        value: '27',
       },
       {
         label: 'R28',
-        value: 28,
+        value: '28',
       },
     ]
   },
@@ -407,35 +407,35 @@ export const permanentTeeth = [
     tooths: [
       {
         label: 'R31',
-        value: 31,
+        value: '31',
       },
       {
         label: 'R32',
-        value: 32,
+        value: '32',
       },
       {
         label: 'R33',
-        value: 33,
+        value: '33',
       },
       {
         label: 'R34',
-        value: 34,
+        value: '34',
       },
       {
         label: 'R35',
-        value: 35,
+        value: '35',
       },
       {
         label: 'R36',
-        value: 36,
+        value: '36',
       },
       {
         label: 'R37',
-        value: 37,
+        value: '37',
       },
       {
         label: 'R38',
-        value: 38,
+        value: '38',
       },
     ]
   },
@@ -445,35 +445,35 @@ export const permanentTeeth = [
     tooths: [
       {
         label: 'R48',
-        value: 48,
+        value: '48',
       },
       {
         label: 'R47',
-        value: 47,
+        value: '47',
       },
       {
         label: 'R46',
-        value: 46,
+        value: '46',
       },
       {
         label: 'R45',
-        value: 45,
+        value: '45',
       },
       {
         label: 'R44',
-        value: 44,
+        value: '44',
       },
       {
         label: 'R43',
-        value: 43,
+        value: '43',
       },
       {
         label: 'R42',
-        value: 42,
+        value: '42',
       },
       {
         label: 'R41',
-        value: 41,
+        value: '41',
       },
     ]
   },
@@ -486,23 +486,23 @@ export const milkTooth = [
     tooths: [
       {
         label: 'R55',
-        value: 55,
+        value: '55',
       },
       {
         label: 'R54',
-        value: 54,
+        value: '54',
       },
       {
         label: 'R53',
-        value: 53,
+        value: '53',
       },
       {
         label: 'R52',
-        value: 52,
+        value: '52',
       },
       {
         label: 'R51',
-        value: 51,
+        value: '51',
       },
     ]
   },
@@ -512,23 +512,23 @@ export const milkTooth = [
     tooths: [
       {
         label: 'R61',
-        value: 61,
+        value: '61',
       },
       {
         label: 'R62',
-        value: 62,
+        value: '62',
       },
       {
         label: 'R63',
-        value: 63,
+        value: '63',
       },
       {
         label: 'R64',
-        value: 64,
+        value: '64',
       },
       {
         label: 'R65',
-        value: 65,
+        value: '65',
       },
     ]
   },
@@ -538,23 +538,23 @@ export const milkTooth = [
     tooths: [
       {
         label: 'R71',
-        value: 71,
+        value: '71',
       },
       {
         label: 'R72',
-        value: 72,
+        value: '72',
       },
       {
         label: 'R73',
-        value: 73,
+        value: '73',
       },
       {
         label: 'R74',
-        value: 74,
+        value: '74',
       },
       {
         label: 'R75',
-        value: 75,
+        value: '75',
       },
     ]
   },
@@ -564,23 +564,23 @@ export const milkTooth = [
     tooths: [
       {
         label: 'R85',
-        value: 85,
+        value: '85',
       },
       {
         label: 'R84',
-        value: 84,
+        value: '84',
       },
       {
         label: 'R83',
-        value: 83,
+        value: '83',
       },
       {
         label: 'R82',
-        value: 82,
+        value: '82',
       },
       {
         label: 'R81',
-        value: 81,
+        value: '81',
       },
     ]
   },
