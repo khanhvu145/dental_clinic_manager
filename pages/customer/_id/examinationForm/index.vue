@@ -933,7 +933,7 @@ export default {
 				.$confirm(`Bạn có chắc muốn hủy phiếu khám ${data.code}?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     await _this.$axios.$delete(`/api/customer/cancelExamination/${data._id}`).then(

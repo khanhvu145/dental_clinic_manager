@@ -8,43 +8,53 @@
                         <span>Quay lại</span>
                     </button>
                     <button
-                        v-if="(checkRight('printExamination') && $route.query.examinationId && $route.query.examinationId != 'create' && formData._id)"
+                        v-if="
+                            checkRight('printExamination') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status != 'cancelled'
+                        "
                         type="button" 
                         class="control-btn red" 
-                        @click="exportPDF"
+                        @click="cancelExamination($route.query.examinationId)"
                     >
                         <i class='bx bx-x'></i>
-                        <span>Hủy phiếu khám</span>
+                        <span>Hủy</span>
                     </button>
                     <button
-                        v-if="(checkRight('printExamination') && $route.query.examinationId && $route.query.examinationId != 'create' && formData._id)"
+                        v-if="
+                            checkRight('printExamination') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status == 'approved'
+                        "
                         type="button" 
                         class="control-btn yellow" 
                         @click="exportPDF"
                     >
                         <i class='bx bx-printer'></i>
-                        <span>In phiếu khám</span>
+                        <span>In phiếu</span>
                     </button>
                     <button
-                        v-if="(checkRight('printExamination') && $route.query.examinationId && $route.query.examinationId != 'create' && formData._id)"
+                        v-if="
+                            checkRight('updateExamination') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status == 'new'
+                        "
                         type="button" 
                         class="control-btn blue" 
-                        @click="exportPDF"
+                        @click="confirmExamination($route.query.examinationId)"
                     >
                         <i class='bx bx-list-check'></i>
                         <span>Xác nhận điều trị</span>
                     </button>
                     <button
                         v-if="
-                            (checkRight('createExamination') && $route.query.examinationId && $route.query.examinationId == 'create') ||
-                            (checkRight('updateExamination') && $route.query.examinationId && $route.query.examinationId != 'create')
+                            ((checkRight('createExamination') && $route.query.examinationId && $route.query.examinationId == 'create') ||
+                            (checkRight('updateExamination') && $route.query.examinationId && $route.query.examinationId != 'create'))
+                            && formData.status == 'new'
                         "
                         type="button" 
                         class="control-btn green" 
                         @click="submitExaminationForm"
                     >
                         <i class='bx bx-save' ></i>
-                        <span>Lưu phiếu khám</span>
+                        <span>Lưu</span>
                     </button>
                 </div>
             </div>
@@ -52,11 +62,14 @@
                 <div class="col-md-12">
                     <el-tabs v-model="activeName">
                         <el-tab-pane label="Tổng quan" name="generalExam">
-                            <el-card class="box-card mb-4">
+                            <el-card class="box-card mb-4" :style="{ 'pointer-events': formData.status == 'new' ? 'auto' : 'none' }">
                                 <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <span>{{ formData.code || '' }}</span>
+                                            <span>{{ formData.code ? `${formData.code} | ` : ''}}</span> 
+                                            <span v-if="formData.status == 'new'" style="color:#409eff;">Mới</span>
+                                            <span v-else-if="formData.status == 'approved'" style="color:#67c23a;">Đã duyệt</span>
+                                            <span v-else-if="formData.status == 'cancelled'" style="color:#909399;">Đã hủy</span>
                                         </div>
                                         <div class="col-md-6" style="text-align:right;">
                                             <span>NGÀY KHÁM: {{ formData._id ? $moment(formData.createdAt).format('DD/MM/YYYY') : $moment().format('DD/MM/YYYY') }}</span>
@@ -201,13 +214,17 @@
                             <el-card class="box-card mb-4">
                                 <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div v-if="formData.status == 'new'" class="col-md-12">
                                             <a class="btn control-btn green" style="float:right;" @click="addDesignation('create')">
                                                 <i class='bx bxs-file-plus'></i>
                                                 Thêm chỉ định mới
                                             </a>
                                         </div>
-                                        <div class="col-md-12 mt-3">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="attachFile-content mt-3 mb-4" style="padding:0 12px;font-size:13px;line-height: 1.7;">
                                             <div v-if="formData.attachFiles && formData.attachFiles.length > 0" class="row">
                                                 <div v-for="item in formData.attachFiles" :key="item.key" class="col-lg-6 mb-2">
                                                     <el-card class="box-card" style="height:100%;">
@@ -216,7 +233,7 @@
                                                                 <div class="col-sm-6">
                                                                     <span style="font-weight:bold;">{{ getDesignationTypeName(item.type) }}</span>
                                                                 </div>
-                                                                <div class="col-sm-6" style="text-align:right;">
+                                                                <div v-if="formData.status == 'new'" class="col-sm-6" style="text-align:right;">
                                                                     <el-tooltip class="item" effect="dark" content="Chỉnh sửa" placement="top">
                                                                         <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="addDesignation('update', item)">
                                                                             <i class='bx bxs-edit'></i>
@@ -234,7 +251,7 @@
                                                             <div class="col-md-12">
                                                                 <div class="col-form-label">Danh sách file:</div>
                                                                 <div class="row">
-                                                                    <div v-for="(file, index) in item.files" :key="index" class="col-md-12 mb-2">
+                                                                    <div v-for="(file, index) in item.files" :key="index" class="col-md-12">
                                                                         <span style="font-family:Wingdings">&#119;</span>
                                                                         <a :href="file.url" target="_blank" style="font-style:italic;text-decoration:underline!important;">
                                                                             {{ file.name || 'File' }}
@@ -339,9 +356,9 @@
                             </el-card>
                         </el-tab-pane>
                         <el-tab-pane v-if="$route.query.examinationId && $route.query.examinationId != 'create' && formData._id" label="Khám và điều trị" name="diagnosisAndTreatment">
-                            <el-card class="box-card mb-4">
+                            <el-card class="box-card mb-4" :style="{ 'pointer-events': formData.status == 'new' ? 'auto' : 'none' }">
                                 <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
-                                    <div class="row">
+                                    <div v-if="formData.status == 'new'" class="row">
                                         <div class="col-md-12">
                                             <a class="btn control-btn green" style="float:right;" @click="openExaminationDialog('create')">
                                                 <i class='bx bx-list-plus'></i>
@@ -393,7 +410,7 @@
                                                     {{ (scope.row.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column label="Thao tác" min-width="100">
+                                            <el-table-column v-if="formData.status == 'new'" label="Thao tác" min-width="100">
                                                 <template slot-scope="scope">
                                                     <a class="btn control-btn blue2" style="padding: 4px 6px;" @click="openExaminationDialog('update', scope.row)">
                                                         <i class="el-icon-edit-outline"></i>
@@ -849,6 +866,7 @@ export default {
                 data: new ExaminationDesignation()
             },
             printData: {},
+            latestExamination: [],
         }
     },
     async created() { 
@@ -868,6 +886,8 @@ export default {
                     _this.customerInfo = new Customer();
 				}
 			);
+            const exam = await _this.$axios.$post('/api/customer/getLatestExamination', { customerId: _this.$route.params.id });
+            _this.latestExamination = exam.data || [];
         }
         //Lấy danh sách tiền sử bệnh
         var anamnesisArr = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamAnamnesis' })) || [];
@@ -936,6 +956,10 @@ export default {
             }
             else{
                 _this.formData = new Examination();
+                if(_this.latestExamination != null && _this.latestExamination.length > 0){
+                    _this.formData.anamnesis = _this.latestExamination[0].anamnesis;
+                    _this.formData.allergy = _this.latestExamination[0].allergy;
+                }
             }
 
             //Select tiền sử bệnh
@@ -976,7 +1000,7 @@ export default {
                 .$confirm(`Bạn có chắc muốn lưu phiếu khám?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     try{
@@ -1022,7 +1046,7 @@ export default {
                 .$confirm(`Bạn có chắc muốn lưu phiếu khám?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     try{
@@ -1475,6 +1499,86 @@ export default {
                     }
                 );
             }
+        },
+        async confirmExamination(id){
+            const _this = this;
+            _this
+                .$confirm(`Bạn có chắc muốn xác nhận điều trị?`, 'Xác nhận', {
+					confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+					type: 'warning',
+				})
+                .then(async () => {
+                    try{
+                        _this.dataLoading = true;
+                        const data = await _this.$axios.$post('/api/customer/confirmExamination', {
+                            id: id,
+                            approvedBy: _this.userInfo.data.username
+                        });
+                        if (data.success) {
+                            await _this.getData();
+                            _this.$message({
+                                message: 'Xác nhận điều trị thành công',
+                                type: 'success',
+                            });
+                            _this.dataLoading = false;
+                        } else {
+                            _this.$message.error(data.error);
+                            _this.dataLoading = false;
+                        }
+                    }
+                    catch (e){
+                        console.log(e);
+                        _this.$message.error(e);
+                        _this.dataLoading = false;
+                    }
+                });
+        },
+        async cancelExamination(id){
+            const _this = this;
+            _this.dataLoading = true;
+            _this.
+                $prompt('Lý do hủy *', 'Xác nhận hủy phiếu khám', {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập lý do hủy',
+                    inputValidator: this.validateInput
+                }).then(async ({ value }) => {
+                    if (value) {
+                        const data = await _this.$axios.$post('/api/customer/cancelExamination', {
+                            id: id,
+                            cancelReason: value,
+                            cancelledBy: _this.userInfo.data.username
+                        });
+                        if (data.success) {
+                            await _this.getData();
+                            _this.$message({
+                                message: 'Hủy phiếu khám thành công',
+                                type: 'success',
+                            });
+                            _this.dataLoading = false;
+                        } else {
+                            _this.$message.error(data.error);
+                            _this.dataLoading = false;
+                        }
+                    }
+                    else{
+                        _this.dataLoading = false;
+                        _this.$message({
+                            type: 'error',
+                            message: 'Vui lòng nhập lý do hủy',
+                        });
+                    }
+                })
+                .catch((error) => {
+                    _this.dataLoading = false;
+                    console.log(error);
+                });
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
         },
     }
 }

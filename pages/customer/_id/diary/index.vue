@@ -344,7 +344,7 @@ export default {
         async viewPayment(data){
             const _this = this;
             if (data && data.targetId) {
-                await _this.$axios.$get(`/api/payment/getReceiptsById/${data.targetId}`).then(
+                await _this.$axios.$get(`/api/receipts/getById/${data.targetId}`).then(
                     async (response) => {
                         _this.viewReceiptDialog.data = response.data[0];
                         _this.viewReceiptDialog.visible = true;

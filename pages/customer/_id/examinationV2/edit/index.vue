@@ -480,7 +480,7 @@ export default {
                 .$confirm(`Bạn có chắc muốn tạo phiếu khám?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     try{
@@ -521,7 +521,7 @@ export default {
                 .$confirm(`Bạn có chắc muốn cập nhật phiếu khám?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     try{

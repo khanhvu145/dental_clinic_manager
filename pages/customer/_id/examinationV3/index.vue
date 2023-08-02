@@ -91,10 +91,14 @@
                         </el-table-column>
                         <el-table-column label="Trạng thái" min-width="60">
                             <template slot-scope="scope">
-                                <div style="text-align:center;">
-                                    <el-tag v-if="scope.row.status == 'new'">Mới</el-tag>
-                                    <el-tag v-if="scope.row.status == 'approved'" type="success">Dã duyệt</el-tag>
-                                    <el-tag v-if="scope.row.status == 'cancelled'" type="info">Đã hủy</el-tag>
+                                <div v-if="scope.row.status == 'new'" style="text-align:center;">
+                                    <el-tag>Mới</el-tag>
+                                </div>
+                                <div v-if="scope.row.status == 'approved'" style="text-align:center;">
+                                    <el-tag type="success">Dã duyệt</el-tag>
+                                </div>
+                                <div v-if="scope.row.status == 'cancelled'" style="text-align:center;">
+                                    <el-tag type="info">Đã hủy</el-tag>
                                 </div>
                             </template>
                         </el-table-column>

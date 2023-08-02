@@ -848,7 +848,7 @@ export default {
 				.$confirm(`Bạn có chắc muốn hủy phiếu khám?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     _this.isExam = false;
@@ -1111,7 +1111,7 @@ export default {
                 .$confirm(`Bạn có chắc muốn tạo phiếu khám?`, 'Xác nhận', {
 					confirmButtonText: 'Xác nhận',
 					cancelButtonText: 'Hủy',
-					type: 'confirm',
+					type: 'warning',
 				})
                 .then(async () => {
                     _this.dataLoading = true;

@@ -17,4 +17,5 @@ export default function() {
     this.totalDiscountAmount = 0;
     this.totalAmount = 0;
     this.note = '';
+    this.status = 'new';
 }
