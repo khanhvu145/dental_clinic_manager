@@ -3,7 +3,7 @@
         <form class="mt-3 mb-4" v-loading="dataLoading" v-on:submit.prevent="submitExaminationForm">
             <div class="row mt-3">
                 <div class="col-md-12" style="text-align: right;">
-                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examinationV3`)">
+                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examination`)">
                         <i class='bx bx-arrow-back'></i>
                         <span>Quay lại</span>
                     </button>
@@ -1023,7 +1023,7 @@ export default {
                             });
                             _this.dataLoading = false;
                             _this.$router.replace({
-                                path: `/customer/${_this.$route.params.id}/examinationV3/edit`,
+                                path: `/customer/${_this.$route.params.id}/examination/edit`,
                                 query: { examinationId: data.data._id }
                             }).then(async () => {
                                 await _this.getData();

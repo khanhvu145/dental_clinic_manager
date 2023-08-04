@@ -16,11 +16,11 @@
                         <div class="col-form-label">Mã phiếu khám</div>
                         <el-input placeholder="Mã phiếu khám..." v-model="searchQuery.filters.examinationCodeF" name="examinationCodeF"></el-input>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                          <div class="col-form-label">Khách hàng</div>
                         <el-input placeholder="Mã, tên..." v-model="searchQuery.filters.customerF" name="customerF"></el-input>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="col-form-label">Ngày thanh toán</div>
                         <el-date-picker
                             v-model="searchQuery.filters.dateF"
@@ -30,6 +30,14 @@
                             end-placeholder="Ngày kết thúc"
                             format="dd/MM/yyyy">
                         </el-date-picker>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="col-form-label">Trạng thái</div>
+                        <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
+                            <el-option label="Tất cả" value="all"></el-option>
+                            <el-option label="Đã thanh toán" value="paid"></el-option>
+                            <el-option label="Đã hủy" value="cancelled"></el-option>
+                        </el-select>
                     </div>
                     <div class="col-md-2">
                         <div style="display: flex; height: 100%; align-items: end; gap: 8px;">
@@ -79,7 +87,7 @@
                              <el-table-column label="Hình thức thanh toán" min-width="100">
                                 <template slot-scope="scope">
                                     <div style="text-align:center;">
-                                        <el-tag v-if="scope.row.methodFee == 'transfer'" type="success">Chuyển khoản</el-tag>
+                                        <el-tag v-if="scope.row.methodFee == 'transfer'" type="danger">Chuyển khoản</el-tag>
                                         <el-tag v-if="scope.row.methodFee == 'cash'" type="warning">Tiền mặt</el-tag>
                                     </div>
                                 </template>
@@ -89,9 +97,20 @@
                                     {{ scope.row.examinationCode || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Khách hàng" min-width="120">
+                            <el-table-column label="Khách hàng" min-width="100">
                                 <template slot-scope="scope">
-                                    {{ `(${scope.row.customerCode})` || 'N/A' }} {{ scope.row.customerName || 'N/A' }}
+                                    <div>{{ `(${scope.row.customerCode})` || 'N/A' }}</div>
+                                    <div>{{ scope.row.customerName || 'N/A' }}</div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Trạng thái" min-width="80">
+                                <template slot-scope="scope">
+                                    <div v-if="scope.row.status == 'paid'" style="text-align:center;">
+                                        <el-tag type="success">Đã thanh toán</el-tag>
+                                    </div>
+                                    <div v-if="scope.row.status == 'cancelled'" style="text-align:center;">
+                                        <el-tag type="info">Đã hủy</el-tag>
+                                    </div>
                                 </template>
                             </el-table-column>
                             <el-table-column label="Tệp đính kèm" min-width="80">
@@ -108,7 +127,7 @@
                             </el-table-column>
                             <el-table-column label="Thao tác" min-width="60">
                                 <template slot-scope="scope">
-                                    <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
+                                    <div v-if="scope.row.status != 'cancelled'" style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
                                         <div v-if="checkRight('printReceipts')">
                                             <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
                                                 <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipts(scope.row)">
@@ -118,7 +137,7 @@
                                         </div>
                                         <div v-if="checkRight('cancelReceipts')">
                                             <el-tooltip class="item" effect="dark" content="Hủy phiếu thu" placement="top">
-                                                <a class="btn control-btn red" style="padding: 4px 6px;" @click="cancelReceipts(scope.row)">
+                                                <a class="btn control-btn red" style="padding: 4px 6px;" @click="cancelReceipts(scope.row._id)">
                                                     <i class='bx bx-x'></i>
                                                 </a>
                                             </el-tooltip>
@@ -242,7 +261,7 @@
                             </div>
                             <div class="col-md-12 mt-2">
                                 <ul class="ml-3">
-                                    <li>- Thu phí khám & điều trị theo phiếu khám <span style="font-weight:bold;">{{ receiptsData.code || 'N/A' }}</span></li>
+                                    <li>- Thu phí khám & điều trị theo phiếu khám <span style="font-weight:bold;">{{ receiptsData.examinationCode || 'N/A' }}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -323,6 +342,7 @@ export default {
                     examinationCodeF: '',
                     customerF: '',
                     dateF: [],
+                    statusF: 'paid'
                 },
                 sorts: -1,
                 pages:{
@@ -424,39 +444,51 @@ export default {
         convertAmountToWord(number){
             return readAmountByWord(number);
         },
-        async cancelExamination(data){
+        async cancelReceipts(id){
             const _this = this;
-            // _this
-			// 	.$confirm(`Bạn có chắc muốn hủy phiếu khám ${data.code}?`, 'Xác nhận', {
-			// 		confirmButtonText: 'Xác nhận',
-			// 		cancelButtonText: 'Hủy',
-			// 		type: 'confirm',
-			// 	})
-            //     .then(async () => {
-            //         await _this.$axios.$delete(`/api/customer/cancelExamination/${data._id}`).then(
-            //             async (response) => {
-            //                 if (response.success) {
-            //                     _this.viewDialog.visible = false;
-            //                     await _this.getData(_this.searchQuery);
-            //                     _this.$message({
-            //                         message: `Phiếu khám ${data.code} được hủy thành công`,
-            //                         type: 'success',
-            //                     });
-            //                 }
-            //                 else {
-            //                     _this.$message.error(response.error);
-            //                 }
-            //             },
-            //             (error) => {
-            //                 console.log('Error: ', error);
-            //                 _this.$message({
-            //                     type: 'error',
-            //                     message: 'Có lỗi xảy ra',
-            //                 });
-            //             }
-            //         );
-            //     });
-        }
+            _this.
+                $prompt('Lý do hủy *', 'Xác nhận hủy phiếu thu', {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập lý do hủy',
+                    inputValidator: this.validateInput
+                }).then(async ({ value }) => {
+                    if (value) {
+                        const data = await _this.$axios.$post('/api/receipts/cancel', {
+                            id: id,
+                            cancelReason: value,
+                            cancelledBy: _this.userInfo.data.username
+                        });
+                        if (data.success) {
+                            await _this.getData(_this.searchQuery);
+                            _this.$message({
+                                message: 'Hủy phiếu thu thành công',
+                                type: 'success',
+                            });
+                            _this.dataLoading = false;
+                        } else {
+                            _this.$message.error(data.error);
+                            _this.dataLoading = false;
+                        }
+                    }
+                    else{
+                        _this.dataLoading = false;
+                        _this.$message({
+                            type: 'error',
+                            message: 'Vui lòng nhập lý do hủy',
+                        });
+                    }
+                })
+                .catch((error) => {
+                    _this.dataLoading = false;
+                    console.log(error);
+                });
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
+        },
     }
 }
 </script>

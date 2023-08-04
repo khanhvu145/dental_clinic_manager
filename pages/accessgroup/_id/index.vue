@@ -252,8 +252,25 @@ export default {
                                 {
 									name: 'Phiếu thu',
 									value: 'receipts',
-									customRights: [],
-                                    hideDefaultRights: false,
+									customRights: [
+                                        {
+                                            name: 'Tất cả',
+                                            value: 'all',
+                                        },
+                                        {
+                                            name: 'Xem',
+                                            value: 'view',
+                                        },
+                                        {
+											name: 'Hủy phiếu thu',
+											value: 'cancelReceipts',
+										},
+                                        {
+											name: 'In phiếu thu',
+											value: 'printReceipts',
+										},
+                                    ],
+                                    hideDefaultRights: true,
 								},
                                 {
 									name: 'Cấu hình chung',

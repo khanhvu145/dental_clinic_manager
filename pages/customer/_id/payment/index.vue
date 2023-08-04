@@ -118,7 +118,7 @@
                 :visible.sync='paymentDialog.visible'
                 title="Ghi nhận thanh toán"
                 :close-on-click-modal="false"
-                width="65%"
+                width="70%"
             >
                 <form v-if="paymentDialog.data" class="container" v-on:submit.prevent="confirmPayment" v-loading="dataLoading">
                     <div class="row">
@@ -297,7 +297,7 @@
                 :visible.sync='detailPaymentDialog.visible'
                 title="Thông tin chi tiết thanh toán"
                 :close-on-click-modal="false"
-                width="65%"
+                width="70%"
             >
                 <div v-if="detailPaymentDialog.data" class="container">
                     <div class="row">
@@ -385,7 +385,7 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="Tệp đính kèm" min-width="120">
+                                <el-table-column label="Tệp đính kèm" min-width="100">
                                     <template slot-scope="scope">
                                         <div v-for="(item, index) in scope.row.attachFiles" :key="index">
                                             <a :href="item" target="_blank" style="font-style:italic;text-decoration:underline!important;">{{ 'Tệp đính kèm ' + (index + 1) }}</a> 
