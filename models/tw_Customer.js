@@ -19,4 +19,5 @@ export default function() {
 	this.imageFile = null;
 	this.customerGroup = '';
 	this.source = '';
+	this.fullAddress = '';
 }

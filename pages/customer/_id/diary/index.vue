@@ -14,6 +14,7 @@
                     <div class="col-form-label">Loại</div>
                     <el-select v-model="searchQuery.filters.typeF" placeholder="Loại..." name="typeF" filterable>
                         <el-option label="Tất cả" value="all"></el-option>
+                        <el-option label="Thông tin" value="profile"></el-option>
                         <el-option label="Đặt hẹn" value="booking"></el-option>
                         <el-option label="Khám và điều trị" value="examination"></el-option>
                         <el-option label="Thanh toán" value="payment"></el-option>
@@ -45,30 +46,367 @@
             <div class="row mt-4" v-loading="dataLoading">
                 <div v-if="data.total > 0" class="col-md-12">
                     <el-timeline>
-                        <el-timeline-item v-for="(item, index) in data.data" :key="index" color="#64dd17" size="large">
-                            <div class="row">
+                        <el-timeline-item v-for="(item, index) in data.data" :key="index" :color="getColor(item.type)" size="large">
+                            <div v-if="item.type == 'profile'" class="row">
                                 <div class="col-md-12">
-                                     <a v-if="item.type == 'examination'" style="font-weight:bold;color:#60c248;cursor:pointer;">
-                                        <div>
-                                            Khám và điều trị ({{ item.content ? item.content.code : '' }})
-                                            <i class='bx bxs-edit-alt'></i>
+                                    <div style="font-weight:bold;">
+                                        {{ item.action == 'create' ? 'Tạo mới thông tin' : 'Cập nhật thông tin' }}
+                                        <i class='bx bxs-edit-alt'></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <el-tooltip class="item" effect="dark" content="Xem chi tiết" placement="top">
+                                            <a class='text-info' title="Xem sự thay đổi" href='javascript:void(0)'  @click='viewDetailProfileLog(item.note)'>
+                                                Chi tiết dữ liệu <i class='el-icon-view'></i>
+                                            </a>
+                                        </el-tooltip>
+                                    </div>
+                                    <div class="mt-2" style="font-style: italic;color:#98a6ad;">
+                                        {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
+                                    </div>
+                                    <el-dialog title="Chi tiết" :visible.sync="detailProfileLog.visible" :close-on-click-modal="false" width="60%">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table table-bordered">
+                                                    <thead style="background-color:#f1f7fd;color:#909399;font-weight:bold;">
+                                                        <tr>
+                                                            <th style="width: 50%">Dữ liệu mới</th>
+                                                            <th style="width: 50%">Dữ liệu cũ</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th style="width: 50%">
+                                                                <ul v-if="detailProfileLog.data.length > 0">
+                                                                    <li class="mb-2" v-for="(item, index) in detailProfileLog.data" :key="index">
+                                                                        <div v-if="item.newvalue">
+                                                                            &#9900; 
+                                                                            <span style="font-weight: bold;">
+                                                                                {{ item.column }}: 
+                                                                            </span>
+                                                                            {{ item.newvalue }}
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </th>
+                                                            <th style="width: 50%">
+                                                                <tr>
+                                                                    <ul v-if="detailProfileLog.data.length > 0">
+                                                                        <li class="mb-2" v-for="(item, index) in detailProfileLog.data" :key="index">
+                                                                            <div v-if="item.oldvalue">
+                                                                                &#9900; 
+                                                                                <span style="font-weight: bold;">
+                                                                                    {{ item.column }}: 
+                                                                                </span>
+                                                                                {{ item.oldvalue }}
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </tr>
+                                                            </th>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </a>
-                                    <a v-else-if="item.type == 'payment'" style="font-weight:bold;color:#60c248;cursor:pointer;">
-                                        <div>
-                                            Thanh toán ({{ item.content ? item.content.code : '' }})
-                                            <i class='bx bxs-edit-alt'></i>
-                                        </div>
-                                    </a>
-                                    <a v-else-if="item.type == 'booking'" style="font-weight:bold;color:#60c248;cursor:pointer;">
-                                        <div>
-                                            Đặt hẹn ({{ item.content ? item.content.code : '' }})
-                                            <i class='bx bxs-edit-alt'></i>
-                                        </div>
-                                    </a>
+                                        <span slot="footer" class="dialog-footer">
+                                            <button type="button" class="control-btn gray" @click="detailProfileLog.visible = false">
+                                                <span>Đóng</span>
+                                            </button>
+                                        </span>
+                                    </el-dialog>
                                 </div>
-                                <div class="col-md-12 mt-3" style="font-style: italic;color:#98a6ad;">
-                                    {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
+                            </div>
+                            <div v-else-if="item.type == 'booking'" class="row">
+                                
+                            </div>
+                            <div v-else-if="item.type == 'examination'" class="row">
+                                <div class="col-md-12">
+                                    <div style="font-weight:bold;">
+                                        <span v-if="item.action == 'create'">Tạo mới phiếu khám</span>
+                                        <span v-if="item.action == 'update'">Cập nhật phiếu khám</span>
+                                        <span v-if="item.action == 'confirm'">Xác nhận điều trị</span>
+                                        <span v-if="item.action == 'cancel'">Hủy phiếu khám</span>
+                                        <i class='bx bxs-edit-alt'></i>
+                                    </div>
+                                    <div v-if="item.action == 'create' || item.action == 'update'" class="mt-2">
+                                        <el-tooltip class="item" effect="dark" content="Xem dữ liệu mới" placement="top">
+                                            <a class='text-info' title="Xem sự thay đổi" href='javascript:void(0)' @click="viewExaminationLog(item.note, 'new')">
+                                                Dữ liệu mới <i class='el-icon-view'></i>
+                                            </a>
+                                        </el-tooltip> | 
+                                        <el-tooltip class="item" effect="dark" content="Xem dữ liệu cũ" placement="top">
+                                            <a class='text-info' title="Xem sự thay đổi" href='javascript:void(0)' @click="viewExaminationLog(item.note, 'old')">
+                                                Dữ liệu cũ <i class='el-icon-view'></i>
+                                            </a>
+                                        </el-tooltip>
+                                    </div>
+                                    <div v-else class="mt-2">
+                                        <el-tooltip class="item" effect="dark" content="Xem dữ liệu" placement="top">
+                                            <a class='text-info' title="Xem sự thay đổi" href='javascript:void(0)' @click="viewExaminationLog(item.note, 'new')">
+                                                Chi tiết phiếu khám <i class='el-icon-view'></i>
+                                            </a>
+                                        </el-tooltip>
+                                    </div>
+                                    <div class="mt-2" style="font-style: italic;color:#98a6ad;">
+                                        {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
+                                    </div>
+                                    <el-dialog
+                                        :visible.sync='examinationLog.visible'
+                                        :width='examinationLog.width'
+                                        title="Chi tiết"
+                                        :close-on-click-modal="false"
+                                    >
+                                        <div v-if="examinationLog.data" class="container" style="color:#000;">
+                                            <div class="row">
+                                                <div class="col-md-12 text-center">
+                                                    <div style="font-weight:bold;font-size:24px;">PHIẾU KHÁM VÀ ĐIỀU TRỊ</div>
+                                                </div>
+                                                <div class="col-md-12 mt-2">
+                                                    <div class="row">
+                                                        <div class="col-md-4"></div>
+                                                        <div class="col-md-4 text-center">Ngày {{$moment(examinationLog.data.createdAt).format('DD')}} tháng {{$moment(examinationLog.data.createdAt).format('MM')}} năm {{$moment(examinationLog.data.createdAt).format('YYYY')}}</div>
+                                                        <div class="col-md-4 text-right">Mã: {{examinationLog.data.code}}</div>
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <div class="col-md-6 mt-2">
+                                                            <div class="row">
+                                                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                                                    TIỀN SỬ BỆNH
+                                                                </div>
+                                                                <div class="col-md-12 mt-2">
+                                                                    <ul v-if="examinationLog.data.anamnesis != null && examinationLog.data.anamnesis.length > 0" class="ml-3">
+                                                                        <li v-for="item in examinationLog.data.anamnesis" :key="item.value" class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            {{item.label}} {{item.note ? ` - ${item.note}` : ''}}
+                                                                        </li>
+                                                                    </ul>
+                                                                    <ul v-else class="ml-3">
+                                                                        <li class="mb-5 pb-2">- Không có</li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mt-2">
+                                                            <div class="row">
+                                                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                                                    DỊ ỨNG
+                                                                </div>
+                                                                <div class="col-md-12 mt-2">
+                                                                    <ul v-if="examinationLog.data.allergy != null && examinationLog.data.allergy.allergies != null && examinationLog.data.allergy.allergies.length > 0" class="ml-3">
+                                                                        <li v-for="item in examinationLog.data.allergy.allergies" :key="item" class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            {{getAllergyName(item)}}
+                                                                        </li>
+                                                                        <li v-if="examinationLog.data.allergy.other" class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            {{examinationLog.data.allergy.other}}
+                                                                        </li>
+                                                                    </ul>
+                                                                    <ul v-else class="ml-3">
+                                                                        <li class="mb-5 pb-2">- Không có</li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mt-2">
+                                                            <div class="row">
+                                                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                                                    KHÁM LÂM SÀNG
+                                                                </div>
+                                                                <div class="col-md-12 mt-2">
+                                                                    <ul v-if="examinationLog.data.clinicalExam" class="ml-3">
+                                                                        <li  class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            {{examinationLog.data.clinicalExam}}
+                                                                        </li>
+                                                                    </ul>
+                                                                    <ul v-else class="ml-3">
+                                                                        <li class="mb-5 pb-2">- Không có thông tin khám</li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mt-2">
+                                                            <div class="row">
+                                                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                                                    KHÁM CẬN LÂM SÀNG
+                                                                </div>
+                                                                <div class="col-md-12 mt-2">
+                                                                    <ul class="ml-3">
+                                                                        <li class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            X-quang:
+                                                                            <span v-if="examinationLog.data.preclinicalExam != null && examinationLog.data.preclinicalExam.xquang != null && examinationLog.data.preclinicalExam.xquang.length > 0">
+                                                                                <span v-for="(item, index) in examinationLog.data.preclinicalExam.xquang" :key="index">
+                                                                                    {{index > 0 ? ', ' : ' '}} {{getXquangName(item)}}
+                                                                                </span>
+                                                                            </span> 
+                                                                        </li>
+                                                                        <li class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            Xét nghiệm:
+                                                                            <span v-if="examinationLog.data.preclinicalExam != null && examinationLog.data.preclinicalExam.test != null && examinationLog.data.preclinicalExam.test.length > 0">
+                                                                                <span v-for="(item, index) in examinationLog.data.preclinicalExam.test" :key="index">
+                                                                                    {{index > 0 ? ', ' : ' '}} {{getTestName(item)}}
+                                                                                </span>
+                                                                            </span>
+                                                                        </li>
+                                                                        <li class="mb-2">
+                                                                            <span style="font-family:Wingdings">&#118;</span>
+                                                                            Khác: 
+                                                                            <span v-if="examinationLog.data.preclinicalExam != null && examinationLog.data.preclinicalExam.other != null">
+                                                                                {{examinationLog.data.preclinicalExam.other}}
+                                                                            </span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                            <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                                            CHẨN ĐOÁN VÀ ĐIỀU TRỊ
+                                                        </div>
+                                                        <div class="col-md-12 mt-2">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
+                                                                        <th scope="col">Răng/hàm</th>
+                                                                        <th scope="col">Chẩn đoán</th>
+                                                                        <th scope="col">Điều trị</th>
+                                                                        <th scope="col">Đơn giá</th>
+                                                                        <th scope="col">SL</th>
+                                                                        <th scope="col">Giảm giá</th>
+                                                                        <th scope="col">Thành tiền</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr v-for="item in examinationLog.data.diagnosisTreatment" :key="item.key">
+                                                                        <td>
+                                                                            {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }}
+                                                                        </td>
+                                                                        <td>
+                                                                            {{ item.diagnose }}
+                                                                        </td>
+                                                                        <td>
+                                                                            {{ getServiceName(item.serviceId) }}
+                                                                        </td>
+                                                                        <td style="text-align:right;">
+                                                                            {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                                                        </td>
+                                                                        <td style="text-align:center;">
+                                                                            {{ item.isJaw ? item.quantityJaw : item.quantity }}
+                                                                        </td>
+                                                                        <td style="text-align:right;">
+                                                                            {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                                                        </td>
+                                                                        <td style="text-align:right;">
+                                                                            {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-6">
+                                                            <div class="row">
+                                                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                                                    GHI CHÚ
+                                                                </div>
+                                                                <div class="col-md-12 ml-3 mt-2">
+                                                                    {{examinationLog.data.note}}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="row">
+                                                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                                                    TỔNG CHI PHÍ ĐIỀU TRỊ
+                                                                </div>
+                                                                <div class="col-md-12 ml-2">
+                                                                    <table class="table table-borderless" style="font-size:14px;">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td style="width:40%;font-weight:bold;">Chi phí điều trị</td>
+                                                                                <td style="width:5%">:</td>
+                                                                                <td style="text-align:right;width:55%">
+                                                                                    <span>{{ examinationLog.data.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style="width:40%;font-weight:bold;">Giảm giá</td>
+                                                                                <td style="width:5%">:</td>
+                                                                                <td style="text-align:right;width:55%">
+                                                                                    <span>{{ examinationLog.data.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style="width:40%;font-weight:bold;">Thành tiền</td>
+                                                                                <td style="width:5%">:</td>
+                                                                                <td style="text-align:right;width:55%">
+                                                                                    <span>{{ examinationLog.data.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span slot="footer" class="dialog-footer">
+                                            <button type="button" class="control-btn gray" @click="examinationLog.visible = false">
+                                                <i class='bx bx-x'></i>
+                                                <span>Đóng</span>
+                                            </button>
+                                        </span>
+                                    </el-dialog>
+                                </div>
+                            </div>
+                            <div v-else-if="item.type == 'payment'" class="row">
+                                <div class="col-md-12">
+                                    <div style="font-weight:bold;">
+                                        <span v-if="item.action == 'confirm'">Xác nhận thanh toán</span>
+                                        <span v-if="item.action == 'cancel'">Hủy thanh toán</span>
+                                        <i class='bx bxs-edit-alt'></i>
+                                    </div>
+                                    <div v-if="item.action == 'confirm'" class="mt-2">
+                                        <el-tooltip class="item" effect="dark" content="Mã phiếu khám" placement="top">
+                                            <a class='text-info' href='javascript:void(0)'>
+                                                {{ (item.note && item.note.length > 0) ? item.note[0].newvalue.code : '' }}
+                                            </a>
+                                        </el-tooltip> | 
+                                        <el-tooltip class="item" effect="dark" content="Số tiền thanh toán" placement="top">
+                                            <a class='text-info' href='javascript:void(0)'>
+                                                {{ (item.note && item.note.length > 0) ? `${item.note[0].newvalue.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} VND` : '' }}
+                                            </a>
+                                        </el-tooltip>
+                                    </div>
+                                    <div v-if="item.action == 'cancel'" class="mt-2">
+                                        <el-tooltip class="item" effect="dark" content="Mã phiếu khám" placement="top">
+                                            <a class='text-info' href='javascript:void(0)'>
+                                                {{ (item.note && item.note.length > 0) ? item.note[0].newvalue.code : '' }}
+                                            </a>
+                                        </el-tooltip> | 
+                                        <el-tooltip class="item" effect="dark" content="Lý do hủy" placement="top">
+                                            <a class='text-info' href='javascript:void(0)'>
+                                                {{ (item.note && item.note.length > 0) ? item.note[0].newvalue.cancelReason : '' }}
+                                            </a>
+                                        </el-tooltip>
+                                    </div>
+                                    <div class="mt-2" style="font-style: italic;color:#98a6ad;">
+                                        {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
+                                    </div>
                                 </div>
                             </div>
                         </el-timeline-item>
@@ -119,8 +457,6 @@ export default {
         return{
             searchQuery: {
                 filters: {
-                    // codeF: '',
-                    // dentistsF: [],
                     typeF: 'all',
                     dateF: [],
                 },
@@ -135,11 +471,6 @@ export default {
             data: {},
             currentPage: 1,
             customerInfo: new Customer(),
-            viewDialog: {
-                visible: false,
-                data: null,
-                width: '60%'
-            },
             xquangData: [],
             testData: [],
             allergyData: [],
@@ -148,6 +479,15 @@ export default {
                 visible: false,
                 data: null,
             },
+            detailProfileLog: {
+                visible: false,
+                data: []
+            },
+            examinationLog:{
+                visible: false,
+                data: null,
+                width: '60%'
+            }
         }
     },
     async created(){
@@ -252,42 +592,6 @@ export default {
             _this.searchQuery.pages.from = (_this.currentPage - 1) * _this.searchQuery.pages.size;
             _this.getData(_this.searchQuery);
         },
-        async viewExamination(data){
-            const _this = this;
-            //#region Set độ rộng dialog
-            var w = window.innerWidth;
-            if(w >= 1200 && w <= 1500){
-                _this.viewDialog.width = '60%'
-            }
-            else if(w >= 1100 && w < 1200){
-                _this.viewDialog.width = '70%'
-            }
-            else if(w >= 900 && w < 1100){
-                _this.viewDialog.width = '80%'
-            }
-            else if(w < 900){
-                _this.viewDialog.width = '90%'
-            }
-            else{
-                _this.viewDialog.width = '50%'
-            }
-            //#endregion
-            if (data && data.targetId) {
-                await _this.$axios.$get(`/api/customer/getExaminationById/${data.targetId}`).then(
-                    async (response) => {
-                        _this.viewDialog.data = response.data[0];
-                        _this.viewDialog.visible = true;
-                    },
-                    (error) => {
-                        console.log('Error: ', error);
-                        _this.$message({
-                            type: 'error',
-                            message: 'Có lỗi xảy ra',
-                        });
-                    }
-                );
-            }
-        },
         printExamination(id){
             const _this = this;
             _this.$refs.html2Pdf_history.generatePdf();
@@ -364,6 +668,43 @@ export default {
             const _this = this;
             _this.$refs.html2Pdf_receipt.generatePdf();
         },
+        getColor(type){
+            if(type == 'profile'){
+                return '#659be0';
+            }
+            else if(type == 'booking'){
+                return '#DC3545';
+            }
+            else if(type == 'examination'){
+                return '#64dd17';
+            }
+            else if(type == 'FFCA2C'){
+                return '#64dd17';
+            }
+            else{
+                return '#64dd17';
+            }
+        },
+        viewDetailProfileLog(data){
+            const _this = this;
+            _this.detailProfileLog.data = data;
+            _this.detailProfileLog.visible = true;
+        },
+        viewExaminationLog(data, type){
+            const _this = this;
+            if(type == 'new'){
+                if(data && data.length > 0){
+                    _this.examinationLog.data = data[0].newvalue;
+                    _this.examinationLog.visible = true;
+                }
+            }
+            else if(type == 'old'){
+                if(data && data.length > 0){
+                    _this.examinationLog.data = data[0].oldvalue;
+                    _this.examinationLog.visible = true;
+                }
+            }
+        }
     }
 }
 </script>

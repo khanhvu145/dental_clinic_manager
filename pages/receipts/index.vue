@@ -69,17 +69,22 @@
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border show-summary :summary-method="getSummaries">
-                            <el-table-column label="Mã phiếu thu" min-width="80">
+                            <el-table-column label="Mã phiếu thu" min-width="70">
                                 <template slot-scope="scope">
                                     {{ scope.row.code || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Ngày thanh toán" min-width="80">
+                            <el-table-column label="Thanh toán lúc" min-width="80">
                                 <template slot-scope="scope">
-                                    <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}</div>
+                                    <div>
+                                        {{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm') : '' }}
+                                    </div>
+                                    <div>
+                                        {{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}
+                                    </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Số tiền thanh toán" min-width="80" prop="amount" align="right">
+                            <el-table-column label="Số tiền" min-width="80" prop="amount" align="right">
                                 <template slot-scope="scope">
                                     {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                 </template>
@@ -109,7 +114,13 @@
                                         <el-tag type="success">Đã thanh toán</el-tag>
                                     </div>
                                     <div v-if="scope.row.status == 'cancelled'" style="text-align:center;">
-                                        <el-tag type="info">Đã hủy</el-tag>
+                                        <el-tooltip class="item" effect="dark" placement="top">
+                                            <div slot="content">
+                                                <div>Hủy lúc: {{ scope.row.cancelledAt ? $moment(scope.row.cancelledAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+                                                <div class="mt-1">Lý do: {{ scope.row.cancelReason || '' }}</div>
+                                            </div>
+                                            <el-tag type="info">Đã hủy</el-tag>
+                                        </el-tooltip>
                                     </div>
                                 </template>
                             </el-table-column>

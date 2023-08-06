@@ -27,7 +27,13 @@
                         </button>
                     </div>
                     <div class="col-md-3 mt-4">
-                        <ImageUpload v-if="!dataLoading || formData.imageFile" :value="formData.img" @input="(newValue) => {formData.imageFile = newValue;}"></ImageUpload>
+                        <div class="row">
+                            <div class="col-3 col-md-12"></div>
+                            <div class="col-6 col-md-12">
+                                <ImageUpload v-if="!dataLoading || formData.imageFile" :value="formData.img" @input="(newValue) => {formData.imageFile = newValue;}"></ImageUpload>
+                            </div>
+                            <div class="col-3 col-md-12"></div>
+                        </div>
                     </div>
                     <div class="col-md-9 mt-4">
                         <div class="row">
@@ -260,6 +266,7 @@ export default {
             const _this = this;
             _this.dataLoading = true;
             _this.formData.createdBy = _this.userInfo.data.username;
+            _this.formData.fullAddress = _this.getFullAddress(_this.formData.address.building, _this.formData.address.provinceId, _this.formData.address.districtId, _this.formData.address.wardId);
             var oldData = cloneDeep(_this.formData);
             var newData = new FormData();
             buildFormData(newData, oldData);
@@ -277,7 +284,18 @@ export default {
                 _this.$message.error(data.error);
             }
             _this.dataLoading = false;
-        })
+        }),
+        getFullAddress(building, provinceId, districtId, wardId){
+            const _this = this;
+            building = building ? building : '';
+            var ward = _this.wardByDistrict.find(e => e.value == wardId) ? _this.wardByDistrict.find(e => e.value == wardId).label : '';
+            var district = _this.districtByProvince.find(e => e.value == districtId) ? _this.districtByProvince.find(e => e.value == districtId).label : '';
+            var province = _this.provinceMasterData.find(e => e.value == provinceId) ? _this.provinceMasterData.find(e => e.value == provinceId).label : '';
+
+            var fullAddress = building + " " + ward + " " + district + " " + province;
+
+            return fullAddress;
+        }
      }
 }
 </script>
