@@ -20,7 +20,7 @@ export default {
     components: {
 		FullCalendar,
 	},
-    props: ['dentistId', 'appointmentConfig'],
+    props: ['dentistId', 'appointmentConfig', 'currentPage', 'appointmentId'],
     data(){
         var _this = this;
         var dayOff = _this.appointmentConfig.workingTime.dayOfWeek.filter(item => item.value == false);
@@ -118,6 +118,9 @@ export default {
             await _this.$axios.$get(`/api/appointment/getCalendarByDentist/${_this.dentistId}`).then(
                 (response) => {
                     if(response.data.length > 0){
+                        if(_this.currentPage && _this.currentPage == 'appointment' && _this.appointmentId){
+                            response.data = response.data.filter((item) => item._id != _this.appointmentId);
+                        }
                         _this.options.events = response.data.map(item => {
                             return {
                                 resourceId: item.dentistId,

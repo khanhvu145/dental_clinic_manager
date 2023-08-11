@@ -104,7 +104,7 @@
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
-                            <el-table-column v-if="columns[0].isShow" :label="columns[0].name" min-width="150">
+                            <el-table-column v-if="columns[0].isShow" :label="columns[0].name" min-width="200">
                                 <template slot-scope="scope">
                                     <div style="font-weight: bold;"> 
                                         <i class='bx bx-code-alt' ></i>
@@ -118,6 +118,11 @@
                                         <i class='bx bx-time-five' ></i>
                                         {{ scope.row.timeFrom ? $moment(scope.row.timeFrom).format('HH:mm') : '' }} - 
                                         {{ scope.row.timeTo ? $moment(scope.row.timeTo).format('HH:mm') : '' }}
+                                    </div>
+                                    <div v-if="scope.row.refId">
+                                        <el-tooltip effect="dark" :content="scope.row.refTransferReason" placement="left-start">
+                                            <span style="color:#FF0000;font-weight:bold;">({{ scope.row.refCode }})</span>
+                                        </el-tooltip>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -231,8 +236,12 @@
                                         {{ appointmentType.find(e => e.value == scope.row.type) ? appointmentType.find(e => e.value == scope.row.type).label : '' }}
                                     </div>
                                     <div>
-                                        <i class='bx bxs-category-alt'></i>
-                                        {{ scope.row.serviceGroupName || '' }}
+                                        <i class='bx bxs-notepad'
+                                            v-bind:style="{
+												color: appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).color : '#ccc',
+											}"
+                                        ></i>
+                                        {{ appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).label : '' }}
                                     </div>
                                     <div>
                                         <i class='bx bx-edit' ></i>
@@ -405,7 +414,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <div class="col-form-label">Dịch vụ</div>
                                         <el-select v-model="updateData.serviceGroupId" placeholder="Chọn dịch vụ" name="serviceGroupId" filterable :disabled="updateData.status != 'Booked'">
                                             <el-option
@@ -415,12 +424,23 @@
                                                 :value="item.value"
                                             ></el-option>
                                         </el-select>
-                                    </div>
+                                    </div> -->
                                     <div class="col-md-6">
                                         <div class="col-form-label">Loại lịch hẹn</div>
                                         <el-select v-model="updateData.type" placeholder="Loại lịch hẹn" name="type" filterable :disabled="updateData.status != 'Booked'">
                                             <el-option
                                                 v-for="item in appointmentType"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
+                                            ></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-form-label">Nội dung *</div>
+                                        <el-select v-model="updateData.content" placeholder="Nội dung" name="content" :disabled="updateData.status != 'Booked'" filterable>
+                                            <el-option
+                                                v-for="item in appointmentContent"
                                                 :key="item.value"
                                                 :label="item.label"
                                                 :value="item.value"
@@ -448,7 +468,7 @@
                         <button
                             type="button" 
                             class="control-btn red"
-                            @click="openDialogCancel(updateData._id)"
+                            @click="cancelBooking(updateData._id)"
                             v-if="checkRight('cancelBooking')"
                         >
                             <span>Hủy</span>
@@ -465,7 +485,7 @@
                 </el-dialog>
 
                 <!-- Dialog cancel appointment -->
-                <el-dialog title="Hủy lịch hẹn" :visible.sync="dialogCancelAppointment" :close-on-click-modal="false" width="40%">
+                <!-- <el-dialog title="Hủy lịch hẹn" :visible.sync="dialogCancelAppointment" :close-on-click-modal="false" width="40%">
                     <form v-on:submit.prevent="cancelBooking">
                         <div class="row">
                             <div class="col-md-12">
@@ -494,7 +514,7 @@
                             <span>Hủy</span>
                         </button>
                     </span>
-                </el-dialog>
+                </el-dialog> -->
 
                 <!-- Dialog logs appointment -->
                 <el-dialog title="Xem lịch sử" :visible.sync="dialogLogsAppointment" :close-on-click-modal="false" width="70%">
@@ -542,7 +562,7 @@
                 </el-dialog>
 
                 <!-- Dialog transfer -->
-                <el-dialog :visible.sync="dialogTransfer" :close-on-click-modal="false" width="40%">
+                <el-dialog :visible.sync="dialogTransfer" :close-on-click-modal="false" width="55%">
                     <span slot="title" class="dialog-title">
                         Chuyển lịch hẹn | 
                         <span style="color: #FFCC33; font-weight: bold;">
@@ -552,77 +572,118 @@
                     <form v-on:submit.prevent="submitTransfer">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="col-form-label">Nha sĩ phụ trách *</div>
+                                <div style="font-size:16px;font-weight:bold;" class="col-form-label">Thông tin lịch hẹn</div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <el-select v-model="transferData.dentistId" placeholder="Chọn nha sĩ" name="dentistId" filterable>
+                                        <div class="col-form-label">Loại lịch hẹn</div>
+                                        <el-select v-model="transferData.type" placeholder="Loại lịch hẹn" name="type" filterable>
                                             <el-option
-                                                v-for="item in dentistsData"
-                                                :key="item._id"
-                                                :label="`Ns ${item.name}`"
-                                                :value="item._id"
+                                                v-for="item in appointmentType"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
                                             ></el-option>
                                         </el-select>
                                     </div>
                                     <div class="col-md-6">
-                                        <button
-                                            v-if="transferData.dentistId"
-                                            type="button" 
-                                            class="control-btn blue"
-                                            @click="openCalendar()"
-                                        >
-                                            <i class='bx bxs-calendar'></i>
-                                            <span>Xem lịch trống</span>
-                                        </button>
+                                        <div class="col-form-label">Nội dung</div>
+                                        <el-select v-model="transferData.content" placeholder="Nội dung" name="content" filterable>
+                                            <el-option
+                                                v-for="item in appointmentContent"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
+                                            ></el-option>
+                                        </el-select>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <div class="col-form-label">Thời gian *</div>
-                                <div class="row">
                                     <div class="col-md-12">
-                                        <el-date-picker
-                                            v-model="transferData.date"
-                                            type="date"
-                                            name="date"
-                                            format="dd/MM/yyyy"
-                                            placeholder="Chọn ngày hẹn">
-                                        </el-date-picker>
-                                    </div>
-                                    <div class="col-md-6 mt-4">
-                                        <el-time-select
-                                            v-model="transferData.time"
-                                            :picker-options="{
-                                                start: '00:00',
-                                                step: '00:05',
-                                                end: '24:00'
-                                            }"
-                                            name="time"
-                                            placeholder="Chọn thời gian">
-                                        </el-time-select>
-                                    </div>
-                                    <div class="col-md-6 mt-4">
-                                        <el-input placeholder="0" v-model="transferData.duration" class="input-with-select" style="text-align: right;" name="duration" type="number">
-                                            <el-select v-model="transferData.durationType" slot="append" style="width:80px;" name="durationType" :default-first-option="true">
-                                                <el-option label="Phút" value="minutes"></el-option>
-                                                <el-option label="Giờ" value="hours"></el-option>
-                                            </el-select>
+                                        <div class="col-form-label">Ghi chú</div>
+                                        <el-input
+                                            type="textarea"
+                                            :rows="4"
+                                            placeholder="Ghi chú"
+                                            v-model="transferData.note">
                                         </el-input>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <div class="col-form-label">Ghi chú</div>
-                                <el-input
-                                    type="textarea"
-                                    :rows="4"
-                                    placeholder="Ghi chú"
-                                    v-model="transferData.note">
-                                </el-input>
+                            <div class="col-md-12 mt-2">
+                                <div style="font-size:16px;font-weight:bold;" class="col-form-label">Thông tin chuyển hẹn *</div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-form-label">Nha sĩ phụ trách</div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <el-select v-model="transferData.dentistId" placeholder="Chọn nha sĩ" name="dentistId" filterable>
+                                                    <el-option
+                                                        v-for="item in dentistsData"
+                                                        :key="item._id"
+                                                        :label="`Ns ${item.name}`"
+                                                        :value="item._id"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button
+                                                    v-if="transferData.dentistId"
+                                                    type="button" 
+                                                    class="control-btn blue"
+                                                    @click="openCalendar()"
+                                                >
+                                                    <i class='bx bxs-calendar'></i>
+                                                    <span>Xem lịch trống</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-form-label">Thời gian</div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <el-date-picker
+                                                    v-model="transferData.date"
+                                                    type="date"
+                                                    name="date"
+                                                    format="dd/MM/yyyy"
+                                                    placeholder="Chọn ngày hẹn">
+                                                </el-date-picker>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <el-time-select
+                                                    v-model="transferData.time"
+                                                    :picker-options="{
+                                                        start: '00:00',
+                                                        step: '00:05',
+                                                        end: '24:00'
+                                                    }"
+                                                    name="time"
+                                                    placeholder="Chọn thời gian">
+                                                </el-time-select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <el-input placeholder="0" v-model="transferData.duration" class="input-with-select" style="text-align: right;" name="duration" type="number">
+                                                    <el-select v-model="transferData.durationType" slot="append" style="width:80px;" name="durationType" :default-first-option="true">
+                                                        <el-option label="Phút" value="minutes"></el-option>
+                                                        <el-option label="Giờ" value="hours"></el-option>
+                                                    </el-select>
+                                                </el-input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-form-label">Lý do</div>
+                                        <el-input
+                                            type="textarea"
+                                            :rows="4"
+                                            placeholder="Lý do"
+                                            v-model="transferData.transferReason">
+                                        </el-input>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -643,7 +704,14 @@
 
                 <!-- Dialog calendar -->
                 <el-dialog title="Xem lịch trống" :visible.sync="dialogCalendarByDentist" :close-on-click-modal="false" width="80%">
-                    <CalendarByDentist :dentistId="transferData.dentistId" :appointmentConfig="appointmentConfig" @select-empty-calendar = "selectEmptyCalendar" ref="calendarByDentistComponent" />
+                    <CalendarByDentist 
+                        :dentistId="transferData.dentistId" 
+                        :appointmentConfig="appointmentConfig"  
+                        :currentPage="`appointment`"
+                        :appointmentId="transferData._id"
+                        @select-empty-calendar = "selectEmptyCalendar" 
+                        ref="calendarByDentistComponent" 
+                    />
                     <span slot="footer" class="dialog-footer">
                         <button type="button" class="control-btn gray" @click="dialogCalendarByDentist = false">
                             <span>Đóng</span>
@@ -721,10 +789,11 @@ export default {
             },
             dialogLogsAppointment: false,
             logsData: [],
-            transferData: {},
+            transferData: new Appointment(),
             dialogTransfer: false,
             dialogCalendarByDentist: false,
-            appointmentConfig: new AppointmentConfig()
+            appointmentConfig: new AppointmentConfig(),
+            appointmentContent: [],
         }
     },
     async created() {
@@ -743,7 +812,8 @@ export default {
             }
         );
         _this.appointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
-        _this.serviceData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
+        // _this.serviceData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
+        _this.appointmentContent = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentContent' })) || [];
         await _this.$axios.$get('/api/appointmentConfig/getData').then(
             (response) => {
                 _this.appointmentConfig = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
@@ -799,6 +869,11 @@ export default {
                 statusF: ['Booked', 'Checkin', 'Examined'],
                 dateF: [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))]
             }
+            _this.searchQuery.pages = {
+                from: 0,
+                size: 10
+            }
+
             _this.getData(_this.searchQuery);
         },
         onChangeSorts(value){
@@ -826,14 +901,14 @@ export default {
             await _this.$axios.$get(`/api/appointment/getById/${val}`).then(
 				(response) => {
                     _this.updateData = (response.data != null && response.data.length > 0) ? response.data[0] : new Appointment();
-                    var expireTime = moment(_this.updateData.timeFrom).add(1, 'm')._d;
-                    const date = new Date(expireTime);
-                    const minutes = date.getMinutes();
-                    const hours = date.getHours();
-                    const days = date.getDate();
-                    const months = date.getMonth() + 1;
-                    const dayOfWeek = date.getDay();
-                    console.log(`00 ${minutes} ${hours} ${days} ${months} ${dayOfWeek}`)
+                    // var expireTime = moment(_this.updateData.timeFrom).add(1, 'm')._d;
+                    // const date = new Date(expireTime);
+                    // const minutes = date.getMinutes();
+                    // const hours = date.getHours();
+                    // const days = date.getDate();
+                    // const months = date.getMonth() + 1;
+                    // const dayOfWeek = date.getDay();
+                    // console.log(`00 ${minutes} ${hours} ${days} ${months} ${dayOfWeek}`)
 				},
 				(error) => {
                     console.log('Error: ', error);
@@ -847,6 +922,7 @@ export default {
         },
         submitUpdate: debounce(async function (){
             const _this = this;
+            _this.dataLoading = true;
             _this.updateData.updatedBy = _this.userInfo.data.username;
             var newData = cloneDeep(_this.updateData);
             const data = await _this.$axios.$put('/api/appointment/updateBooking', newData);
@@ -862,37 +938,38 @@ export default {
                 console.log('Error: ', data.error);
                 _this.$message.error(data.error);
             }
+            _this.dataLoading = false;
         }),
-        cancelBooking: debounce(async function(){
-            const _this = this;
-            _this.$confirm('Bạn có chắc muốn hủy lịch hẹn này?', 'Xác nhận hủy', {
-                confirmButtonText: 'Xác nhận',
-                cancelButtonText: 'Đóng',
-                type: 'warning',
-                closeOnClickModal: false
-            }).then(async () => {
-                _this.cancelBookingData.updatedBy = _this.userInfo.data.username;
-                var newData = cloneDeep(_this.cancelBookingData);
-                const data = await _this.$axios.$put('/api/appointment/cancelBooking', newData);
-                if(data.success){
-                    _this.dialogUpdateAppointment = false;
-                    _this.dialogCancelAppointment = false;
-                    _this.updateData = new Appointment();
-                    _this.cancelBookingData = {
-                        id: 0,
-                        cancelReason: ''
-                    }
-                    _this.$message({
-                        message: data.message,
-                        type: 'success',
-                    });
-                    _this.getData(_this.searchQuery);
-                }else {
-                    console.log('Error: ', data.error);
-                    _this.$message.error(data.error);
-                }
-            }).catch(() => {});
-        }),
+        // cancelBooking: debounce(async function(){
+        //     const _this = this;
+        //     _this.$confirm('Bạn có chắc muốn hủy lịch hẹn này?', 'Xác nhận hủy', {
+        //         confirmButtonText: 'Xác nhận',
+        //         cancelButtonText: 'Đóng',
+        //         type: 'warning',
+        //         closeOnClickModal: false
+        //     }).then(async () => {
+        //         _this.cancelBookingData.updatedBy = _this.userInfo.data.username;
+        //         var newData = cloneDeep(_this.cancelBookingData);
+        //         const data = await _this.$axios.$put('/api/appointment/cancelBooking', newData);
+        //         if(data.success){
+        //             _this.dialogUpdateAppointment = false;
+        //             _this.dialogCancelAppointment = false;
+        //             _this.updateData = new Appointment();
+        //             _this.cancelBookingData = {
+        //                 id: 0,
+        //                 cancelReason: ''
+        //             }
+        //             _this.$message({
+        //                 message: data.message,
+        //                 type: 'success',
+        //             });
+        //             _this.getData(_this.searchQuery);
+        //         }else {
+        //             console.log('Error: ', data.error);
+        //             _this.$message.error(data.error);
+        //         }
+        //     }).catch(() => {});
+        // }),
         openDialogCancel(id){
             const _this = this;
             _this.cancelBookingData.id = id;
@@ -940,6 +1017,7 @@ export default {
                 type: 'warning',
                 closeOnClickModal: false
             }).then(async () => {
+                _this.dataLoading = true;
                 const data = await _this.$axios.$put('/api/appointment/changeStatus', { id: id, action: action, currentUser: _this.userInfo.data.username });
                 if(data.success){
                     _this.$message({
@@ -950,19 +1028,23 @@ export default {
                 }else {
                     _this.$message.error(data.error);
                 }
+                _this.dataLoading = false;
             }).catch(() => {});
         },
         openDialogTransfer(item){
             const _this = this;
-            _this.transferData = {};
+            _this.transferData = new Appointment();
             _this.transferData.durationType = 'minutes';
             _this.transferData.code = item.code;
             _this.transferData._id = item._id;
+            _this.transferData.type = item.type;
+            _this.transferData.content = item.content;
+            _this.transferData.note = item.note;
+            _this.transferData.transferReason = '';
             _this.dialogTransfer = true;
         },
         submitTransfer: debounce(async function (){
             const _this = this;
-            console.log(_this.transferData);
             _this.transferData.updatedBy = _this.userInfo.data.username;
             var newData = cloneDeep(_this.transferData);
             const data = await _this.$axios.$post('/api/appointment/transferBooking', newData);
@@ -1006,6 +1088,7 @@ export default {
                 type: 'warning',
                 closeOnClickModal: false
             }).then(async () => {
+                _this.dataLoading = true;
                 const data = await _this.$axios.$post('/api/appointment/sendMail', { id: id });
                 if(data.success){
                     _this.$message({
@@ -1016,8 +1099,62 @@ export default {
                 }else {
                     _this.$message.error(data.error);
                 }
+                _this.dataLoading = false;
             }).catch(() => {});
-        }
+        },
+        getAppointmentContent(content){
+            const _this = this;
+            let data = _.find(_this.appointmentContent, { value: content });
+			return data ? data.label : '';
+        },
+        async cancelBooking(id){
+            const _this = this;
+            _this.dataLoading = true;
+            _this.
+                $prompt('Lý do hủy *', 'Xác nhận hủy lịch hẹn', {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập lý do hủy',
+                    inputValidator: this.validateInput
+                }).then(async ({ value }) => {
+                    if (value) {
+                        const data = await _this.$axios.$put('/api/appointment/cancelBooking', {
+                            id: id,
+                            cancelReason: value,
+                            updatedBy: _this.userInfo.data.username
+                        });
+                        if (data.success) {
+                            _this.dialogUpdateAppointment = false;
+                            _this.updateData = new Appointment();
+                            _this.$message({
+                                message: 'Hủy lịch hẹn thành công',
+                                type: 'success',
+                            });
+                            _this.dataLoading = false;
+                            _this.getData(_this.searchQuery);
+                        } else {
+                            _this.$message.error(data.error);
+                            _this.dataLoading = false;
+                        }
+                    }
+                    else{
+                        _this.dataLoading = false;
+                        _this.$message({
+                            type: 'error',
+                            message: 'Vui lòng nhập lý do hủy',
+                        });
+                    }
+                })
+                .catch((error) => {
+                    _this.dataLoading = false;
+                    console.log(error);
+                });
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
+        },
     },
 }
 </script>

@@ -2,7 +2,7 @@ export default function() {
 	this.code = '';
 	this.dentistId = '';
 	this.customerId = '';
-    this.serviceGroupId = '';
+    // this.serviceGroupId = '';
 	this.date = null;
 	this.time = '';
 	this.duration = '';
@@ -11,4 +11,6 @@ export default function() {
     this.status = '';
     this.note = '';
 	this.isActive = true;
+	this.content = '';
+	this.transferReason = '';
 }

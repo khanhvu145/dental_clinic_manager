@@ -151,6 +151,17 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                     isActive: item.isActive,
                 };
             })
+        case 'generalConfigAppointmentContent': // Nội dung lịch hẹn
+            const appointmentContentData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'appointment_content', isActive: true });
+            var appointmentContent = appointmentContentData.data['appointment_content'];
+            return appointmentContent.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
         case 'generalConfigExamAnamnesis': // Tiền sử bệnh
             const examAnamnesisData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_anamnesis', isActive: true });
             var examAnamnesis = examAnamnesisData.data['exam_anamnesis'];

@@ -1,7 +1,7 @@
 export const statusData = [
     {
       key: 1,
-      label: 'Tất cả...',
+      label: 'Tất cả',
       value: null,
     },
     {
@@ -92,12 +92,19 @@ export const generalCategory = [
         active: true,
       },
       {
-        key: 'appointment_status',
-        label: 'Trạng thái lịch hẹn',
+        key: 'appointment_content',
+        label: 'Nội dung lịch hẹn',
         pickColor: true,
-        planHolder: 'Trạng thái lịch hẹn',
+        planHolder: 'Nội dung lịch hẹn',
         active: true,
-      }
+      },
+      // {
+      //   key: 'appointment_status',
+      //   label: 'Trạng thái lịch hẹn',
+      //   pickColor: true,
+      //   planHolder: 'Trạng thái lịch hẹn',
+      //   active: true,
+      // }
     ]
   },
   {

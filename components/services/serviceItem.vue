@@ -505,6 +505,10 @@ export default {
                 groupF: '',
                 statusF: true
             }
+            _this.searchQuery.pages = {
+                from: 0,
+                size: 10
+            }
             _this.getData(_this.searchQuery);
         },
         async onEdit(val){

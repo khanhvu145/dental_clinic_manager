@@ -95,7 +95,7 @@
                                     <el-tag>Mới</el-tag>
                                 </div>
                                 <div v-if="scope.row.status == 'approved'" style="text-align:center;">
-                                    <el-tag type="success">Dã duyệt</el-tag>
+                                    <el-tag type="success">Đã duyệt</el-tag>
                                 </div>
                                 <div v-if="scope.row.status == 'cancelled'" style="text-align:center;">
                                     <el-tag type="info">Đã hủy</el-tag>
@@ -227,6 +227,10 @@ export default {
                 codeF: '',
                 dentistsF: [],
                 dateF: []
+            }
+            _this.searchQuery.pages = {
+                from: 0,
+                size: 10
             }
             _this.getData(_this.searchQuery);
         },

@@ -184,7 +184,7 @@
                                             </div>
                                         </div>
                                         <div class="row mt-3">
-                                            <div class="col-md-6">
+                                            <!-- <div class="col-md-6">
                                                 <div class="col-form-label">Dịch vụ *</div>
                                                 <el-select v-model="registerData.serviceGroupId" placeholder="Chọn dịch vụ" name="serviceGroupId" clearable filterable>
                                                     <el-option
@@ -194,12 +194,23 @@
                                                         :value="item.value"
                                                     ></el-option>
                                                 </el-select>
-                                            </div>
+                                            </div> -->
                                             <div class="col-md-6">
                                                 <div class="col-form-label">Loại lịch hẹn</div>
                                                 <el-select v-model="registerData.type" placeholder="Loại lịch hẹn" name="type" filterable>
                                                     <el-option
                                                         v-for="item in apointmentType"
+                                                        :key="item.value"
+                                                        :label="item.label"
+                                                        :value="item.value"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-form-label">Nội dung *</div>
+                                                <el-select v-model="registerData.content" placeholder="Nội dung" name="content" filterable>
+                                                    <el-option
+                                                        v-for="item in appointmentContent"
                                                         :key="item.value"
                                                         :label="item.label"
                                                         :value="item.value"
@@ -475,7 +486,8 @@ export default {
             apointmentStatus: appointmentStatus,
             dialogViewEmptyCalendar: false,
             appointmentConfig: new AppointmentConfig(),
-            selectableRange: []
+            selectableRange: [],
+            appointmentContent: [],
         }
     },
     async created() {
@@ -487,7 +499,8 @@ export default {
         _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
         _this.apointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
         // _this.apointmentStatus = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentStatus' })) || [];
-        _this.serviceList = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
+        // _this.serviceList = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'serviceGroupData' })) || [];
+        _this.appointmentContent = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentContent' })) || [];
         await _this.$axios.$get('/api/customer/getAll').then(
             (response) => {
                 _this.customerList = response.data || [];
@@ -664,7 +677,6 @@ export default {
         },
         handleChangeTime(){
             const _this = this;
-            console.log(_this.registerData.time)
             if(_this.registerData.duration == '' || _this.registerData.duration == null){
                 _this.registerData.duration = 60;
             }

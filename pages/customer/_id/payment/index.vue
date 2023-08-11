@@ -661,6 +661,10 @@ export default {
                 statusF: [],
                 createdAtF: [],
             }
+            _this.searchQuery.pages = {
+                from: 0,
+                size: 10
+            }
             _this.getData(_this.searchQuery);
         },
         async getData(searchQuery){
