@@ -117,7 +117,29 @@
                                 </div>
                             </div>
                             <div v-else-if="item.type == 'booking'" class="row">
-                                
+                                <div class="col-md-12">
+                                    <div style="font-weight:bold;">
+                                        <span v-if="item.action == 'create'">Đặt hẹn</span>
+                                        <span v-if="item.action == 'update'">Lịch hẹn được chỉnh sửa</span>
+                                        <span v-if="item.action == 'cancel'">Hủy đặt hẹn</span>
+                                        <span v-if="item.action == 'checkin'">Đã đến khám</span>
+                                        <span v-if="item.action == 'transfer'">Chuyển lịch hẹn</span>
+                                        <span v-if="item.action != 'transfer'">({{ (item.note && item.note.length > 0) ? item.note[0].newvalue : '' }})</span>
+                                        <i class='bx bxs-edit-alt'></i>
+                                    </div>
+                                    <div v-if="item.action == 'transfer'" class="mt-2">
+                                        <a class='text-info' href='javascript:void(0)'>
+                                            {{ (item.note && item.note.length > 0) ? item.note[0].oldvalue : '' }}
+                                        </a>
+                                        {{ ' &#10142; ' }}
+                                        <a class='text-info' href='javascript:void(0)'>
+                                            {{ (item.note && item.note.length > 0) ? item.note[0].newvalue : '' }}
+                                        </a>
+                                    </div>
+                                    <div class="mt-2" style="font-style: italic;color:#98a6ad;">
+                                        {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
+                                    </div>
+                                </div>
                             </div>
                             <div v-else-if="item.type == 'examination'" class="row">
                                 <div class="col-md-12">

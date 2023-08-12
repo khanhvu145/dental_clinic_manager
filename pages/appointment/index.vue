@@ -178,13 +178,13 @@
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <div v-if="checkRight('cancelConfirmBooking') && scope.row.status == 'Checkin'" class="col-md-6 mb-1">
+                                                <!-- <div v-if="checkRight('cancelConfirmBooking') && scope.row.status == 'Checkin'" class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Hủy xác nhận đến khám" placement="left-start">
                                                         <button class="control-btn red" style="padding: 4px 6px;" @click="changeStatusBooking(scope.row._id, 'Booked')">
                                                             <i class='bx bx-check'></i>
                                                         </button>
                                                     </el-tooltip>
-                                                </div>
+                                                </div> -->
                                                 <div v-if="checkRight('update') && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')" class="col-md-6 mb-1">
                                                     <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
                                                         <button class="control-btn blue2" style="padding: 4px 6px;" @click="openDialogUpdate(scope.row._id)">
@@ -236,7 +236,7 @@
                                         {{ appointmentType.find(e => e.value == scope.row.type) ? appointmentType.find(e => e.value == scope.row.type).label : '' }}
                                     </div>
                                     <div>
-                                        <i class='bx bxs-notepad'
+                                        <i class='bx bx-notepad'
                                             v-bind:style="{
 												color: appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).color : '#ccc',
 											}"
