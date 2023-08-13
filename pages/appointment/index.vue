@@ -32,7 +32,7 @@
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>
                             </button>
-                            <button type="button" class="control-btn green" @click="getData(searchQuery)">
+                            <button type="button" class="control-btn green" @click="searchData()">
                                 <i class='bx bx-search'></i>
                                 Tìm
                             </button>
@@ -119,11 +119,6 @@
                                         {{ scope.row.timeFrom ? $moment(scope.row.timeFrom).format('HH:mm') : '' }} - 
                                         {{ scope.row.timeTo ? $moment(scope.row.timeTo).format('HH:mm') : '' }}
                                     </div>
-                                    <div v-if="scope.row.refId">
-                                        <el-tooltip effect="dark" :content="scope.row.refTransferReason" placement="left-start">
-                                            <span style="color:#FF0000;font-weight:bold;">({{ scope.row.refCode }})</span>
-                                        </el-tooltip>
-                                    </div>
                                 </template>
                             </el-table-column>
                             <el-table-column v-if="columns[1].isShow" :label="columns[1].name" min-width="280">
@@ -171,35 +166,52 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="row">
-                                                <div v-if="checkRight('confirmBooking') && scope.row.status == 'Booked'" class="col-md-6 mb-1">
+                                                <div 
+                                                    class="col-md-6 mb-1"
+                                                    v-if="
+                                                        checkRight('confirmBooking') 
+                                                        && scope.row.status == 'Booked'
+                                                    " 
+                                                >
                                                     <el-tooltip effect="dark" content="Xác nhận đến khám" placement="left-start">
                                                         <button class="control-btn green2" style="padding: 4px 6px;" @click="changeStatusBooking(scope.row._id, 'Checkin')">
                                                             <i class='bx bx-check'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <!-- <div v-if="checkRight('cancelConfirmBooking') && scope.row.status == 'Checkin'" class="col-md-6 mb-1">
-                                                    <el-tooltip effect="dark" content="Hủy xác nhận đến khám" placement="left-start">
-                                                        <button class="control-btn red" style="padding: 4px 6px;" @click="changeStatusBooking(scope.row._id, 'Booked')">
-                                                            <i class='bx bx-check'></i>
-                                                        </button>
-                                                    </el-tooltip>
-                                                </div> -->
-                                                <div v-if="checkRight('update') && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')" class="col-md-6 mb-1">
+                                                 <div 
+                                                    class="col-md-6 mb-1"
+                                                    v-if="
+                                                        checkRight('update') 
+                                                        && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')
+                                                    " 
+                                                >
                                                     <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
                                                         <button class="control-btn blue2" style="padding: 4px 6px;" @click="openDialogUpdate(scope.row._id)">
                                                             <i class="el-icon-edit-outline"></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <div v-if="checkRight('sendMail') && scope.row.status == 'Booked'" class="col-md-6 mb-1">
+                                                <div 
+                                                    class="col-md-6 mb-1"
+                                                    v-if="
+                                                        checkRight('sendMail') 
+                                                        && scope.row.status == 'Booked'
+                                                    " 
+                                                >
                                                     <el-tooltip effect="dark" content="Gửi nhắc hẹn" placement="left-start">
                                                         <button class="control-btn blue" style="padding: 4px 6px;" @click="sendMail(scope.row._id)">
                                                             <i class='bx bx-mail-send'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                <div v-if="checkRight('transferBooking') && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')" class="col-md-6 mb-1">
+                                                <div 
+                                                    class="col-md-6 mb-1"
+                                                    v-if="
+                                                        checkRight('transferBooking')
+                                                        && scope.row.status == 'Booked'
+                                                    " 
+                                                >
                                                     <el-tooltip effect="dark" content="Chuyển lịch hẹn" placement="right-start">
                                                         <button class="control-btn orange" style="padding: 4px 6px;" @click="openDialogTransfer(scope.row)">
                                                             <i class='bx bxs-chevrons-left'></i>
@@ -228,24 +240,39 @@
                             <el-table-column v-if="columns[3].isShow" :label="columns[3].name" min-width="150">
                                 <template slot-scope="scope">
                                     <div>
-                                        <i class='bx bxs-circle'
-                                            v-bind:style="{
-												color: appointmentType.find(e => e.value == scope.row.type) ? appointmentType.find(e => e.value == scope.row.type).color : '#ccc',
-											}"
-                                        ></i>
-                                        {{ appointmentType.find(e => e.value == scope.row.type) ? appointmentType.find(e => e.value == scope.row.type).label : '' }}
+                                        <el-tooltip effect="dark" content="Loại lịch hẹn" placement="top-start">
+                                            <div>
+                                                <i class='bx bxs-circle'
+                                                    v-bind:style="{
+                                                        color: appointmentType.find(e => e.value == scope.row.type) ? appointmentType.find(e => e.value == scope.row.type).color : '#ccc',
+                                                    }"
+                                                ></i>
+                                                {{ appointmentType.find(e => e.value == scope.row.type) ? appointmentType.find(e => e.value == scope.row.type).label : '' }}
+                                            </div>
+                                        </el-tooltip>
                                     </div>
                                     <div>
-                                        <i class='bx bx-notepad'
-                                            v-bind:style="{
-												color: appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).color : '#ccc',
-											}"
-                                        ></i>
-                                        {{ appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).label : '' }}
+                                        <el-tooltip effect="dark" content="Nội dung lịch hẹn" placement="top-start">
+                                            <div>
+                                                <i class='bx bx-notepad'
+                                                    v-bind:style="{
+                                                        color: appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).color : '#ccc',
+                                                    }"
+                                                ></i>
+                                                {{ appointmentContent.find(e => e.value == scope.row.content) ? appointmentContent.find(e => e.value == scope.row.content).label : '' }}
+                                            </div>
+                                        </el-tooltip>
                                     </div>
                                     <div>
-                                        <i class='bx bx-edit' ></i>
-                                        {{ scope.row.note || '' }}
+                                        <el-tooltip effect="dark" content="Ghi chú" placement="top-start">
+                                            <div>
+                                                <i class='bx bx-edit' ></i>
+                                                {{ scope.row.note || '' }}
+                                            </div>
+                                        </el-tooltip>
+                                    </div>
+                                    <div v-if="scope.row.refId">
+                                        <span style="font-weight:bold;">Được chuyển từ lịch hẹn {{ scope.row.refCode }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -754,12 +781,20 @@ export default {
             columns: columns,
             sortData: [
                 {
-                    label: 'Ngày hẹn tăng dần',
-                    value: 1,
+                    label: 'Thời gian tạo giảm dần',
+                    value: 'createdAt&&-1',
+                },
+                {
+                    label: 'Thời gian tạo tăng dần',
+                    value: 'createdAt&&1',
                 },
                 {
                     label: 'Ngày hẹn giảm dần',
-                    value: -1,
+                    value: 'timeFrom&&-1',
+                },
+                {
+                    label: 'Ngày hẹn tăng dần',
+                    value: 'timeFrom&&1',
                 },
             ],
             searchQuery: {
@@ -770,7 +805,7 @@ export default {
                     statusF: ['Booked', 'Checkin', 'Examined'],
                     dateF: [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))]
                 },
-                sorts: 1,
+                sorts: 'createdAt&&-1',
                 pages:{
                     from: 0,
                     size: 10
@@ -860,6 +895,12 @@ export default {
 
             _this.dataLoading = false;
         },
+        searchData(){
+            const _this = this;
+            _this.currentPage = 1;
+            _this.searchQuery.pages.from = 0;
+            _this.getData(_this.searchQuery)
+        },
         refreshData(){
             const _this = this;
             _this.searchQuery.filters = {
@@ -869,10 +910,8 @@ export default {
                 statusF: ['Booked', 'Checkin', 'Examined'],
                 dateF: [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))]
             }
-            _this.searchQuery.pages = {
-                from: 0,
-                size: 10
-            }
+            _this.searchQuery.pages.from = 0;
+            _this.currentPage = 1;
 
             _this.getData(_this.searchQuery);
         },

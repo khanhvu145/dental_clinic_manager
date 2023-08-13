@@ -26,7 +26,7 @@
                         <button type="button" class="control-btn gray" @click="refreshData()">
                             <i class='bx bx-refresh'></i>
                         </button>
-                        <button type="button" class="control-btn green" @click="getData(searchQueryGroup)">
+                        <button type="button" class="control-btn green" @click="searchData()">
                             <i class='bx bx-search'></i>
                             Tìm
                         </button>
@@ -360,6 +360,12 @@ export default {
             _this.searchQueryGroup.sorts = value;
             _this.getData(_this.searchQueryGroup);
         },
+        searchData(){
+            const _this = this;
+            _this.currentPage = 1;
+            _this.searchQueryGroup.pages.from = 0;
+            _this.getData(_this.searchQueryGroup)
+        },
         refreshData(){
             const _this = this;
             _this.searchQueryGroup.filters = {
@@ -367,10 +373,8 @@ export default {
                 nameF: '',
                 statusF: true
             }
-            _this.searchQuery.pages = {
-                from: 0,
-                size: 10
-            }
+            _this.searchQueryGroup.pages.from = 0;
+            _this.currentPage = 1;
             _this.getData(_this.searchQueryGroup);
         },
         async onEdit(val){

@@ -154,13 +154,13 @@ export default {
 									value: 'appointment',
 									customRights: [
                                         {
-											name: 'Xác nhận',
+											name: 'Xác nhận đến khám',
 											value: 'confirmBooking',
 										},
-                                        {
-											name: 'Hủy xác nhận',
-											value: 'cancelConfirmBooking',
-										},
+                                        // {
+										// 	name: 'Hủy xác nhận',
+										// 	value: 'cancelConfirmBooking',
+										// },
                                         {
 											name: 'Hủy lịch hẹn',
 											value: 'cancelBooking',

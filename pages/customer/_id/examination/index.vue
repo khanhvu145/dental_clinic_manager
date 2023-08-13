@@ -58,7 +58,7 @@
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>
                             </button>
-                            <button type="button" class="control-btn green" @click="getData(searchQuery)">
+                            <button type="button" class="control-btn green" @click="searchData()">
                                 <i class='bx bx-search'></i>
                                 Tìm
                             </button>
@@ -221,17 +221,22 @@ export default {
 			const values = ['customer.all', 'customer.' + right];
 			return !!(intersection(_this.accesses || [], values).length > 0);
 		},
+        searchData(){
+            const _this = this;
+            _this.currentPage = 1;
+            _this.searchQuery.pages.from = 0;
+            _this.getData(_this.searchQuery)
+        },
         refreshData(){
             const _this = this;
             _this.searchQuery.filters = {
                 codeF: '',
                 dentistsF: [],
-                dateF: []
+                dateF: [],
+                statusF: ['new', 'approved'],
             }
-            _this.searchQuery.pages = {
-                from: 0,
-                size: 10
-            }
+            _this.searchQuery.pages.from = 0;
+            _this.currentPage = 1;
             _this.getData(_this.searchQuery);
         },
         async getData(searchQuery){
