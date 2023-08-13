@@ -162,7 +162,7 @@ export default {
     components: {
 		FullCalendar,
 	},
-    props: ['listAppointments'],
+    props: ['listAppointments', 'viewDate'],
     computed: {
 		...mapState({
 			accesses: (state) => state.accesses,
@@ -214,6 +214,15 @@ export default {
         const _this = this;
         await _this.getData();
       },
+      viewDate(){
+        const _this = this;
+        if(_this.viewDate != '' && _this.viewDate != null){
+            _this.$refs.workingCalendar.getApi().gotoDate(_this.viewDate);
+        }
+        else{
+            _this.$refs.workingCalendar.getApi().gotoDate(moment()._d);
+        }
+      }
     },
     async created() { 
         const _this = this;

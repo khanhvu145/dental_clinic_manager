@@ -39,7 +39,7 @@
                 </div>
                 <div class="row mt-5 mb-4" v-loading="dataLoading">
                     <div class="col-md-12">
-                        <WorkingCalendar v-if="isCheck" :listAppointments="listAppointments" ref="workingCalendarComponent" />
+                        <WorkingCalendar v-if="isCheck" :listAppointments="listAppointments" :viewDate="viewDate" ref="workingCalendarComponent" />
                     </div>
                 </div>
             </div>
@@ -78,6 +78,7 @@ export default {
                 statusF: ['Booked', 'Checkin', 'Completed'],
                 dateF: new Date()
             },
+            viewDate: new Date()
         }
     },
     async created(){
@@ -116,6 +117,7 @@ export default {
         searchData(){
             const _this = this;
             _this.getData();
+            _this.viewDate = _this.searchQuery.dateF;
         },
     }
 }
