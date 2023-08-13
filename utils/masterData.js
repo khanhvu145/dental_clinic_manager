@@ -168,8 +168,8 @@ export const appointmentStatus = [
     apply: true,
   },
   {
-    label: 'Đã khám',
-    value: 'Examined',
+    label: 'Hoàn thành',
+    value: 'Completed',
     backgroundColor: "#f0f9eb",
     borderColor: '#e1f3d8',
     textColor: '#67c23a',

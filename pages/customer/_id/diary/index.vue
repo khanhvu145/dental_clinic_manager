@@ -123,6 +123,7 @@
                                         <span v-if="item.action == 'update'">Lịch hẹn được chỉnh sửa</span>
                                         <span v-if="item.action == 'cancel'">Hủy đặt hẹn</span>
                                         <span v-if="item.action == 'checkin'">Đã đến khám</span>
+                                        <span v-if="item.action == 'completed'">Hoàn thành lịch hẹn</span>
                                         <span v-if="item.action == 'transfer'">Chuyển lịch hẹn</span>
                                         <span v-if="item.action != 'transfer'">({{ (item.note && item.note.length > 0) ? item.note[0].newvalue : '' }})</span>
                                         <i class='bx bxs-edit-alt'></i>
@@ -403,7 +404,7 @@
                                         <i class='bx bxs-edit-alt'></i>
                                     </div>
                                     <div v-if="item.action == 'confirm'" class="mt-2">
-                                        <el-tooltip class="item" effect="dark" content="Mã phiếu khám" placement="top">
+                                        <el-tooltip class="item" effect="dark" content="Mã phiếu thu" placement="top">
                                             <a class='text-info' href='javascript:void(0)'>
                                                 {{ (item.note && item.note.length > 0) ? item.note[0].newvalue.code : '' }}
                                             </a>
@@ -708,8 +709,8 @@ export default {
             else if(type == 'examination'){
                 return '#64dd17';
             }
-            else if(type == 'FFCA2C'){
-                return '#64dd17';
+            else if(type == 'payment'){
+                return '#FFCA2C';
             }
             else{
                 return '#64dd17';

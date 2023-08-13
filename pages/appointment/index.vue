@@ -173,22 +173,32 @@
                                                         && scope.row.status == 'Booked'
                                                     " 
                                                 >
-                                                    <el-tooltip effect="dark" content="Xác nhận đến khám" placement="left-start">
+                                                    <el-tooltip effect="dark" content="Xác nhận đến khám" placement="top-start">
                                                         <button class="control-btn green2" style="padding: 4px 6px;" @click="changeStatusBooking(scope.row._id, 'Checkin')">
                                                             <i class='bx bx-check'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
-                                                 <div 
+                                                <div 
                                                     class="col-md-6 mb-1"
                                                     v-if="
                                                         checkRight('update') 
                                                         && (scope.row.status == 'Booked' || scope.row.status == 'Checkin')
                                                     " 
                                                 >
-                                                    <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
+                                                    <el-tooltip effect="dark" content="Chỉnh sửa" placement="top-start">
                                                         <button class="control-btn blue2" style="padding: 4px 6px;" @click="openDialogUpdate(scope.row._id)">
                                                             <i class="el-icon-edit-outline"></i>
+                                                        </button>
+                                                    </el-tooltip>
+                                                </div>
+                                                <div 
+                                                    class="col-md-6 mb-1"
+                                                    v-if="scope.row.status == 'Completed' && scope.row.examinationId" 
+                                                >
+                                                    <el-tooltip effect="dark" content="Xem phiếu khám" placement="top-start">
+                                                        <button class="control-btn blue2" style="padding: 4px 6px;" @click="viewExamination(scope.row)">
+                                                            <i class='bx bx-detail'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
@@ -199,7 +209,7 @@
                                                         && scope.row.status == 'Booked'
                                                     " 
                                                 >
-                                                    <el-tooltip effect="dark" content="Gửi nhắc hẹn" placement="left-start">
+                                                    <el-tooltip effect="dark" content="Gửi nhắc hẹn" placement="top-start">
                                                         <button class="control-btn blue" style="padding: 4px 6px;" @click="sendMail(scope.row._id)">
                                                             <i class='bx bx-mail-send'></i>
                                                         </button>
@@ -212,21 +222,21 @@
                                                         && scope.row.status == 'Booked'
                                                     " 
                                                 >
-                                                    <el-tooltip effect="dark" content="Chuyển lịch hẹn" placement="right-start">
+                                                    <el-tooltip effect="dark" content="Chuyển lịch hẹn" placement="top-start">
                                                         <button class="control-btn orange" style="padding: 4px 6px;" @click="openDialogTransfer(scope.row)">
                                                             <i class='bx bxs-chevrons-left'></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
                                                 <div class="col-md-6 mb-1">
-                                                    <el-tooltip effect="dark" content="Xem lịch sử" placement="left-start">
+                                                    <el-tooltip effect="dark" content="Xem lịch sử" placement="top-start">
                                                         <button class="control-btn yellow" style="padding: 4px 6px;" @click="openDialogLogs(scope.row._id)">
                                                             <i class='bx bx-history' ></i>
                                                         </button>
                                                     </el-tooltip>
                                                 </div>
                                                 <div v-if="scope.row.status != 'Cancelled'" class="col-md-6 mb-1">
-                                                    <el-tooltip effect="dark" content="Gọi điện KH" placement="right-start">
+                                                    <el-tooltip effect="dark" content="Gọi điện KH" placement="top-start">
                                                         <a class="control-btn green" style="padding: 4px 6px;" :href="`tel:${scope.row.customerPhone}`">
                                                             <i class='bx bx-phone'></i>
                                                         </a>
@@ -292,12 +302,12 @@
                                     }">
                                         Đã đến
                                     </el-tag>
-                                    <el-tag v-else-if="scope.row.status == 'Examined'" :style="{
-                                        'background-color': appointmentConfig.views.find(e => e.value == 'Examined').apply ? appointmentConfig.views.find(e => e.value == 'Examined').backgroundColor : statusData.find(e => e.value == 'Examined').backgroundColor,
-                                        'border-color': appointmentConfig.views.find(e => e.value == 'Examined').apply ? appointmentConfig.views.find(e => e.value == 'Examined').borderColor : statusData.find(e => e.value == 'Examined').borderColor,
-                                        'color': appointmentConfig.views.find(e => e.value == 'Examined').apply ? appointmentConfig.views.find(e => e.value == 'Examined').textColor : statusData.find(e => e.value == 'Examined').textColor,
+                                    <el-tag v-else-if="scope.row.status == 'Completed'" :style="{
+                                        'background-color': appointmentConfig.views.find(e => e.value == 'Completed').apply ? appointmentConfig.views.find(e => e.value == 'Completed').backgroundColor : statusData.find(e => e.value == 'Completed').backgroundColor,
+                                        'border-color': appointmentConfig.views.find(e => e.value == 'Completed').apply ? appointmentConfig.views.find(e => e.value == 'Completed').borderColor : statusData.find(e => e.value == 'Completed').borderColor,
+                                        'color': appointmentConfig.views.find(e => e.value == 'Completed').apply ? appointmentConfig.views.find(e => e.value == 'Completed').textColor : statusData.find(e => e.value == 'Completed').textColor,
                                     }">
-                                        Đã khám
+                                        Hoàn thành
                                     </el-tag>
                                     <el-tag v-else :style="{
                                         'background-color': appointmentConfig.views.find(e => e.value == 'Cancelled').apply ? appointmentConfig.views.find(e => e.value == 'Cancelled').backgroundColor : statusData.find(e => e.value == 'Cancelled').backgroundColor,
@@ -802,7 +812,7 @@ export default {
                     codeF: '',
                     customersF: '',
                     dentistsF: [],
-                    statusF: ['Booked', 'Checkin', 'Examined'],
+                    statusF: ['Booked', 'Checkin', 'Completed'],
                     dateF: [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))]
                 },
                 sorts: 'createdAt&&-1',
@@ -907,7 +917,7 @@ export default {
                 codeF: '',
                 customersF: '',
                 dentistsF: [],
-                statusF: ['Booked', 'Checkin', 'Examined'],
+                statusF: ['Booked', 'Checkin', 'Completed'],
                 dateF: [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(30, 'd').format('YYYY-MM-DD'))]
             }
             _this.searchQuery.pages.from = 0;
@@ -1035,7 +1045,7 @@ export default {
         },
         getLogsType(type){
             if(type == 'create'){
-                return 'Tạo mới';
+                return 'Đặt hẹn';
             }
             else if(type == 'update'){
                 return 'Chỉnh sửa';
@@ -1128,7 +1138,7 @@ export default {
                 closeOnClickModal: false
             }).then(async () => {
                 _this.dataLoading = true;
-                const data = await _this.$axios.$post('/api/appointment/sendMail', { id: id });
+                const data = await _this.$axios.$post('/api/appointment/sendMail', { id: id, currentUser: _this.userInfo.data.username });
                 if(data.success){
                     _this.$message({
                         message: data.message,
@@ -1194,6 +1204,16 @@ export default {
             if (input) return true;
             else return 'Vui lòng nhập lý do hủy.';
         },
+        viewExamination(data){
+            const _this = this;
+            if(data && data.examinationId && data.customerId){
+                let routeData = _this.$router.resolve({
+                    path: `/customer/${data.customerId}/examination/edit`,
+                    query: { examinationId: data.examinationId }
+                });
+                window.open(routeData.href, '_blank');
+            }
+        }
     },
 }
 </script>

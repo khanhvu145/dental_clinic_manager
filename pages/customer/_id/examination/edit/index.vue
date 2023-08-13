@@ -504,6 +504,63 @@
                     </el-tabs>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-md-12" style="text-align: right;">
+                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examination`)">
+                        <i class='bx bx-arrow-back'></i>
+                        <span>Quay lại</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('printExamination') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status != 'cancelled'
+                        "
+                        type="button" 
+                        class="control-btn red" 
+                        @click="cancelExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-x'></i>
+                        <span>Hủy</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('printExamination') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status == 'approved'
+                        "
+                        type="button" 
+                        class="control-btn yellow" 
+                        @click="exportPDF"
+                    >
+                        <i class='bx bx-printer'></i>
+                        <span>In phiếu</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status == 'new'
+                        "
+                        type="button" 
+                        class="control-btn blue" 
+                        @click="confirmExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-list-check'></i>
+                        <span>Xác nhận điều trị</span>
+                    </button>
+                    <button
+                        v-if="
+                            ((checkRight('createExamination') && $route.query.examinationId && $route.query.examinationId == 'create') ||
+                            (checkRight('updateExamination') && $route.query.examinationId && $route.query.examinationId != 'create'))
+                            && formData.status == 'new'
+                        "
+                        type="button" 
+                        class="control-btn green" 
+                        @click="submitExaminationForm"
+                    >
+                        <i class='bx bx-save' ></i>
+                        <span>Lưu</span>
+                    </button>
+                </div>
+            </div>
         </form>
         <vue-html2pdf 
                 class="print-content"

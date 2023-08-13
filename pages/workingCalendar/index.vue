@@ -7,7 +7,37 @@
                         <div class="title titleAfter mb-0">Lịch làm việc</div>
                     </div>
                 </div>
-                <div class="row mt-4 mb-4" v-loading="dataLoading">
+                <div class="row" style="margin-top: 9px;">
+                    <div class="col-md-4">
+                        <div class="col-form-label">Trạng thái</div>
+                        <el-select v-model="searchQuery.statusF" placeholder="Trạng thái..." filterable multiple clearable name="statusF">
+                            <el-option
+                                v-for="item in statusData"
+                                :key="item.key"
+                                :label="item.label"
+                                :value="item.value"
+                            ></el-option>
+                        </el-select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="col-form-label">Thời gian</div>
+                        <el-date-picker
+                            v-model="searchQuery.dateF"
+                            type="date"
+                            format="dd/MM/yyyy"
+                            placeholder="Chọn thời gian"
+                        ></el-date-picker>
+                    </div>
+                    <div class="col-md-4">
+                        <div style="display: flex; height: 100%;align-items: end;">
+                            <button type="button" class="control-btn green" @click="searchData()">
+                                <i class='bx bx-search'></i>
+                                Tìm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5 mb-4" v-loading="dataLoading">
                     <div class="col-md-12">
                         <WorkingCalendar v-if="isCheck" :listAppointments="listAppointments" ref="workingCalendarComponent" />
                     </div>
@@ -27,6 +57,7 @@ import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'l
 import Appointment from '@/models/tw_Appointment';
 import WorkingCalendar from '@/components/workingCalendar/workingCalendar';
 import AppointmentConfig from '@/models/tw_AppointmentConfig';
+import { appointmentStatus } from '@/utils/masterData';
 export default {
     components: {
 		WorkingCalendar,
@@ -42,7 +73,11 @@ export default {
             dataLoading: true,
             isCheck: false,
             listAppointments: [],
-            
+            statusData: appointmentStatus,
+            searchQuery: {
+                statusF: ['Booked', 'Checkin', 'Completed'],
+                dateF: new Date()
+            },
         }
     },
     async created(){
@@ -58,7 +93,10 @@ export default {
 		},
         async getData(){
             const _this = this;
-            await _this.$axios.$post(`/api/workingCalendar/getWorkingCalendarByDentist`, { dentistId: _this.userInfo.data._id }).then(
+            await _this.$axios.$post(`/api/workingCalendar/getWorkingCalendarByDentist`, { 
+                dentistId: _this.userInfo.data._id ,
+                statusF: _this.searchQuery.statusF
+            }).then(
                 (response) => {
                     _this.listAppointments = response.data;
                     _this.dataLoading = false;
@@ -74,7 +112,11 @@ export default {
                     _this.isCheck = true;
                 }
             );
-        }
+        },
+        searchData(){
+            const _this = this;
+            _this.getData();
+        },
     }
 }
 </script>

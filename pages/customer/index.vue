@@ -31,7 +31,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <div style="display: flex; height: 100%; align-items: end; gap: 8px;">
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>

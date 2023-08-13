@@ -233,8 +233,8 @@
                                     <!-- Thao tác -->
                                     <div class="col-md-12 mt-4" style="text-align: right;">
                                         <button type="button" class="control-btn gray" @click="cancelForm">
-                                            <i class='bx bx-x'></i>
-                                            <span>Hủy</span>
+                                            <i class='bx bx-refresh'></i>
+                                            <span>Mới</span>
                                         </button>
                                         <button
                                             type="button" 

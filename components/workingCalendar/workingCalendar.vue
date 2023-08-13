@@ -1,10 +1,10 @@
 <template>
     <div class="row">
-        <div class="col-md-12">
-            <FullCalendar v-loading="dataLoading" ref="workingCalendar" :options="options" />
+        <div v-loading="dataLoading" class="col-md-12">
+            <FullCalendar ref="workingCalendar" :options="options" />
 
             <!-- Dialog working calendar detail -->
-            <el-dialog :visible.sync="dialogWorkingCalendarDetail" :close-on-click-modal="false" width="45%">
+            <el-dialog :visible.sync="dialogWorkingCalendarDetail" :close-on-click-modal="false" width="40%">
                 <span slot="title" class="dialog-title">
                     Chi tiết lịch hẹn |
                     <span style="color: #FFCC33; font-weight: bold;">
@@ -19,8 +19,8 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-lg-6 mb-3">
-                                         <el-avatar :size="100">
+                                    <div class="col-lg-6">
+                                        <el-avatar :size="120">
                                             <img :src="appointment.customerImg ? appointment.customerImg : '/images/user.png'" alt="">
                                         </el-avatar>
                                     </div>
@@ -34,6 +34,10 @@
                                                 Tên:
                                                 <span style="font-weight: bold;">{{ appointment.customerName || '' }}</span>
                                             </div>
+                                            <div class="col-md-12 mb-3" style="word-break: break-word;">
+                                                CMND/CCCD:
+                                                <span style="font-weight: bold;">{{ appointment.customerPhysicalId || '' }}</span>
+                                            </div>
                                             <div class="col-md-12 mb-3">
                                                 Ngày sinh:
                                                 <span style="font-weight: bold;">{{ $moment(appointment.customerBirthday).format('DD/MM/YYYY') || '' }}</span>
@@ -42,36 +46,32 @@
                                                 Giới tính:
                                                 <span style="font-weight: bold;">{{ appointment.customerGender == 'male' ? 'Nam' : 'Nữ' }}</span>
                                             </div>
+                                            <div class="col-md-12 mb-3" style="word-break: break-word;">
+                                                Số điện thoại:
+                                                <span style="font-weight: bold;">{{ appointment.customerPhone || '' }}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
-                                        CMND/CCCD:
-                                        <span style="font-weight: bold;">{{ appointment.customerPhysicalId || '' }}</span>
-                                    </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
-                                        Số điện thoại:
-                                        <span style="font-weight: bold;">{{ appointment.customerPhone || '' }}</span>
-                                    </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
+                                    <!-- <div class="col-lg-6 mb-3" style="word-break: break-word;">
                                         Email:
                                         <span style="font-weight: bold;">{{ appointment.customerEmail || '' }}</span>
-                                    </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
-                                        Địa chỉ:
-                                        <span style="font-weight: bold;">{{ appointment.fullAddress || '' }}</span>
-                                    </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
+                                    </div> -->
+                                    <!-- <div class="col-lg-6 mb-3" style="word-break: break-word;">
                                         Nhóm:
                                         <span style="font-weight: bold;">
                                             {{ customerType.find(e => e.value == appointment.customerGroup) ? customerType.find(e => e.value == appointment.customerGroup).label : '' }}
                                         </span>
-                                    </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
+                                    </div> -->
+                                    <!-- <div class="col-lg-6 mb-3" style="word-break: break-word;">
                                         Nguồn:
                                         <span style="font-weight: bold;">
                                             {{ customerSource.find(e => e.value == appointment.customerSource) ? customerSource.find(e => e.value == appointment.customerSource).label : '' }}
                                         </span>
-                                    </div>
+                                    </div> -->
+                                    <!-- <div class="col-lg-6 mb-3" style="word-break: break-word;">
+                                        Địa chỉ:
+                                        <span style="font-weight: bold;">{{ appointment.fullAddress || '' }}</span>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -102,13 +102,15 @@
                                         <span style="font-weight: bold;">{{ $moment(appointment.timeTo).format('HH:mm') || '' }}</span>
                                     </div>
                                     <div class="col-lg-6 mb-3" style="word-break: break-word;">
-                                        Dịch vụ:
-                                        <span style="font-weight: bold;">{{ appointment.serviceGroupName || '' }}</span>
-                                    </div>
-                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
                                         Loại lịch hẹn:
                                         <span style="font-weight: bold;">
                                             {{ appointmentType.find(e => e.value == appointment.type) ? appointmentType.find(e => e.value == appointment.type).label : '' }}
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-6 mb-3" style="word-break: break-word;">
+                                        Nội dung:
+                                        <span style="font-weight: bold;">
+                                            {{ appointmentContent.find(e => e.value == appointment.content) ? appointmentContent.find(e => e.value == appointment.content).label : '' }}
                                         </span>
                                     </div>
                                     <div class="col-lg-12 mb-3" style="word-break: break-word;">
@@ -124,8 +126,14 @@
                     <a v-if="appointment.status != 'Cancelled'" :href="`/customer/${appointment.customerId}/profile`" target="_blank" class="control-btn green">
                         Xem hồ sơ
                     </a>
-                    <a v-if="appointment.status == 'Checkin'" :href="`/customer/${appointment.customerId}/examination`" target="_blank" class="control-btn yellow">
+                    <a v-if="appointment.status == 'Completed'" href='javascript:void(0)' @click="viewExamination(appointment)" class="control-btn blue">
+                        Xem phiếu khám
+                    </a>
+                    <!-- <a v-if="appointment.status == 'Checkin'" :href="`/customer/${appointment.customerId}/examination`" target="_blank" class="control-btn yellow">
                         Khám & điều trị
+                    </a> -->
+                    <a v-if="appointment.status == 'Checkin'" href='javascript:void(0)' @click="completeBooking(appointment._id)" class="control-btn yellow">
+                        Hoàn thành
                     </a>
                     <button type="button" class="control-btn gray" @click="dialogWorkingCalendarDetail = false">
                         <span>Đóng</span>
@@ -137,6 +145,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import '@fullcalendar/core/vdom';
 import FullCalendar from '@fullcalendar/vue';
 import timegrid from '@fullcalendar/timegrid';
@@ -154,6 +163,12 @@ export default {
 		FullCalendar,
 	},
     props: ['listAppointments'],
+    computed: {
+		...mapState({
+			accesses: (state) => state.accesses,
+            userInfo: (state) => state.auth.user,
+		}),
+	},
     data(){
         return {
             options: {
@@ -191,7 +206,14 @@ export default {
             appointmentType: [],
             appointmentStatus: appointmentStatus,
             dataLoading: true,
+            appointmentContent: [],
         }
+    },
+    watch: {
+      async listAppointments() {
+        const _this = this;
+        await _this.getData();
+      },
     },
     async created() { 
         const _this = this;
@@ -201,6 +223,7 @@ export default {
         _this.customerType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerType' })) || [];
         _this.customerSource = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigCustomerSource' })) || [];
         _this.appointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
+        _this.appointmentContent = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentContent' })) || [];
         await _this.$axios.$get('/api/appointmentConfig/getData').then(
             (response) => {
                 _this.appointmentConfig = (response.data.length > 0 && response.data != null) ? response.data[0] : new AppointmentConfig();
@@ -240,7 +263,9 @@ export default {
             else{
                 _this.options.events = [];
             }
-            _this.dataLoading = false;
+            setTimeout(() => {
+                _this.dataLoading = false;
+            }, 500);
         },
         async handleEventClick(eventInfo){
             const _this = this;
@@ -283,6 +308,55 @@ export default {
             var fullAddress = building + " " + ward + " " + district + " " + province;
 
             return fullAddress;
+        },
+        async completeBooking(id){
+            const _this = this;
+            _this.
+                $prompt('Mã phiếu khám *', 'Xác nhận hoàn thành', {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập mã phiếu khám',
+                    inputValidator: _this.validateInput
+                }).then(async ({ value }) => {
+                    if (value) {
+                        const data = await _this.$axios.$put('/api/appointment/changeStatus', { id: id, action: 'Completed', value: value, currentUser: _this.userInfo.data.username });
+                        console.log(data);
+                        if(data.success){
+                            _this.$message({
+                                message: data.message,
+                                type: 'success',
+                            });
+                            _this.dialogWorkingCalendarDetail = false;
+                            _this.getData();
+                        }else {
+                            _this.$message.error(data.error);
+                        }
+                    }
+                    else{
+                        _this.$message({
+                            type: 'error',
+                            message: 'Vui lòng nhập mã phiếu khám.'
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập mã phiếu khám.';
+        },
+        viewExamination(data){
+            const _this = this;
+            if(data && data.examinationId && data.customerId){
+                let routeData = _this.$router.resolve({
+                    path: `/customer/${data.customerId}/examination/edit`,
+                    query: { examinationId: data.examinationId }
+                });
+                window.open(routeData.href, '_blank');
+            }
         }
     },
 }
