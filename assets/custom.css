@@ -47,11 +47,14 @@
     min-height: 100%;
 }
 .el-menu-item span{
-    font-size: 0.9rem;
+    font-weight: 500;
+    font-size: 14px;
     color: #909399;
+    display: inline-block;
 }
 .el-menu-item i{
-    font-size: 1.4rem;
+    font-weight: 500;
+    font-size: 18px;
 }
 .el-menu-item.is-active {
     color: #31a315;
@@ -68,15 +71,20 @@
     background-color: #f1f1f1;
 }
 .el-menu-item, .el-submenu__title {
-    height: 58px;
-    line-height: 58px;
+    height: 55px;
+    line-height: 55px;
+    padding: 0 12px;
 }
 .el-submenu__title span {
-    font-size: 1rem;
+    font-weight: 500;
+    font-size: 14px;
     color: #909399;
+    display: inline-block;
 }
 .el-submenu__title i {
-    font-size: 1.5rem;
+    font-weight: 500;
+    font-size: 18px;
+    margin-right: 4px;
 }
 .el-submenu .el-menu .el-menu-item {
     padding: 0 30px !important;
@@ -105,6 +113,12 @@
 }
 .el-submenu.is-active .el-submenu__title i{
     color: #31a315;
+}
+.el-submenu .el-menu{
+    background-color: #f6f6f6;
+}
+.el-submenu__title:hover{
+    background-color: #f1f1f1;
 }
 .el-input.is-active .el-input__inner, .el-input__inner:focus, .el-textarea__inner:focus {
     border-color: rgba(82, 161, 157, 0.719) !important;

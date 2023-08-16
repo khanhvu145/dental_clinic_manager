@@ -8,7 +8,7 @@
                     </div>
                 </div>
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-md-8 col-lg-6">
                         <form v-loading="dataLoading" v-on:submit.prevent="submitForm">
                             <div class="row mt-3">
                                 <div class="col-md-12">
@@ -56,7 +56,7 @@
                                 </div>
                             </div>
                             <div class="row mt-3 pt-3">
-                                <div class="col-md-12">
+                                <div class="col-md-12" style="text-align:right;">
                                     <button
                                         v-if="checkRight('create') || checkRight('update')"
                                         type="button" 
