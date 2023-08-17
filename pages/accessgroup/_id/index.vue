@@ -59,12 +59,12 @@
                             <div class="col-md-12 mt-3">
                                 <div class="col-form-label" style="font-size:20px;font-weight:bold;">Phân quyền</div>
                                 <div v-for="page in pages" :key="page.app">
-                                    <div v-for="pageGroup in page['group']" :key="pageGroup.value">
-                                        <el-collapse id="custome-el-colapse" accordion class="percent-100" style="border: none;">
-                                            <el-collapse-item>
+                                    <div class="mb-2" v-for="pageGroup in page['group']" :key="pageGroup.value">
+                                        <el-collapse id="custome-el-colapse" class="percent-100" style="border: none;" v-model="activeName" accordion>
+                                            <el-collapse-item :name="pageGroup.name">
                                                 <template slot="title">
                                                     <div class="pl-2 w-100 text-black">
-                                                        Phân quyền nhóm người dùng
+                                                        {{ pageGroup.name }}
                                                     </div>
                                                 </template>
                                                 <div v-for="pageSub in pageGroup['pages']" :key="pageSub.value" :name="pageSub.value" class="row mx-0 pt-4 pb-4" style="border-bottom: 2px solid #eee;align-items:center;">
@@ -123,6 +123,7 @@ export default {
             dataLoading: true,
             formData: new AccessRight(),
             titleType: '',
+            activeName: '',
             defaultRights: [
 				{
 					name: 'Tất cả',
@@ -146,54 +147,16 @@ export default {
                     app: 'dental-clinic-manager',
                     group: [
                         {
-                            name: 'Phân quyền *',
-                            value: 'g_role',
+                            name: 'Báo cáo',
+                            value: 'g_report_role',
                             pages: [
-                                {
-									name: 'Lịch hẹn',
-									value: 'appointment',
-									customRights: [
-                                        {
-											name: 'Xác nhận đến khám',
-											value: 'confirmBooking',
-										},
-                                        // {
-										// 	name: 'Hủy xác nhận',
-										// 	value: 'cancelConfirmBooking',
-										// },
-                                        {
-											name: 'Hủy lịch hẹn',
-											value: 'cancelBooking',
-										},
-                                        {
-											name: 'Chuyển lịch hẹn',
-											value: 'transferBooking',
-										},
-                                        {
-											name: 'Gửi nhắc hẹn',
-											value: 'sendMail',
-										},
-                                    ],
-                                    hideDefaultRights: false,
-								},
-                                {
-                                    name: 'Cấu hình lịch hẹn',
-									value: 'appointmentConfig',
-                                    customRights: [],
-                                    hideDefaultRights: false,
-                                },
-                                {
-									name: 'Nhóm người dùng',
-									value: 'accessgroup',
-									customRights: [],
-                                    hideDefaultRights: false,
-								},
-                                {
-									name: 'Người dùng',
-									value: 'users',
-									customRights: [],
-                                    hideDefaultRights: false,
-								},
+
+                            ]
+                        },
+                        {
+                            name: 'Khách hàng',
+                            value: 'g_customer_role',
+                            pages: [
                                 {
 									name: 'Khách hàng',
 									value: 'customer',
@@ -237,6 +200,58 @@ export default {
                                     ],
                                     hideDefaultRights: false,
 								},
+                            ]
+                        },
+                        {
+                            name: 'Lịch hẹn',
+                            value: 'g_apointment_role',
+                            pages: [
+                                {
+                                    name: 'Đăng ký khám',
+									value: 'register',
+                                    customRights: [
+                                        {
+                                            name: 'Tất cả',
+                                            value: 'all',
+                                        },
+                                        {
+                                            name: 'Xem',
+                                            value: 'view',
+                                        },
+                                        {
+                                            name: 'Tạo lịch hẹn',
+                                            value: 'create',
+                                        },
+                                    ],
+                                    hideDefaultRights: true,
+                                },
+                                {
+									name: 'Quản lý lịch hẹn',
+									value: 'appointment',
+									customRights: [
+                                        {
+											name: 'Xác nhận đến khám',
+											value: 'confirmBooking',
+										},
+                                        // {
+										// 	name: 'Hủy xác nhận',
+										// 	value: 'cancelConfirmBooking',
+										// },
+                                        {
+											name: 'Hủy lịch hẹn',
+											value: 'cancelBooking',
+										},
+                                        {
+											name: 'Chuyển lịch hẹn',
+											value: 'transferBooking',
+										},
+                                        {
+											name: 'Gửi nhắc hẹn',
+											value: 'sendMail',
+										},
+                                    ],
+                                    hideDefaultRights: false,
+								},
                                 {
 									name: 'Lịch làm việc',
 									value: 'workingCalendar',
@@ -244,11 +259,29 @@ export default {
                                     hideDefaultRights: false,
 								},
                                 {
+                                    name: 'Cấu hình lịch hẹn',
+									value: 'appointmentConfig',
+                                    customRights: [],
+                                    hideDefaultRights: false,
+                                },
+                            ]
+                        },
+                        {
+                            name: 'Thiết lập',
+                            value: 'g_establish_role',
+                            pages: [
+                                {
 									name: 'Loại hình dịch vụ',
 									value: 'service',
 									customRights: [],
                                     hideDefaultRights: false,
 								},
+                            ]
+                        },
+                        {
+                            name: 'Quản lý thu chi',
+                            value: 'g_receipts_payment_role',
+                            pages: [
                                 {
 									name: 'Phiếu thu',
 									value: 'receipts',
@@ -272,6 +305,45 @@ export default {
                                     ],
                                     hideDefaultRights: true,
 								},
+                                {
+                                    name: 'Phiếu chi',
+									value: 'payment',
+                                    customRights: [
+                                        {
+                                            name: 'Tất cả',
+                                            value: 'all',
+                                        },
+                                        {
+                                            name: 'Xem',
+                                            value: 'view',
+                                        },
+                                    ],
+                                    hideDefaultRights: true,
+                                }
+                            ]
+                        },
+                        {
+                            name: 'Hệ thống',
+                            value: 'g_system_role',
+                            pages: [
+                                {
+									name: 'Nhóm quyền',
+									value: 'accessgroup',
+									customRights: [],
+                                    hideDefaultRights: false,
+								},
+                                {
+									name: 'Người dùng',
+									value: 'users',
+									customRights: [],
+                                    hideDefaultRights: false,
+								},
+                            ]
+                        },
+                        {
+                            name: 'Cấu hình',
+                            value: 'g_config_role',
+                            pages: [
                                 {
 									name: 'Cấu hình chung',
 									value: 'generalconfig',

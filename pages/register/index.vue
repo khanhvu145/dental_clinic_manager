@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <div class="content" v-if="checkRight('create')">
+        <div class="content" v-if="checkRight('view')">
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -558,7 +558,7 @@ export default {
         checkRight(right) {
 			const _this = this;
 			// If user have permission below
-			const values = ['appointment.all', 'appointment.' + right];
+			const values = ['register.all', 'register.' + right];
 			return !!(intersection(_this.accesses || [], values).length > 0);
 		},
         checkRightCustomer(right) {

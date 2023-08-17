@@ -8,19 +8,19 @@
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
-                    <div class="col-md-2">
+                    <div class="col-md-4 col-lg-2">
                         <div class="col-form-label">Mã phiếu thu</div>
                         <el-input placeholder="Mã phiếu thu..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4 col-lg-2">
                         <div class="col-form-label">Mã phiếu khám</div>
                         <el-input placeholder="Mã phiếu khám..." v-model="searchQuery.filters.examinationCodeF" name="examinationCodeF"></el-input>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4 col-lg-2">
                          <div class="col-form-label">Khách hàng</div>
                         <el-input placeholder="Mã, tên..." v-model="searchQuery.filters.customerF" name="customerF"></el-input>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4 col-lg-2">
                         <div class="col-form-label">Ngày thanh toán</div>
                         <el-date-picker
                             v-model="searchQuery.filters.dateF"
@@ -31,7 +31,7 @@
                             format="dd/MM/yyyy">
                         </el-date-picker>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4 col-lg-2">
                         <div class="col-form-label">Trạng thái</div>
                         <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
                             <el-option label="Tất cả" value="all"></el-option>
@@ -39,7 +39,7 @@
                             <el-option label="Đã hủy" value="cancelled"></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4 col-lg-2">
                         <div style="display: flex; height: 100%; align-items: end; gap: 8px;">
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>
