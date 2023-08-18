@@ -61,7 +61,7 @@ export const generalCategory = [
       {
         key: 'customer_source',
         label: 'Nguồn khách hàng',
-        pickColor: false,
+        pickColor: true,
         planHolder: 'Tên nguồn',
         active: true,
       }

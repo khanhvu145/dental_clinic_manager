@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="row" style="margin-top: 9px;">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="col-form-label">Mã</div>
                     <el-input placeholder="Mã..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
                 </div>
@@ -32,7 +32,7 @@
                         ></el-option>
                     </el-select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div style="display: flex; height: 100%; align-items: end; gap: 8px;">
                         <button type="button" class="control-btn gray" @click="refreshData()">
                             <i class='bx bx-refresh'></i>
@@ -58,7 +58,21 @@
                         ></el-option>
                     </el-select>
                 </div>
-                <div class="col-md-7 mt-2"></div>
+                <div class="col-md-2">
+                    <el-dropdown :hide-on-click="false" trigger="click" style="width:100%;">
+                        <el-button class="elButtonCustom" style="width:100%; text-align:left;font-weight:400;padding:12px 10px">
+                            <i class="el-icon-view el-icon--left" style="color:#C0C4CC;"></i>
+                            Ẩn hiện cột
+                            <i class="el-icon-arrow-down el-icon--right" style="float:right;color:#C0C4CC;"></i>
+                        </el-button>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-for="item in columns" :key="item.name">
+                                <el-checkbox v-model="item.isShow">{{ item.name }}</el-checkbox>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </div>
+                <div class="col-md-5 mt-2"></div>
                 <div class="col-md-2">
                     <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
                         <button class="control-btn blue" @click="openCreateDialog" v-if="(checkRight('create'))">
@@ -71,39 +85,39 @@
             <div class="row mt-4">
                 <div class="col-md-12">
                     <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
-                        <el-table-column label="Mã dịch vụ" min-width="120">
+                        <el-table-column v-if="columns[0].isShow" label="Mã dịch vụ" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ scope.row.code || '' }}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Tên dịch vụ" min-width="120">
+                        <el-table-column v-if="columns[1].isShow" label="Tên dịch vụ" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ scope.row.name || '' }}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Nhóm dịch vụ" min-width="120">
+                        <el-table-column v-if="columns[2].isShow" label="Nhóm dịch vụ" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ groupData.find(e => e.value == scope.row.groupId) ? groupData.find(e => e.value == scope.row.groupId).label : '' }}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Giá dịch vụ" min-width="120">
+                        <el-table-column v-if="columns[3].isShow" label="Giá dịch vụ" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ (scope.row.price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Đơn vị tính" min-width="80">
+                        <el-table-column v-if="columns[4].isShow" label="Đơn vị tính" min-width="80">
                             <template slot-scope="scope">
                                 <div>{{ scope.row.unit == 'unit1' ? 'Răng' : scope.row.unit == 'unit2' ? 'Hàm' : '' }}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Trạng thái" min-width="80">
+                        <el-table-column v-if="columns[5].isShow" label="Trạng thái" min-width="80">
                             <template slot-scope="scope">
                                 <el-tag :type="scope.row.isActive ? 'success' : 'danger'">
                                     {{ scope.row.isActive ? 'Hoạt động' : 'Ngưng hoạt động' }}
                                 </el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Thao tác" width="150">
+                        <el-table-column v-if="columns[6].isShow" label="Thao tác" width="150">
                             <template slot-scope="scope">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -120,13 +134,13 @@
                                 </div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Tạo bởi-lúc" min-width="120">
+                        <el-table-column v-if="columns[7].isShow" label="Tạo bởi-lúc" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ scope.row.createdBy || 'System' }}</div>
                                 <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Cập nhật bởi-lúc" min-width="120">
+                        <el-table-column v-if="columns[8].isShow" label="Cập nhật bởi-lúc" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ scope.row.updatedBy }}</div>
                                 <div>{{ scope.row.updatedAt ? $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
@@ -379,6 +393,7 @@ import { statusData } from '@/utils/masterData';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import Service from '@/models/tw_Service';
 import VueAutonumeric from 'vue-autonumeric';
+import { columns } from '@/utils/filter/service';
 export default {
     computed: {
 		...mapState({
@@ -396,6 +411,7 @@ export default {
             updateData: new Service(),
             dataLoading: true,
             statusData: statusData,
+            columns: columns,
             sortData: [
                 {
                     label: 'Thời gian tạo giảm dần',

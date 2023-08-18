@@ -8,19 +8,19 @@
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-3">
                         <div class="col-form-label">Mã phiếu thu</div>
                         <el-input placeholder="Mã phiếu thu..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-2">
                         <div class="col-form-label">Mã phiếu khám</div>
                         <el-input placeholder="Mã phiếu khám..." v-model="searchQuery.filters.examinationCodeF" name="examinationCodeF"></el-input>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-2">
                          <div class="col-form-label">Khách hàng</div>
                         <el-input placeholder="Mã, tên..." v-model="searchQuery.filters.customerF" name="customerF"></el-input>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-3">
                         <div class="col-form-label">Ngày thanh toán</div>
                         <el-date-picker
                             v-model="searchQuery.filters.dateF"
@@ -31,7 +31,7 @@
                             format="dd/MM/yyyy">
                         </el-date-picker>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-2">
                         <div class="col-form-label">Trạng thái</div>
                         <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
                             <el-option label="Tất cả" value="all"></el-option>
@@ -39,8 +39,8 @@
                             <el-option label="Đã hủy" value="cancelled"></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-4 col-lg-2">
-                        <div style="display: flex; height: 100%; align-items: end; gap: 8px;">
+                    <div class="col-md-12 mt-3">
+                        <div style="display: flex; height: 100%; align-items: end; gap: 8px; justify-content: end;">
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>
                             </button>
@@ -65,31 +65,42 @@
                             ></el-option>
                         </el-select>
                     </div>
+                    <div class="col-md-2">
+                        <el-dropdown :hide-on-click="false" trigger="click" style="width:100%;">
+                            <el-button class="elButtonCustom" style="width:100%; text-align:left;font-weight:400;padding:12px 10px">
+                                <i class="el-icon-view el-icon--left" style="color:#C0C4CC;"></i>
+                                Ẩn hiện cột
+                                <i class="el-icon-arrow-down el-icon--right" style="float:right;color:#C0C4CC;"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item v-for="item in columns" :key="item.name">
+                                    <el-checkbox v-model="item.isShow">{{ item.name }}</el-checkbox>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </div>
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border show-summary :summary-method="getSummaries">
-                            <el-table-column label="Mã phiếu thu" min-width="70">
+                            <el-table-column v-if="columns[0].isShow" label="Mã phiếu thu" min-width="120">
                                 <template slot-scope="scope">
                                     {{ scope.row.code || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Thanh toán lúc" min-width="80">
+                            <el-table-column v-if="columns[1].isShow" label="Ngày thanh toán" min-width="150">
                                 <template slot-scope="scope">
-                                    <div>
-                                        {{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm') : '' }}
-                                    </div>
                                     <div>
                                         {{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Số tiền" min-width="80" prop="amount" align="right">
+                            <el-table-column v-if="columns[2].isShow" label="Số tiền" min-width="150" prop="amount" align="right">
                                 <template slot-scope="scope">
                                     {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                 </template>
                             </el-table-column>
-                             <el-table-column label="Hình thức thanh toán" min-width="100">
+                             <el-table-column v-if="columns[3].isShow" label="Hình thức thanh toán" min-width="180">
                                 <template slot-scope="scope">
                                     <div style="text-align:center;">
                                         <el-tag v-if="scope.row.methodFee == 'transfer'" type="danger">Chuyển khoản</el-tag>
@@ -97,18 +108,18 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Mã phiếu khám" min-width="80">
+                            <el-table-column v-if="columns[4].isShow" label="Mã phiếu khám" min-width="120">
                                 <template slot-scope="scope">
                                     {{ scope.row.examinationCode || 'N/A' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Khách hàng" min-width="100">
+                            <el-table-column v-if="columns[5].isShow" label="Khách hàng" min-width="150">
                                 <template slot-scope="scope">
                                     <div>{{ `(${scope.row.customerCode})` || 'N/A' }}</div>
                                     <div>{{ scope.row.customerName || 'N/A' }}</div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Trạng thái" min-width="80">
+                            <el-table-column v-if="columns[6].isShow" label="Trạng thái" min-width="120">
                                 <template slot-scope="scope">
                                     <div v-if="scope.row.status == 'paid'" style="text-align:center;">
                                         <el-tag type="success">Đã thanh toán</el-tag>
@@ -124,19 +135,19 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Tệp đính kèm" min-width="80">
+                            <el-table-column v-if="columns[7].isShow" label="Tệp đính kèm" min-width="150">
                                 <template slot-scope="scope">
                                     <div v-for="(item, index) in scope.row.attachFiles" :key="index">
                                         <a :href="item" target="_blank" style="font-style:italic;text-decoration:underline!important;">{{ 'Tệp đính kèm ' + (index + 1) }}</a> 
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Ghi chú" min-width="80">
+                            <el-table-column v-if="columns[8].isShow" label="Ghi chú" min-width="120">
                                 <template slot-scope="scope">
                                     {{ scope.row.note || '' }}
                                 </template>
                             </el-table-column>
-                            <el-table-column label="Thao tác" min-width="60">
+                            <el-table-column v-if="columns[9].isShow" label="Thao tác" min-width="80">
                                 <template slot-scope="scope">
                                     <div v-if="scope.row.status != 'cancelled'" style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
                                         <div v-if="checkRight('printReceipts')">
@@ -155,6 +166,18 @@
                                         </div>
                                     </div>
                                 </template>
+                            </el-table-column>
+                            <el-table-column v-if="columns[10].isShow" label="Tạo bởi-lúc" min-width="150">
+                                <template slot-scope="scope">
+                                    <div>{{ scope.row.createdBy || 'System' }}</div>
+                                    <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+								</template>
+                            </el-table-column>
+                            <el-table-column v-if="columns[11].isShow" label="Cập nhật bởi-lúc" min-width="150">
+                                <template slot-scope="scope">
+                                    <div>{{ scope.row.updatedBy || '' }}</div>
+                                    <div>{{ scope.row.updatedAt ? $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+								</template>
                             </el-table-column>
                         </el-table>
                     </div>
@@ -335,6 +358,7 @@
 import { mapState } from 'vuex';
 import { intersection } from 'lodash';
 import readAmountByWord from '@/utils/functions/readAmountByWord';
+import { columns } from '@/utils/filter/receipts';
 export default {
     computed: {
 		...mapState({
@@ -347,6 +371,7 @@ export default {
             data: {},
             dataLoading: true,
             currentPage: 1,
+            columns: columns,
             searchQuery: {
                 filters: {
                     codeF: '',
