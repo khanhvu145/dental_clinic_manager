@@ -79,10 +79,9 @@
                             </el-dropdown-menu>
                         </el-dropdown>
                     </div>
-                    <div class="col-md-5 mt-2"></div>
-                    <div class="col-md-2">
+                    <div class="col-md-7">
                         <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                            <button class="control-btn blue">
+                            <button v-if="(checkRight('create'))" class="control-btn blue" @click="openCreateDialog()">
                                 <i class='bx bx-plus' ></i>
                                 Tạo phiếu chi
                             </button>
@@ -91,7 +90,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
-                        <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border show-summary>
+                        <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border show-summary :summary-method="getSummaries">
                             <el-table-column v-if="columns[0].isShow" label="Mã phiếu chi" min-width="100">
                                 <template slot-scope="scope">
                                     {{ scope.row.code || 'N/A' }}
@@ -159,6 +158,54 @@
                     </div>
                 </div>
             </div>
+            <!-- Dialog tạo phiếu chi -->
+            <el-dialog title="Tạo phiếu chi" :visible.sync="dialogPayment.visible" :close-on-click-modal="false" width="40%">
+                <form class="row" v-on:submit.prevent="submitCreatePayment">
+                    <div class="col-md-12">
+                        <div class="col-form-label">Số tiền chi *</div>
+                        <vue-autonumeric
+                            v-model="dialogPayment.data.amount"
+                            class="el-input__inner"
+                            placeholder="Số tiền chi"
+                            :options="{
+                                decimalPlaces: 0,
+                                digitGroupSeparator: ',',
+                                decimalCharacter: '.',
+                                decimalCharacterAlternative: '.',
+                                currencySymbol: '\u00a0VND',
+                                currencySymbolPlacement: 's',
+                                roundingMethod: 'U',
+                                minimumValue: '0',
+                            }"
+                        ></vue-autonumeric>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-form-label">Nội dung chi *</div>
+                        <el-input
+                            type="textarea"
+                            placeholder="Nội dung chi"
+                            v-model="dialogPayment.data.content"
+                            :rows="8"
+                        >
+                        </el-input>
+                    </div>
+                </form>
+                <span slot="footer" class="dialog-footer">
+                    <button type="button" class="control-btn gray" @click="dialogPayment.visible = false">
+                        <i class='bx bx-x'></i>
+                        <span>Đóng</span>
+                    </button>
+                    <button
+                        type="button" 
+                        class="control-btn green"
+                        @click="submitCreatePayment"
+                        v-if="(checkRight('create'))"
+                    >
+                        <i class='bx bx-save' ></i>
+                        <span>Lưu</span>
+                    </button>
+                </span>
+            </el-dialog>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -168,10 +215,15 @@
 
 <script>
 import { mapState } from 'vuex';
-import { intersection } from 'lodash';
+import { debounce, cloneDeep, intersection } from 'lodash';
 import readAmountByWord from '@/utils/functions/readAmountByWord';
 import { columns } from '@/utils/filter/payment';
+import PaymentSlip from '@/models/tw_PaymentSlip';
+import VueAutonumeric from 'vue-autonumeric';
 export default {
+    components: {
+        'vue-autonumeric': VueAutonumeric,
+    },
     computed: {
 		...mapState({
 			accesses: (state) => state.accesses,
@@ -191,7 +243,7 @@ export default {
                     statusF: 'new',
                     typeF: 'all',
                 },
-                sorts: -1,
+                sorts: 'date&&-1',
                 pages:{
                     from: 0,
                     size: 10
@@ -200,18 +252,31 @@ export default {
             sortData: [
                 {
                     label: 'Thời gian chi giảm dần',
-                    value: -1,
+                    value: 'date&&-1',
                 },
                 {
                     label: 'Thời gian chi tăng dần',
-                    value: 1,
+                    value: 'date&&1',
+                },
+                {
+                    label: 'Thời gian tạo giảm dần',
+                    value: 'createdAt&&-1',
+                },
+                {
+                    label: 'Thời gian tạo tăng dần',
+                    value: 'createdAt&&1',
                 },
             ],
+            dialogPayment: {
+                visible: false,
+                data: {}
+            }
         }
     },
     async created() {
         const _this = this;
-        _this.dataLoading = false;
+        //Lấy danh sách dữ liệu
+        await _this.getData(_this.searchQuery);
     },
     methods: {
         checkRight(right) {
@@ -254,7 +319,62 @@ export default {
             _this.getData(_this.searchQuery);
         },
         async getData(searchQuery){
-
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/paymentSlip/getByQuery', searchQuery).then(
+                (response) => {
+                    _this.data = response;
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        openCreateDialog(){
+            const _this = this;
+            _this.dialogPayment.data = new PaymentSlip();
+            _this.dialogPayment.visible = true;
+        },
+        submitCreatePayment: debounce(async function (){
+            const _this = this;
+            _this.dialogPayment.data.createdBy = _this.userInfo.data.username;
+            var newData = cloneDeep(_this.dialogPayment.data);
+            const data = await _this.$axios.$post('/api/paymentSlip/create', newData);
+            if (data.success) {
+                _this.$message({
+                    message: data.message,
+                    type: 'success',
+                });
+                _this.dialogPayment.visible = false;
+                _this.dialogPayment.data = new PaymentSlip(),
+                _this.getData(_this.searchQuery);
+            } else {
+                _this.$message.error(data.error);
+            }
+        }),
+        getSummaries(param){
+            const { columns, data } = param;
+			const _this = this;
+            let sums = [];
+            columns.forEach((column, index) => {
+                if (index === 0) {
+                    sums[index] = 'Tổng';
+                    return;
+                }
+                if (index === 2) {
+                    const values = data.map(item => Number(item[column.property]));
+                    var total = values.reduce((partialSum, a) => partialSum + a, 0);
+                    var totalString = (total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0';
+                    sums[index] = totalString;
+                    return;
+                }
+            });
+            return sums;
         },
     }
 }

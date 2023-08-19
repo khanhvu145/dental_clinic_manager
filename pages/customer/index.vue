@@ -83,7 +83,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
-                        <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
+                        <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border>
                             <el-table-column v-if="columns[0].isShow" label="Thông tin khách hàng" min-width="150">
                                 <template slot-scope="scope">
                                     <div style="font-weight: bold;">  
@@ -138,7 +138,7 @@
                             <el-table-column v-if="columns[3].isShow" label="Hoạt động" min-width="150">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.recentActivity ? $moment(scope.row.recentActivity).format('DD/MM/YYYY HH:mm') : 'Chưa có hoạt động' }}</div>
-                                    <div style="font-style: italic;color:#98a6ad;">{{ scope.row.recentActivity ? $moment(scope.row.recentActivity).fromNow() : '' }}</div>
+                                    <div style="font-style: italic;color:#98a6ad;">{{ scope.row.recentActivity ? `Hoạt động - ${$moment(scope.row.recentActivity).fromNow()}` : '' }}</div>
 								</template>
                             </el-table-column>
                             <el-table-column v-if="columns[4].isShow" label="Thao tác" min-width="80">

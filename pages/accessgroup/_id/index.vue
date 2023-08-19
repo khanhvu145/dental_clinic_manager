@@ -308,17 +308,8 @@ export default {
                                 {
                                     name: 'Phiếu chi',
 									value: 'payment',
-                                    customRights: [
-                                        {
-                                            name: 'Tất cả',
-                                            value: 'all',
-                                        },
-                                        {
-                                            name: 'Xem',
-                                            value: 'view',
-                                        },
-                                    ],
-                                    hideDefaultRights: true,
+                                    customRights: [],
+                                    hideDefaultRights: false,
                                 }
                             ]
                         },

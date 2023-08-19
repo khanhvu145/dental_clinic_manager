@@ -84,7 +84,7 @@
             </div>
             <div class="row mt-4">
                 <div class="col-md-12">
-                    <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe>
+                    <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border>
                         <el-table-column v-if="columns[0].isShow" label="Mã dịch vụ" min-width="120">
                             <template slot-scope="scope">
                                 <div>{{ scope.row.code || '' }}</div>
@@ -117,7 +117,7 @@
                                 </el-tag>
                             </template>
                         </el-table-column>
-                        <el-table-column v-if="columns[6].isShow" label="Thao tác" width="150">
+                        <el-table-column v-if="columns[6].isShow" label="Thao tác" width="100">
                             <template slot-scope="scope">
                                 <div class="row">
                                     <div class="col-md-6">
