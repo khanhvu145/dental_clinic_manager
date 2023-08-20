@@ -308,7 +308,12 @@ export default {
                                 {
                                     name: 'Phiếu chi',
 									value: 'payment',
-                                    customRights: [],
+                                    customRights: [
+                                        {
+											name: 'In phiếu chi',
+											value: 'print',
+										},
+                                    ],
                                     hideDefaultRights: false,
                                 }
                             ]

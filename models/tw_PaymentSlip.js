@@ -5,5 +5,7 @@ export default function() {
     this.content = '';
     this.type = 'other';
     this.status = 'new';
-    this.note = '';
+    this.receivingUnit = '';
+    this.addressUnit = '';
+    this.originalDocuments = [];
 }

@@ -13,17 +13,25 @@ export const columns = [
         isShow: true,
     },
     {
-      name: 'Trạng thái',
+      name: 'Đơn vị nhận tiền',
       isShow: true,
     },
     {
-        name: 'Loại',
-        isShow: true,
+      name: 'Chứng từ gốc',
+      isShow: true,
     },
     {
-        name: 'Nội dung',
-        isShow: true,
+      name: 'Nội dung',
+      isShow: true,
     },
+    {
+      name: 'Trạng thái',
+      isShow: true,
+    },
+    // {
+    //     name: 'Loại',
+    //     isShow: true,
+    // },
     {
       name: 'Thao tác',
       isShow: true,

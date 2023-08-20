@@ -398,6 +398,7 @@ export default {
             await _this.$axios.$get(`/api/service/groupGetById/${val}`).then(
 				(response) => {
                     _this.updateDataGroup = response.data || new ServiceGroup();
+                    _this.dialogUpdateServiceGroup = true;
 				},
 				(error) => {
                     console.log('Error: ', error);
@@ -408,7 +409,6 @@ export default {
 					 _this.formData = new ServiceGroup();
 				}
 			);
-            _this.dialogUpdateServiceGroup = true;
         },
         submitUpdateServiceGroup: debounce(async function (){
             const _this = this;

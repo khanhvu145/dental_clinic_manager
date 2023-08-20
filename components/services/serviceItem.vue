@@ -536,6 +536,7 @@ export default {
             await _this.$axios.$get(`/api/service/getById/${val}`).then(
 				(response) => {
                     _this.updateData = response.data || new Service();
+                    _this.dialogUpdateService = true;
 				},
 				(error) => {
                     console.log('Error: ', error);
@@ -546,7 +547,6 @@ export default {
 					 _this.formData = new Service();
 				}
 			);
-            _this.dialogUpdateService = true;
         },
         submitUpdateService: debounce(async function (){
             const _this = this;

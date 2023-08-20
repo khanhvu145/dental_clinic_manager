@@ -205,7 +205,7 @@
                 :preview-modal="true"
                 :enable-download="false"
                 :paginate-elements-by-height="1500"
-                :filename="'test'"
+                :filename="'receiptsForm'"
                 :pdf-quality="2"
                 :manual-pagination="false"
                 pdf-format="a5"
