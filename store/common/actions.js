@@ -217,6 +217,17 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                     isActive: item.isActive,
                 };
             })
+        case 'generalConfigExamMedicine': // Medicine
+            const examMedicineData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'exam_medicine', isActive: true });
+            var examMedicine = examMedicineData.data['exam_medicine'];
+            return examMedicine.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
     }
     return [];
 }

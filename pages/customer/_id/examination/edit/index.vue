@@ -29,7 +29,7 @@
                         @click="exportPDF"
                     >
                         <i class='bx bx-printer'></i>
-                        <span>In phiếu</span>
+                        <span>In phiếu khám</span>
                     </button>
                     <button
                         v-if="
@@ -56,6 +56,18 @@
                         <i class='bx bx-save' ></i>
                         <span>Lưu</span>
                     </button>
+                    <!-- <button
+                        v-if="
+                            checkRight('createPrescription') && $route.query.examinationId 
+                            && $route.query.examinationId != 'create' && formData._id && formData.status == 'approved'
+                        "
+                        type="button" 
+                        class="control-btn blue2" 
+                        @click="openDialogPrescription"
+                    >
+                        <i class='bx bxs-file-plus'></i>
+                        <span>Thêm đơn thuốc</span>
+                    </button> -->
                 </div>
             </div>
             <div class="row mt-3">
@@ -369,7 +381,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <el-table :data="tableData" v-loading="tableLoading" style="width: 100%" stripe>
+                                        <el-table :data="tableData" v-loading="tableLoading" style="width: 100%" border stripe>
                                             <el-table-column label="#" min-width="40">
                                                 <template slot-scope="scope">
                                                     {{ scope.row.key }}
@@ -390,7 +402,7 @@
                                                     {{ getServiceName(scope.row.serviceId) }}
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column label="Đơn giá" min-width="120">
+                                            <el-table-column label="Đơn giá" min-width="120" align="right">
                                                 <template slot-scope="scope">
                                                     {{ (scope.row.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                 </template>
@@ -400,12 +412,12 @@
                                                     {{ scope.row.isJaw ? scope.row.quantityJaw : scope.row.quantity }}
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column label="Giảm giá" min-width="120">
+                                            <el-table-column label="Giảm giá" min-width="120" align="right">
                                                 <template slot-scope="scope">
                                                     {{ (scope.row.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column label="Tổng chi phí" min-width="120">
+                                            <el-table-column label="Tổng chi phí" min-width="120" align="right">
                                                 <template slot-scope="scope">
                                                     {{ (scope.row.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                 </template>
@@ -501,6 +513,98 @@
                                 </div>
                             </el-card>
                         </el-tab-pane>
+                        <el-tab-pane v-if="$route.query.examinationId && $route.query.examinationId != 'create' && formData._id && formData.status != 'new'" label="Đơn thuốc" name="prescription">
+                            <el-card class="box-card mb-4">
+                                <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a v-if="formData.status == 'approved'" class="btn control-btn green" style="float:right;" @click="submitPrescription()">
+                                                <i class='bx bxs-file-plus'></i>
+                                                Lưu
+                                            </a>
+                                            <a v-if="formData.status == 'approved' && prescriptionData && prescriptionData._id" class="btn control-btn blue2 mr-2" style="float:right;" @click="printPrescription()">
+                                                <i class='bx bx-printer'></i>
+                                                In đơn thuốc
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                         <template>
+                                            <el-table :data="prescriptionData.medicines" style="width: 100%" border stripe>
+                                                <el-table-column prop="order" label="#" width="50" align="center"></el-table-column>
+                                                <el-table-column label="Tên thuốc" min-width="120">
+                                                    <template slot-scope="scope">
+                                                        <el-select v-model="scope.row.medicine" placeholder="Chọn thuốc">
+                                                            <el-option
+                                                                v-for="item in medicineData"
+                                                                :key="item.value"
+                                                                :label="item.label"
+                                                                :value="item.value"
+                                                            ></el-option>
+                                                        </el-select>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Số lượng" width="100">
+                                                    <template slot-scope="scope">
+                                                        <div class="inputTextRight">
+                                                            <vue-autonumeric
+                                                                v-model="scope.row.quantity"
+                                                                placeholder="0"
+                                                                class="el-input__inner"
+                                                                :options="{
+                                                                    decimalPlaces: 0,
+                                                                    digitGroupSeparator: ',',
+                                                                    decimalCharacter: '.',
+                                                                    decimalCharacterAlternative: '.',
+                                                                    currencySymbolPlacement: 's',
+                                                                    roundingMethod: 'U',
+                                                                    minimumValue: '0',
+                                                                    maximumValue: '1000',
+                                                                    emptyInputBehavior: '0'
+                                                                }"
+                                                            >
+                                                            </vue-autonumeric>
+                                                        </div>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Ghi chú" min-width="150">
+                                                    <template slot-scope="scope">
+                                                        <el-input
+                                                            type="textarea"
+                                                            placeholder="Nhập ghi chú"
+                                                            v-model="scope.row.note"
+                                                            :rows="2"
+                                                        ></el-input>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column width="50">
+                                                    <template slot="header">
+                                                        <span @click="addPrescription()" style="cursor:pointer;">
+                                                            <i class="el-icon-circle-plus font-20"></i>
+                                                        </span>
+                                                    </template>
+                                                    <template slot-scope="scope">
+                                                        <span @click="removePrescription(scope.row.idForEdit, scope.row.order)" style="cursor:pointer;">
+                                                            <i class="el-icon-remove font-20"></i>
+                                                        </span>
+                                                    </template>
+                                                </el-table-column>
+                                                </el-table>
+                                        </template>
+                                    </div>
+                                    <div class="col-md-12 mt-3">
+                                        <div class="col-form-label" style="font-weight:bold;">Lời dặn của nha sĩ</div>
+                                        <tiny-editor
+                                            data-vv-as='Lời dặn của nha sĩ'
+                                            v-model='prescriptionData.advice'
+                                        >
+                                        </tiny-editor>
+                                    </div>
+                                </div>
+                            </el-card>
+                        </el-tab-pane>
                     </el-tabs>
                 </div>
             </div>
@@ -562,299 +666,426 @@
                 </div>
             </div>
         </form>
+        <!-- Template in phiếu khám -->
         <vue-html2pdf 
-                class="print-content"
-                id="print-content-pdf"
-                :show-layout="false"
-                :float-layout="true"
-                :preview-modal="true"
-                :enable-download="false"
-                :paginate-elements-by-height="1500"
-                filename="test"
-                :pdf-quality="2"
-                :manual-pagination="false"
-                pdf-format="a4"
-                pdf-orientation="portrait"
-                pdf-content-width="100%"
-                ref="html2Pdf_examinationForm"
-            >
-                <section slot="pdf-content">
-                    <div v-if="printData && printData._id" class="container mt-3" style="color:#000;font-size:13px;">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <el-image
-                                    style="width: 100%; height: auto"
-                                    src="/images/logoclinic.png"
-                                    fit="cover">
-                                </el-image>
-                            </div>
-                            <div class="col-md-9">
-                                <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
-                                <div class="mt-3">
-                                    <span style="font-weight:bold;">Địa chỉ:</span>
-                                    <span>Quận 3, HCM</span>
-                                </div>
-                                <div class="mt-2">
-                                    <span style="font-weight:bold;">Số điện thoại:</span>
-                                    <span>0703260457</span>
-                                </div>
-                                <div class="mt-2">
-                                    <span style="font-weight:bold;">Email:</span>
-                                    <span>dentalclinic@gmail.com</span>
-                                </div>
-                                <div class="mt-2">
-                                    <span style="font-weight:bold;">Website:</span>
-                                    <span>https://www.google.com</span>
-                                </div>
-                            </div>
+            class="print-content"
+            id="print-content-pdf"
+            :show-layout="false"
+            :float-layout="true"
+            :preview-modal="true"
+            :enable-download="false"
+            :paginate-elements-by-height="1500"
+            filename="examination"
+            :pdf-quality="2"
+            :manual-pagination="false"
+            pdf-format="a4"
+            pdf-orientation="portrait"
+            pdf-content-width="100%"
+            ref="html2Pdf_examinationForm"
+        >
+            <section slot="pdf-content">
+                <div v-if="printData && printData._id" class="container mt-3" style="color:#000;font-size:13px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <el-image
+                                style="width: 100%; height: auto"
+                                src="/images/logoclinic.png"
+                                fit="cover">
+                            </el-image>
                         </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-12 text-center">
-                                <div style="font-weight:bold;font-size:24px;">PHIẾU KHÁM VÀ ĐIỀU TRỊ</div>
+                        <div class="col-md-9">
+                            <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
+                            <div class="mt-3">
+                                <span style="font-weight:bold;">Địa chỉ:</span>
+                                <span>Quận 3, HCM</span>
                             </div>
-                            <div class="col-md-12 mt-2">
-                                <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4 text-center">Ngày {{$moment(printData.createdAt).format('DD')}} tháng {{$moment(printData.createdAt).format('MM')}} năm {{$moment(printData.createdAt).format('YYYY')}}</div>
-                                    <div class="col-md-4 text-right">Mã: {{printData.code}}</div>
-                                </div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Số điện thoại:</span>
+                                <span>0703260457</span>
                             </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-md-6 mb-2">
-                                <span style="font-weight: bold;">Mã khách hàng: </span>
-                                {{ printData.customerCode || '' }}
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Email:</span>
+                                <span>dentalclinic@gmail.com</span>
                             </div>
-                            <div class="col-md-6 mb-2">
-                                <span style="font-weight: bold;">Họ và tên: </span>
-                                {{ printData.customerName || '' }}
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <span style="font-weight: bold;">Ngày sinh: </span>
-                                {{ $moment(printData.customerBirthday).format('DD/MM/YYYY') || '' }}
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <span style="font-weight: bold;">Giới tính: </span>
-                                {{ printData.customerGender == 'male' ? 'Nam' : 'Nữ' || '' }}
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <span style="font-weight: bold;">CMND/CCCD: </span>
-                                {{ printData.customerPhysicalId || '' }}
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                    <span style="font-weight: bold;">Số điện thoại: </span>
-                                {{ printData.customerPhone || '' }}
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-6 mt-2">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                        <i class='bx bx-check-circle' style="font-size:20px;" ></i>
-                                        TIỀN SỬ BỆNH
-                                    </div>
-                                    <div class="col-md-12 mt-2">
-                                        <ul v-if="printData.anamnesis != null && printData.anamnesis.length > 0" class="ml-3">
-                                            <li v-for="item in printData.anamnesis" :key="item.value" class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                {{item.label}} {{item.note ? ` - ${item.note}` : ''}}
-                                            </li>
-                                        </ul>
-                                        <ul v-else class="ml-3">
-                                            <li class="mb-5 pb-2">- Không có</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                        <i class='bx bx-check-circle' style="font-size:20px;" ></i>
-                                        DỊ ỨNG
-                                    </div>
-                                    <div class="col-md-12 mt-2">
-                                        <ul v-if="printData.allergy != null && printData.allergy.allergies != null && printData.allergy.allergies.length > 0" class="ml-3">
-                                            <li v-for="item in printData.allergy.allergies" :key="item" class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                {{getAllergyName(item)}}
-                                            </li>
-                                            <li v-if="printData.allergy.other" class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                {{printData.allergy.other}}
-                                            </li>
-                                        </ul>
-                                        <ul v-else class="ml-3">
-                                            <li class="mb-5 pb-2">- Không có</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                        <i class='bx bx-check-circle' style="font-size:20px;" ></i>
-                                        KHÁM LÂM SÀNG
-                                    </div>
-                                    <div class="col-md-12 mt-2">
-                                        <ul v-if="printData.clinicalExam" class="ml-3">
-                                            <li  class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                {{printData.clinicalExam}}
-                                            </li>
-                                        </ul>
-                                        <ul v-else class="ml-3">
-                                            <li class="mb-5 pb-2">- Không có thông tin khám</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-2">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                        <i class='bx bx-check-circle' style="font-size:20px;" ></i>
-                                        KHÁM CẬN LÂM SÀNG
-                                    </div>
-                                    <div class="col-md-12 mt-2">
-                                        <ul class="ml-3">
-                                            <li class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                X-quang:
-                                                <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.xquang != null && printData.preclinicalExam.xquang.length > 0">
-                                                    <span v-for="(item, index) in printData.preclinicalExam.xquang" :key="index">
-                                                        {{index > 0 ? ', ' : ' '}} {{getXquangName(item)}}
-                                                    </span>
-                                                </span> 
-                                            </li>
-                                            <li class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                Xét nghiệm:
-                                                <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.test != null && printData.preclinicalExam.test.length > 0">
-                                                    <span v-for="(item, index) in printData.preclinicalExam.test" :key="index">
-                                                        {{index > 0 ? ', ' : ' '}} {{getTestName(item)}}
-                                                    </span>
-                                                </span>
-                                            </li>
-                                            <li class="mb-2">
-                                                <span style="font-family:Wingdings">&#118;</span>
-                                                Khác: 
-                                                <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.other != null">
-                                                    {{printData.preclinicalExam.other}}
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                <i class='bx bx-check-circle' style="font-size:20px;" ></i>
-                                CHẨN ĐOÁN VÀ ĐIỀU TRỊ
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
-                                            <th scope="col">Răng/hàm</th>
-                                            <th scope="col">Chẩn đoán</th>
-                                            <th scope="col">Điều trị</th>
-                                            <th scope="col">Đơn giá</th>
-                                            <th scope="col">SL</th>
-                                            <th scope="col">Giảm giá</th>
-                                            <th scope="col">Thành tiền</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="item in printData.diagnosisTreatment" :key="item.key">
-                                            <td>
-                                                {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }}
-                                            </td>
-                                            <td>
-                                                {{ item.diagnose }}
-                                            </td>
-                                            <td>
-                                                {{ getServiceName(item.serviceId) }}
-                                            </td>
-                                            <td style="text-align:right;">
-                                                {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
-                                            </td>
-                                            <td style="text-align:center;">
-                                                {{ item.isJaw ? item.quantityJaw : item.quantity }}
-                                            </td>
-                                            <td style="text-align:right;">
-                                                {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
-                                            </td>
-                                            <td style="text-align:right;">
-                                                {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                        <i class='bx bx-check-circle' style="font-size:20px;"></i>
-                                        GHI CHÚ
-                                    </div>
-                                    <div class="col-md-12 ml-3 mt-2">
-                                        {{printData.note}}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-size:16px;font-weight:bold;">
-                                        <i class='bx bx-check-circle' style="font-size:20px;"></i>
-                                        TỔNG CHI PHÍ ĐIỀU TRỊ
-                                    </div>
-                                    <div class="col-md-12 ml-2">
-                                        <table class="table table-borderless" style="font-size:14px;">
-                                            <tbody>
-                                                <tr>
-                                                    <td style="width:40%;font-weight:bold;">Chi phí điều trị</td>
-                                                    <td style="width:5%">:</td>
-                                                    <td style="text-align:right;width:55%">
-                                                        <span>{{ printData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:40%;font-weight:bold;">Giảm giá</td>
-                                                    <td style="width:5%">:</td>
-                                                    <td style="text-align:right;width:55%">
-                                                        <span>{{ printData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="width:40%;font-weight:bold;">Thành tiền</td>
-                                                    <td style="width:5%">:</td>
-                                                    <td style="text-align:right;width:55%">
-                                                        <span>{{ printData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row mt-4">
-                            <div class="col-md-6" style="text-align:center;">
-                                <div>Nha sĩ điều trị</div>
-                                <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
-                            </div>
-                            <div class="col-md-6" style="text-align:center;">
-                                <div>Khách hàng</div>
-                                <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Website:</span>
+                                <span>https://www.google.com</span>
                             </div>
                         </div>
                     </div>
-                </section>
-            </vue-html2pdf>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <div style="font-weight:bold;font-size:24px;">PHIẾU KHÁM VÀ ĐIỀU TRỊ</div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="row">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4 text-center">Ngày {{$moment(printData.createdAt).format('DD')}} tháng {{$moment(printData.createdAt).format('MM')}} năm {{$moment(printData.createdAt).format('YYYY')}}</div>
+                                <div class="col-md-4 text-right">Mã: {{printData.code}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Mã khách hàng: </span>
+                            {{ printData.customerCode || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Họ và tên: </span>
+                            {{ printData.customerName || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Ngày sinh: </span>
+                            {{ $moment(printData.customerBirthday).format('DD/MM/YYYY') || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Giới tính: </span>
+                            {{ printData.customerGender == 'male' ? 'Nam' : 'Nữ' || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">CMND/CCCD: </span>
+                            {{ printData.customerPhysicalId || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                                <span style="font-weight: bold;">Số điện thoại: </span>
+                            {{ printData.customerPhone || '' }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    TIỀN SỬ BỆNH
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="printData.anamnesis != null && printData.anamnesis.length > 0" class="ml-3">
+                                        <li v-for="item in printData.anamnesis" :key="item.value" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{item.label}} {{item.note ? ` - ${item.note}` : ''}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    DỊ ỨNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="printData.allergy != null && printData.allergy.allergies != null && printData.allergy.allergies.length > 0" class="ml-3">
+                                        <li v-for="item in printData.allergy.allergies" :key="item" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{getAllergyName(item)}}
+                                        </li>
+                                        <li v-if="printData.allergy.other" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{printData.allergy.other}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    KHÁM LÂM SÀNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="printData.clinicalExam" class="ml-3">
+                                        <li  class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{printData.clinicalExam}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có thông tin khám</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    KHÁM CẬN LÂM SÀNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul class="ml-3">
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            X-quang:
+                                            <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.xquang != null && printData.preclinicalExam.xquang.length > 0">
+                                                <span v-for="(item, index) in printData.preclinicalExam.xquang" :key="index">
+                                                    {{index > 0 ? ', ' : ' '}} {{getXquangName(item)}}
+                                                </span>
+                                            </span> 
+                                        </li>
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            Xét nghiệm:
+                                            <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.test != null && printData.preclinicalExam.test.length > 0">
+                                                <span v-for="(item, index) in printData.preclinicalExam.test" :key="index">
+                                                    {{index > 0 ? ', ' : ' '}} {{getTestName(item)}}
+                                                </span>
+                                            </span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            Khác: 
+                                            <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.other != null">
+                                                {{printData.preclinicalExam.other}}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                            <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                            CHẨN ĐOÁN VÀ ĐIỀU TRỊ
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
+                                        <th scope="col">Răng/hàm</th>
+                                        <th scope="col">Chẩn đoán</th>
+                                        <th scope="col">Điều trị</th>
+                                        <th scope="col">Đơn giá</th>
+                                        <th scope="col">SL</th>
+                                        <th scope="col">Giảm giá</th>
+                                        <th scope="col">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in printData.diagnosisTreatment" :key="item.key">
+                                        <td>
+                                            {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }}
+                                        </td>
+                                        <td>
+                                            {{ item.diagnose }}
+                                        </td>
+                                        <td>
+                                            {{ getServiceName(item.serviceId) }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                        <td style="text-align:center;">
+                                            {{ item.isJaw ? item.quantityJaw : item.quantity }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                    GHI CHÚ
+                                </div>
+                                <div class="col-md-12 ml-3 mt-2">
+                                    {{printData.note}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                    TỔNG CHI PHÍ ĐIỀU TRỊ
+                                </div>
+                                <div class="col-md-12 ml-2">
+                                    <table class="table table-borderless" style="font-size:14px;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Chi phí điều trị</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ printData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Giảm giá</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ printData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Thành tiền</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ printData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mt-4">
+                        <div class="col-md-6" style="text-align:center;">
+                            <div>Nha sĩ điều trị</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div>
+                        <div class="col-md-6" style="text-align:center;">
+                            <div>Khách hàng</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </vue-html2pdf>
+        <!-- Template in đơn thuốc -->
+        <vue-html2pdf 
+            class="print-content"
+            id="print-content-pdf-2"
+            :show-layout="false"
+            :float-layout="true"
+            :preview-modal="true"
+            :enable-download="false"
+            :paginate-elements-by-height="1500"
+            filename="prescription"
+            :pdf-quality="2"
+            :manual-pagination="false"
+            pdf-format="a5"
+            pdf-orientation="portrait"
+            pdf-content-width="100%"
+            ref="html2Pdf_prescription"
+        >
+            <section slot="pdf-content">
+                <div v-if="prescriptionData && prescriptionData._id" class="container mt-3" style="color:#000;font-size:13px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <el-image
+                                style="width: 100%; height: auto"
+                                src="/images/logoclinic.png"
+                                fit="cover">
+                            </el-image>
+                        </div>
+                        <div class="col-md-9">
+                            <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Địa chỉ:</span>
+                                <span>Quận 3, HCM</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">SĐT:</span>
+                                        <span>0703260457</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Email:</span>
+                                        <span>dentalclinic@gmail.com</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span style="font-weight:bold;">Website:</span>
+                                <span>https://www.google.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <div style="font-weight:bold;font-size:16px;">ĐƠN THUỐC</div>
+                        </div>
+                        <div class="col-md-12 mt-1">
+                            <div class="text-right">Mã phiếu khám: {{prescriptionData.examinationCode}}</div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6 mb-2">
+                            <span>Mã khách hàng: </span>
+                            {{ prescriptionData.customerCode || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span>Họ và tên: </span>
+                            {{ prescriptionData.customerName || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span>Ngày sinh: </span>
+                            {{ $moment(prescriptionData.customerBirthday).format('DD/MM/YYYY') || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span>Giới tính: </span>
+                            {{ prescriptionData.customerGender == 'male' ? 'Nam' : 'Nữ' || '' }}
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <span>Địa chỉ: </span>
+                            {{ prescriptionData.customerFullAddress || '' }}
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div v-for="item in prescriptionData.medicines" :key="item._id" class="col-md-12 mb-2">
+                            <div class="row" style="font-weight:bold;">
+                                <div class="col-md-8">
+                                    {{ item.order }}/ {{ getMedicineName(item.medicine) }}
+                                </div>
+                                <div class="col-md-4">
+                                    Số lượng: {{ item.quantity }}
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-11" style="font-style: italic;opacity:0.8;">
+                                    {{ item.note }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col-md-12" style="font-weight:bold;">Lời dặn:</div>
+                        <div class="col-md-12 mt-1 ml-2">
+                            {{ stringToHTML(prescriptionData.advice) }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6" style="text-align:center;"></div>
+                        <div class="col-md-6" style="text-align:center;">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    Ngày {{$moment(prescriptionData.createdAt).format('DD')}} tháng {{$moment(prescriptionData.createdAt).format('MM')}} năm {{$moment(prescriptionData.createdAt).format('YYYY')}}
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <div style="font-weight:bold;margin-bottom:52px;">Nha sĩ điều trị</div>
+                                    <div>{{ prescriptionData.dentistName }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </vue-html2pdf>
     </LeftMenu>
 </template>
 
@@ -863,17 +1094,22 @@ import { mapState } from 'vuex';
 import Customer from '@/models/tw_Customer';
 import Examination from '@/models/tw_Examination';
 import ExaminationDesignation from '@/models/tw_Examination_Designation';
+import Prescription from '@/models/tw_Prescription';
 import LeftMenu from '@/components/customer/LeftMenu';
 import Designation from '@/components/customer/DesignationV2.vue';
 import DiagnosisTreatment from '@/components/customer/DiagnosisTreatment.vue';
 import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import buildFormData from '@/utils/buildFormData';
 import moment from 'moment';
+import VueAutonumeric from 'vue-autonumeric';
+import TinyEditor from '@/components/common/TinyEditor';
 export default {
     components: {
 		LeftMenu,
         Designation,
-        DiagnosisTreatment
+        DiagnosisTreatment,
+        'vue-autonumeric': VueAutonumeric,
+		'tiny-editor': TinyEditor,
 	},
     computed: {
 		...mapState({
@@ -924,6 +1160,8 @@ export default {
             },
             printData: {},
             latestExamination: [],
+            medicineData: [],
+            prescriptionData: new Prescription()
         }
     },
     async created() { 
@@ -981,9 +1219,14 @@ export default {
         _this.xquangData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamXquang' })) || [];
         //Lấy danh sách loại xét nghiệm
         _this.testData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamTest' })) || [];
+        //Lấy danh sách thuốc
+        _this.medicineData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamMedicine' })) || [];
 
         //Lấy thông tin phiếu khám
         await _this.getData();
+
+        //Lấy thông tin đơn thuốc
+        await _this.getPrescription();
 
         _this.dataLoading = false;
     },
@@ -1637,6 +1880,121 @@ export default {
             if (input) return true;
             else return 'Vui lòng nhập lý do hủy.';
         },
+        // openDialogPrescription(){
+        //     const _this = this;
+        //     _this.prescriptionDialog.data = new Prescription();
+        //     _this.prescriptionDialog.visible = true;
+        // },
+        addPrescription(){
+            const _this = this;
+            var order = _this.prescriptionData.medicines.length + 1;
+            _this.prescriptionData.medicines.push({
+                idForEdit: `new_${order}_${_this.$moment().format('DDMMYYYYHHmmssSSS')}`,
+                order: order,
+                medicine: '',
+                quantity: 0,
+                note: ''
+            });
+        },
+        removePrescription(id, order){
+            const _this = this;
+            var arr = _this.prescriptionData.medicines.filter(obj => obj.idForEdit != id);
+            for(var i = order - 1; i < arr.length; i++){
+                arr[i].order = i + 1;
+                arr[i].idForEdit = `new_${i + 1}_${_this.$moment().format('DDMMYYYYHHmmssSSS')}`;
+            }
+            _this.prescriptionData.medicines = arr;
+        },
+        async submitPrescription(){
+            const _this = this;
+            _this.dataLoading = true;
+            if(_this.prescriptionData && _this.prescriptionData._id){
+                try{
+                    _this.prescriptionData.updatedBy = _this.userInfo.data.username;
+                    const data = await _this.$axios.$post('/api/customer/updatePrescription', _this.prescriptionData);
+                    if (data.success) {
+                        await _this.getPrescription();
+                        _this.$message({
+                            message: 'Lưu đơn thuốc thành công',
+                            type: 'success',
+                        });
+                    } 
+                    else {
+                        _this.$message.error(data.error);
+                    }
+                }
+                catch(err){
+                    console.log(error);
+                    _this.$message.error(error);
+                }
+            }
+            else{
+                try{
+                    _this.prescriptionData.examinationId = _this.$route.query.examinationId;
+                    _this.prescriptionData.createdBy = _this.userInfo.data.username;
+                    const data = await _this.$axios.$post('/api/customer/createPrescription', _this.prescriptionData);
+                    if (data.success) {
+                        await _this.getPrescription();
+                        _this.$message({
+                            message: 'Lưu đơn thuốc thành công',
+                            type: 'success',
+                        });
+                    } 
+                    else {
+                        _this.$message.error(data.error);
+                    }
+                }
+                catch(err){
+                    console.log(error);
+                    _this.$message.error(error);
+                }
+            }
+            _this.dataLoading = false;
+        },
+        async getPrescription(){
+            const _this = this;
+            _this.dataLoading = true;
+            if (_this.$route.query.examinationId && _this.$route.query.examinationId != 'create') {
+                await _this.$axios.$get(`/api/customer/getPrescriptionByExaminationId/${_this.$route.query.examinationId}`).then(
+                    async (response) => {
+                        _this.prescriptionData = response.data || new Prescription();
+                        if(_this.prescriptionData.medicines && _this.prescriptionData.medicines.length > 0){
+                            _this.prescriptionData.medicines = _.map(_this.prescriptionData.medicines, (e) => {
+                                return {
+                                    ...e,
+                                    idForEdit: e._id
+                                };
+                            });
+                        }
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                        _this.prescriptionData = new Prescription();
+                    }
+                );
+            }
+            _this.dataLoading = false;
+        },
+        printPrescription(){
+            const _this = this;
+            _this.$refs.html2Pdf_prescription.generatePdf();
+        },
+        getMedicineName(value){
+            const _this = this;
+            let data = _.find(_this.medicineData, { value: value });
+			return data ? data.label : '';
+        },
+        stringToHTML(str) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(str, 'text/html');
+            console.log(doc);
+            console.log(doc.body);
+            return doc.body.textContent;
+        }
     }
 }
 </script>

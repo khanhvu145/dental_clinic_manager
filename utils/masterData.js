@@ -146,6 +146,13 @@ export const generalCategory = [
         planHolder: 'Loại chỉ định',
         active: true,
       },
+      {
+        key: 'exam_medicine',
+        label: 'Thuốc',
+        pickColor: false,
+        planHolder: 'Thuốc',
+        active: true,
+      },
     ]
   }
 ];

@@ -197,6 +197,10 @@ export default {
 											name: 'In phiếu thu',
 											value: 'printReceipt',
 										},
+                                        {
+											name: 'Thêm đơn thuốc',
+											value: 'createPrescription',
+										},
                                     ],
                                     hideDefaultRights: false,
 								},
@@ -267,18 +271,6 @@ export default {
                             ]
                         },
                         {
-                            name: 'Thiết lập',
-                            value: 'g_establish_role',
-                            pages: [
-                                {
-									name: 'Loại hình dịch vụ',
-									value: 'service',
-									customRights: [],
-                                    hideDefaultRights: false,
-								},
-                            ]
-                        },
-                        {
                             name: 'Quản lý thu chi',
                             value: 'g_receipts_payment_role',
                             pages: [
@@ -316,6 +308,18 @@ export default {
                                     ],
                                     hideDefaultRights: false,
                                 }
+                            ]
+                        },
+                        {
+                            name: 'Thiết lập',
+                            value: 'g_establish_role',
+                            pages: [
+                                {
+									name: 'Loại hình dịch vụ',
+									value: 'service',
+									customRights: [],
+                                    hideDefaultRights: false,
+								}
                             ]
                         },
                         {

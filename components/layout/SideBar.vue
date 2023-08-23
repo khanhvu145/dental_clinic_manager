@@ -68,34 +68,10 @@
             </el-submenu>
             <el-submenu 
                 v-if="
-                    checkAccessRight('service') ||
-                    checkAccessRight('medicine')
-                "
-                index="3"
-            >
-                <template slot="title">
-                    <i class='bx bxs-category-alt'></i>
-                    <span>Thiết lập</span>
-                </template>
-                <nuxt-link v-if="checkAccessRight('service')" to="/service" class="sidebar-nav-link">
-                    <el-menu-item index="service">
-                        <i class='bx bxs-category-alt'></i>
-                        <span slot="title">Loại hình dịch vụ</span>
-                    </el-menu-item>
-                </nuxt-link>
-                <nuxt-link v-if="checkAccessRight('medicine')" to="/medicine" class="sidebar-nav-link">
-                    <el-menu-item index="medicine">
-                        <i class='bx bxs-capsule'></i>
-                        <span slot="title">Thuốc men</span>
-                    </el-menu-item>
-                </nuxt-link>
-            </el-submenu>
-            <el-submenu 
-                v-if="
                     checkAccessRight('receipts') ||
                     checkAccessRight('payment')
                 "
-                index="4"
+                index="3"
             >
                 <template slot="title">
                     <i class='bx bxs-food-menu'></i>
@@ -113,6 +89,29 @@
                         <span slot="title">Phiếu chi</span>
                     </el-menu-item>
                 </nuxt-link>
+            </el-submenu>
+            <el-submenu 
+                v-if="
+                    checkAccessRight('service')
+                "
+                index="4"
+            >
+                <template slot="title">
+                    <i class='bx bxs-category-alt'></i>
+                    <span>Thiết lập</span>
+                </template>
+                <nuxt-link v-if="checkAccessRight('service')" to="/service" class="sidebar-nav-link">
+                    <el-menu-item index="service">
+                        <i class='bx bxs-category-alt'></i>
+                        <span slot="title">Loại hình dịch vụ</span>
+                    </el-menu-item>
+                </nuxt-link>
+                <!-- <nuxt-link v-if="checkAccessRight('medicine')" to="/medicine" class="sidebar-nav-link">
+                    <el-menu-item index="medicine">
+                        <i class='bx bxs-capsule'></i>
+                        <span slot="title">Thuốc men</span>
+                    </el-menu-item>
+                </nuxt-link> -->
             </el-submenu>
             <el-submenu 
                 v-if="
