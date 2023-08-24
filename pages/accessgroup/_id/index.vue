@@ -150,7 +150,18 @@ export default {
                             name: 'Báo cáo',
                             value: 'g_report_role',
                             pages: [
-
+                                {
+									name: 'Tổng quan',
+									value: 'overview',
+									customRights: [],
+                                    hideDefaultRights: false,
+								},
+                                {
+									name: 'Khách hàng',
+									value: 'customerProfile',
+									customRights: [],
+                                    hideDefaultRights: false,
+								}
                             ]
                         },
                         {
@@ -200,6 +211,10 @@ export default {
                                         {
 											name: 'Thêm đơn thuốc',
 											value: 'createPrescription',
+										},
+                                        {
+											name: 'In đơn thuốc',
+											value: 'printPrescription',
 										},
                                     ],
                                     hideDefaultRights: false,

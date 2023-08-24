@@ -56,18 +56,6 @@
                         <i class='bx bx-save' ></i>
                         <span>Lưu</span>
                     </button>
-                    <!-- <button
-                        v-if="
-                            checkRight('createPrescription') && $route.query.examinationId 
-                            && $route.query.examinationId != 'create' && formData._id && formData.status == 'approved'
-                        "
-                        type="button" 
-                        class="control-btn blue2" 
-                        @click="openDialogPrescription"
-                    >
-                        <i class='bx bxs-file-plus'></i>
-                        <span>Thêm đơn thuốc</span>
-                    </button> -->
                 </div>
             </div>
             <div class="row mt-3">
@@ -518,11 +506,11 @@
                                 <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <a v-if="formData.status == 'approved'" class="btn control-btn green" style="float:right;" @click="submitPrescription()">
+                                            <a v-if="checkRight('createPrescription') && formData.status == 'approved'" class="btn control-btn green" style="float:right;" @click="submitPrescription()">
                                                 <i class='bx bxs-file-plus'></i>
                                                 Lưu
                                             </a>
-                                            <a v-if="formData.status == 'approved' && prescriptionData && prescriptionData._id" class="btn control-btn blue2 mr-2" style="float:right;" @click="printPrescription()">
+                                            <a v-if="checkRight('printPrescription') && formData.status == 'approved' && prescriptionData && prescriptionData._id" class="btn control-btn blue2 mr-2" style="float:right;" @click="printPrescription()">
                                                 <i class='bx bx-printer'></i>
                                                 In đơn thuốc
                                             </a>
@@ -1044,41 +1032,42 @@
                             {{ prescriptionData.customerFullAddress || '' }}
                         </div>
                     </div>
-                    <div class="row mt-1">
+                    <div class="row mt-2">
                         <div v-for="item in prescriptionData.medicines" :key="item._id" class="col-md-12 mb-2">
                             <div class="row" style="font-weight:bold;">
                                 <div class="col-md-8">
-                                    {{ item.order }}/ {{ getMedicineName(item.medicine) }}
+                                    {{ item.order }}. {{ getMedicineName(item.medicine) }}
                                 </div>
                                 <div class="col-md-4">
                                     Số lượng: {{ item.quantity }}
                                 </div>
                             </div>
                             <div class="row mt-1">
-                                <div class="col-md-1"></div>
-                                <div class="col-md-11" style="font-style: italic;opacity:0.8;">
+                                <div class="col-md-12 ml-4" style="font-style: italic;opacity:0.8;">
                                     {{ item.note }}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-1">
-                        <div class="col-md-12" style="font-weight:bold;">Lời dặn:</div>
-                        <div class="col-md-12 mt-1 ml-2">
-                            {{ stringToHTML(prescriptionData.advice) }}
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-6" style="text-align:center;"></div>
-                        <div class="col-md-6" style="text-align:center;">
+                    <div class="row mt-2">
+                        <div class="col-md-7">
                             <div class="row">
+                                <div class="col-md-12" style="font-weight:bold;font-style:italic;text-decoration:underline;">Lời dặn của nha sĩ:</div>
+                                <div class="adviceContent col-md-12 mt-1 ml-2">
+                                    <div class="adviceItem">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="row mt-3" style="text-align:center;">
                                 <div class="col-md-12">
                                     Ngày {{$moment(prescriptionData.createdAt).format('DD')}} tháng {{$moment(prescriptionData.createdAt).format('MM')}} năm {{$moment(prescriptionData.createdAt).format('YYYY')}}
                                 </div>
                                 <div class="col-md-12 mt-2">
-                                    <div style="font-weight:bold;margin-bottom:52px;">Nha sĩ điều trị</div>
-                                    <div>{{ prescriptionData.dentistName }}</div>
+                                    <div style="font-weight:bold;margin-bottom:80px;">Nha sĩ điều trị</div>
+                                    <div style="font-weight:bold;">{{ prescriptionData.dentistName }}</div>
                                 </div>
                             </div>
                         </div>
@@ -1981,7 +1970,20 @@ export default {
         },
         printPrescription(){
             const _this = this;
-            _this.$refs.html2Pdf_prescription.generatePdf();
+            if(_this.prescriptionData){
+                const printEle = _this.$refs.html2Pdf_prescription.$el.querySelector(".adviceContent .adviceItem");
+                if (printEle) {
+                    printEle.remove();
+                }
+                const myElement = _this.$refs.html2Pdf_prescription.$el.querySelector(".adviceContent");
+                var divContent = document.createElement("div");
+                divContent.classList.add('adviceItem');
+                divContent.innerHTML = _this.prescriptionData.advice || '';
+                myElement.appendChild(divContent);
+                setTimeout(() => {
+                    _this.$refs.html2Pdf_prescription.generatePdf();
+                }, 500);
+            }
         },
         getMedicineName(value){
             const _this = this;
