@@ -110,17 +110,26 @@ export default {
         submitForm: debounce(async function (){
             const _this = this;
             _this.dataLoading = true;
-            _this.data.createdBy = _this.userInfo.data.username;
-            var newData = cloneDeep(_this.data);
-            const data = await _this.$axios.$post('/api/smtpConfig/createUpdate', newData);
-            if (data.success) {
+            try{
+                _this.data.createdBy = _this.userInfo.data.username;
+                var newData = cloneDeep(_this.data);
+                const data = await _this.$axios.$post('/api/smtpConfig/createUpdate', newData);
+                if (data.success) {
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.getData();
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-                    message: data.message,
-                    type: 'success',
+                    type: 'error',
+                    message: error,
                 });
-                _this.getData();
-            } else {
-                _this.$message.error(data.error);
             }
 
             _this.dataLoading = false;
@@ -136,7 +145,7 @@ export default {
 					console.log('Error: ', error);
 					_this.$message({
 						type: 'error',
-						message: 'Có lỗi xảy ra',
+						message: error,
 					});
                     _this.dataLoading = false;
 				}

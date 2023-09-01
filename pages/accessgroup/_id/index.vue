@@ -415,43 +415,54 @@ export default {
 		},
         submitForm: debounce(async function () {
 			const _this = this;
-			_this.formData.accesses = [];
-			document.getElementsByName('accessgroupkey').forEach((e) => {
-				if (e.checked) {
-					_this.formData.accesses.push(e.value);
-				}
-			});
-			if (_this.$route.params.id != 'create') {
-                _this.formData.updatedBy = _this.userInfo.data.username;
-				var newData = cloneDeep(_this.formData);
-                const data = await _this.$axios.$put('/api/accessgroup/update', newData);
-                if (data.success) {
-                    _this.formData = data.data;
-                    _this.$message({
-                        message: data.message,
-                        type: 'success',
-                    });
-                    _this.$router.push(`/accessgroup/${data.data._id}`);
-                    _this.$router.go();
-                } else {
-                    _this.$message.error(data.error);
+            _this.dataLoading = true;
+            try{
+                _this.formData.accesses = [];
+                document.getElementsByName('accessgroupkey').forEach((e) => {
+                    if (e.checked) {
+                        _this.formData.accesses.push(e.value);
+                    }
+                });
+                if (_this.$route.params.id != 'create') {
+                    _this.formData.updatedBy = _this.userInfo.data.username;
+                    var newData = cloneDeep(_this.formData);
+                    const data = await _this.$axios.$put('/api/accessgroup/update', newData);
+                    if (data.success) {
+                        _this.formData = data.data;
+                        _this.$message({
+                            message: data.message,
+                            type: 'success',
+                        });
+                        _this.$router.push(`/accessgroup/${data.data._id}`);
+                        _this.$router.go();
+                    } else {
+                        _this.$message.error(data.error);
+                    }
+                } 
+                else {
+                    _this.formData.createdBy = _this.userInfo.data.username;
+                    var newData = cloneDeep(_this.formData);
+                    const data = await _this.$axios.$post('/api/accessgroup/create', newData);
+                    if (data.success) {
+                        _this.formData = data.data;
+                        _this.$message({
+                            message: data.message,
+                            type: 'success',
+                        });
+                        _this.$router.push(`/accessgroup/${data.data._id}`);
+                    } else {
+                        _this.$message.error(data.error);
+                    }
                 }
-			} 
-            else {
-                _this.formData.createdBy = _this.userInfo.data.username;
-                var newData = cloneDeep(_this.formData);
-                const data = await _this.$axios.$post('/api/accessgroup/create', newData);
-                if (data.success) {
-                    _this.formData = data.data;
-                    _this.$message({
-                        message: data.message,
-                        type: 'success',
-                    });
-                    _this.$router.push(`/accessgroup/${data.data._id}`);
-                } else {
-                    _this.$message.error(data.error);
-                }
-			}
+            }
+            catch(error){
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: error,
+                });
+            }
+            _this.dataLoading = false;
 		}, 500),
     }
 }

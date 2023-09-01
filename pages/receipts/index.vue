@@ -8,39 +8,43 @@
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="col-form-label">Mã phiếu thu</div>
+                                <el-input placeholder="Mã phiếu thu..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-form-label">Mã phiếu khám</div>
+                                <el-input placeholder="Mã phiếu khám..." v-model="searchQuery.filters.examinationCodeF" name="examinationCodeF"></el-input>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-form-label">Khách hàng</div>
+                                <el-input placeholder="Mã, tên..." v-model="searchQuery.filters.customerF" name="customerF"></el-input>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-form-label">Ngày thanh toán</div>
+                                <el-date-picker
+                                    v-model="searchQuery.filters.dateF"
+                                    type="daterange"
+                                    range-separator="-"
+                                    start-placeholder="Ngày bắt đầu"
+                                    end-placeholder="Ngày kết thúc"
+                                    format="dd/MM/yyyy">
+                                </el-date-picker>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-form-label">Trạng thái</div>
+                                <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
+                                    <el-option label="Tất cả" value="all"></el-option>
+                                    <el-option label="Đã thanh toán" value="paid"></el-option>
+                                    <el-option label="Đã hủy" value="cancelled"></el-option>
+                                </el-select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-3">
-                        <div class="col-form-label">Mã phiếu thu</div>
-                        <el-input placeholder="Mã phiếu thu..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-form-label">Mã phiếu khám</div>
-                        <el-input placeholder="Mã phiếu khám..." v-model="searchQuery.filters.examinationCodeF" name="examinationCodeF"></el-input>
-                    </div>
-                    <div class="col-md-2">
-                         <div class="col-form-label">Khách hàng</div>
-                        <el-input placeholder="Mã, tên..." v-model="searchQuery.filters.customerF" name="customerF"></el-input>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="col-form-label">Ngày thanh toán</div>
-                        <el-date-picker
-                            v-model="searchQuery.filters.dateF"
-                            type="daterange"
-                            range-separator="-"
-                            start-placeholder="Ngày bắt đầu"
-                            end-placeholder="Ngày kết thúc"
-                            format="dd/MM/yyyy">
-                        </el-date-picker>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-form-label">Trạng thái</div>
-                        <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
-                            <el-option label="Tất cả" value="all"></el-option>
-                            <el-option label="Đã thanh toán" value="paid"></el-option>
-                            <el-option label="Đã hủy" value="cancelled"></el-option>
-                        </el-select>
-                    </div>
-                    <div class="col-md-12 mt-3">
-                        <div style="display: flex; height: 100%; align-items: end; gap: 8px; justify-content: end;">
+                        <div style="display: flex; gap: 8px;margin-top: 36px;">
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>
                             </button>
@@ -65,7 +69,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <el-dropdown :hide-on-click="false" trigger="click" style="width:100%;">
                             <el-button class="elButtonCustom" style="width:100%; text-align:left;font-weight:400;padding:12px 10px">
                                 <i class="el-icon-view el-icon--left" style="color:#C0C4CC;"></i>
@@ -422,7 +426,7 @@ export default {
                     console.log('Error: ', error);
                     _this.$message({
                         type: 'error',
-                        message: 'Có lỗi xảy ra',
+                        message: error,
                     });
                 }
             );
@@ -527,6 +531,10 @@ export default {
                 .catch((error) => {
                     _this.dataLoading = false;
                     console.log(error);
+                    _this.$message({
+                        type: 'error',
+                        message: error,
+                    });
                 });
         },
         validateInput (input) {

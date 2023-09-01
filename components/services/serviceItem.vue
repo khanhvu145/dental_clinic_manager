@@ -465,19 +465,28 @@ export default {
 		},
         submitCreateService: debounce(async function (){
             const _this = this;
-            _this.createData.createdBy = _this.userInfo.data.username;
-            var newData = cloneDeep(_this.createData);
-            const data = await _this.$axios.$post('/api/service/create', newData);
-            if (data.success) {
+            try{
+                _this.createData.createdBy = _this.userInfo.data.username;
+                var newData = cloneDeep(_this.createData);
+                const data = await _this.$axios.$post('/api/service/create', newData);
+                if (data.success) {
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.dialogCreateService = false;
+                    _this.createData = new Service(),
+                    _this.getData(_this.searchQuery);
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-                    message: data.message,
-                    type: 'success',
+                    type: 'error',
+                    message: error,
                 });
-                _this.dialogCreateService = false;
-                _this.createData = new Service(),
-                _this.getData(_this.searchQuery);
-            } else {
-                _this.$message.error(data.error);
             }
         }),
         async getData(searchQuery){
@@ -492,7 +501,7 @@ export default {
 					console.log('Error: ', error);
 					_this.$message({
 						type: 'error',
-						message: 'Có lỗi xảy ra',
+						message: error,
 					});
                     _this.dataLoading = false;
 				}
@@ -550,18 +559,27 @@ export default {
         },
         submitUpdateService: debounce(async function (){
             const _this = this;
-            _this.updateData.updatedBy = _this.userInfo.data.username;
-            var newData = cloneDeep(_this.updateData);
-            const data = await _this.$axios.$put('/api/service/update', newData);
-            if (data.success) {
-                _this.updateData = data.data;
+            try{
+                _this.updateData.updatedBy = _this.userInfo.data.username;
+                var newData = cloneDeep(_this.updateData);
+                const data = await _this.$axios.$put('/api/service/update', newData);
+                if (data.success) {
+                    _this.updateData = data.data;
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.getData(_this.searchQuery);
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-                    message: data.message,
-                    type: 'success',
+                    type: 'error',
+                    message: error,
                 });
-                _this.getData(_this.searchQuery);
-            } else {
-                _this.$message.error(data.error);
             }
         }),
         openCreateDialog(){

@@ -235,7 +235,7 @@ export default {
 					console.log('Error: ', error);
 					_this.$message({
 						type: 'error',
-						message: 'Có lỗi xảy ra',
+						message: error,
 					});
                     _this.dataLoading = false;
 				}

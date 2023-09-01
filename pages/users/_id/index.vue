@@ -325,46 +325,53 @@ export default {
         submitForm: debounce(async function () {
             const _this = this;
             _this.dataLoading = true;
-            
-            if (_this.$route.params.id != 'create') {
-                _this.formData.updatedBy = _this.userInfo.data.username;
-				var oldData = cloneDeep(_this.formData);
-                var newData = new FormData();
-                buildFormData(newData, oldData);
-                const data = await _this.$axios.$put('/api/user/update', newData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
-                if (data.success) {
-                    _this.formData = data.data;
-                    _this.$message({
-                        message: data.message,
-                        type: 'success',
+            try{
+                if (_this.$route.params.id != 'create') {
+                    _this.formData.updatedBy = _this.userInfo.data.username;
+                    var oldData = cloneDeep(_this.formData);
+                    var newData = new FormData();
+                    buildFormData(newData, oldData);
+                    const data = await _this.$axios.$put('/api/user/update', newData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
                     });
-                    _this.$router.push(`/users/${data.data._id}`);
-                } else {
-                    _this.$message.error(data.error);
+                    if (data.success) {
+                        _this.formData = data.data;
+                        _this.$message({
+                            message: data.message,
+                            type: 'success',
+                        });
+                        _this.$router.push(`/users/${data.data._id}`);
+                    } else {
+                        _this.$message.error(data.error);
+                    }
+                }
+                else{
+                    _this.formData.createdBy = _this.userInfo.data.username;
+                    var oldData = cloneDeep(_this.formData);
+                    var newData = new FormData();
+                    buildFormData(newData, oldData);
+                    const data = await _this.$axios.$post('/api/user/create', newData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                    if (data.success) {
+                        _this.formData = data.data;
+                        _this.$message({
+                            message: data.message,
+                            type: 'success',
+                        });
+                        _this.$router.push(`/users/${data.data._id}`);
+                    } else {
+                        _this.$message.error(data.error);
+                    }
                 }
             }
-            else{
-                _this.formData.createdBy = _this.userInfo.data.username;
-                var oldData = cloneDeep(_this.formData);
-                var newData = new FormData();
-                buildFormData(newData, oldData);
-                const data = await _this.$axios.$post('/api/user/create', newData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+            catch(error){
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: error,
                 });
-                if (data.success) {
-                    _this.formData = data.data;
-                    _this.$message({
-                        message: data.message,
-                        type: 'success',
-                    });
-                    _this.$router.push(`/users/${data.data._id}`);
-                } else {
-                    _this.$message.error(data.error);
-                }
             }
-
             _this.dataLoading = false;
         })
     }

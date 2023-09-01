@@ -74,7 +74,7 @@
                     <div class="col-md-5 mt-2"></div>
                     <div class="col-md-2">
                         <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                            <button class="control-btn blue" @click="$router.push('/users/create')">
+                            <button v-if="checkRight('create')" class="control-btn blue" @click="$router.push('/users/create')">
                                 <i class='bx bx-plus' ></i>
                                 Thêm
                             </button>
@@ -276,7 +276,7 @@ export default {
 					console.log('Error: ', error);
 					_this.$message({
 						type: 'error',
-						message: 'Có lỗi xảy ra',
+						message: error,
 					});
                     _this.dataLoading = false;
 				}

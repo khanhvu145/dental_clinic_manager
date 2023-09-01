@@ -225,3 +225,17 @@ a:hover {
 .inputTextRight input{
     text-align: right;
 }
+
+.avatar-title {
+	align-items: center;
+	color: #fff;
+	display: flex !important;
+	height: 100%;
+	justify-content: center;
+	width: 100%;
+}
+
+.avatar-lg {
+    height: 4.5rem;
+    width: 4.5rem;
+}

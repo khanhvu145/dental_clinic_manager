@@ -328,19 +328,28 @@ export default {
 		},
         submitCreateServiceGroup: debounce(async function (){
             const _this = this;
-            _this.createDataGroup.createdBy = _this.userInfo.data.username;
-            var newData = cloneDeep(_this.createDataGroup);
-            const data = await _this.$axios.$post('/api/service/groupCreate', newData);
-            if (data.success) {
+            try{
+                _this.createDataGroup.createdBy = _this.userInfo.data.username;
+                var newData = cloneDeep(_this.createDataGroup);
+                const data = await _this.$axios.$post('/api/service/groupCreate', newData);
+                if (data.success) {
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.dialogCreateServiceGroup = false;
+                    _this.createDataGroup = new ServiceGroup();
+                    _this.getData(_this.searchQueryGroup);
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-                    message: data.message,
-                    type: 'success',
+                    type: 'error',
+                    message: error,
                 });
-                _this.dialogCreateServiceGroup = false;
-                _this.createDataGroup = new ServiceGroup();
-                _this.getData(_this.searchQueryGroup);
-            } else {
-                _this.$message.error(data.error);
             }
         }),
         async getData(searchQueryGroup){
@@ -355,7 +364,7 @@ export default {
 					console.log('Error: ', error);
 					_this.$message({
 						type: 'error',
-						message: 'Có lỗi xảy ra',
+						message: error,
 					});
                     _this.dataLoading = false;
 				}
@@ -412,18 +421,27 @@ export default {
         },
         submitUpdateServiceGroup: debounce(async function (){
             const _this = this;
-            _this.updateDataGroup.updatedBy = _this.userInfo.data.username;
-            var newData = cloneDeep(_this.updateDataGroup);
-            const data = await _this.$axios.$put('/api/service/groupUpdate', newData);
-            if (data.success) {
-                _this.updateDataGroup = data.data;
+            try{
+                _this.updateDataGroup.updatedBy = _this.userInfo.data.username;
+                var newData = cloneDeep(_this.updateDataGroup);
+                const data = await _this.$axios.$put('/api/service/groupUpdate', newData);
+                if (data.success) {
+                    _this.updateDataGroup = data.data;
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.getData(_this.searchQueryGroup);
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-                    message: data.message,
-                    type: 'success',
+                    type: 'error',
+                    message: error,
                 });
-                _this.getData(_this.searchQueryGroup);
-            } else {
-                _this.$message.error(data.error);
             }
         }),
     }

@@ -128,7 +128,7 @@ export default {
                 console.log('Error: ', error);
                 _this.$message({
                     type: 'error',
-                    message: 'Có lỗi xảy ra',
+                    message: error,
                 });
                 _this.dataLoading = false;
             }
@@ -163,7 +163,7 @@ export default {
                     console.log('Error: ', error);
                     _this.$message({
                         type: 'error',
-                        message: 'Có lỗi xảy ra',
+                        message: error,
                     });
                     _this.dataLoading = false;
                 }
@@ -171,31 +171,42 @@ export default {
         },
         onSaveGeneralConfig: debounce(async function (type) {
             const _this = this;
-            var isValid = true;
-            _this.data[type].forEach(function (item) {
-                if (item.value === '') {
-					isValid = false;
-				}
-            })
-
-            if(isValid) {
-                const response = await _this.$axios.post('/api/generalconfig/update', _this.data[type]);
-                if (response.data.success) {
-					_this.$message({
-						message: response.data.message,
-						type: 'success',
-					});
-					_this.data[type] = response.data.data;
-				} else {
-					_this.$message.error(response.data.error);
-				}
+            _this.dataLoading = true;
+            try{
+                var isValid = true;
+                _this.data[type].forEach(function (item) {
+                    if (item.value === '') {
+                        isValid = false;
+                    }
+                })
+    
+                if(isValid) {
+                    const response = await _this.$axios.post('/api/generalconfig/update', _this.data[type]);
+                    if (response.data.success) {
+                        _this.$message({
+                            message: response.data.message,
+                            type: 'success',
+                        });
+                        _this.data[type] = response.data.data;
+                    } else {
+                        _this.$message.error(response.data.error);
+                    }
+                }
+                else {
+                    _this.$message({
+                        type: 'error',
+                        message: 'Vui lòng nhập đầy đủ thông tin',
+                    });
+                }
             }
-            else {
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-					type: 'error',
-					message: 'Vui lòng nhập đầy đủ thông tin',
-				});
+                    type: 'error',
+                    message: error,
+                });
             }
+            _this.dataLoading = false;
         })
     }
 }

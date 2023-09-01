@@ -680,7 +680,7 @@ export default {
                     console.log('Error: ', error);
                     _this.$message({
                         type: 'error',
-                        message: 'Có lỗi xảy ra',
+                        message: error,
                     });
                 }
             );
@@ -693,19 +693,28 @@ export default {
         },
         submitCreatePayment: debounce(async function (){
             const _this = this;
-            _this.dialogPayment.data.createdBy = _this.userInfo.data.username;
-            var newData = cloneDeep(_this.dialogPayment.data);
-            const data = await _this.$axios.$post('/api/paymentSlip/create', newData);
-            if (data.success) {
+            try{
+                _this.dialogPayment.data.createdBy = _this.userInfo.data.username;
+                var newData = cloneDeep(_this.dialogPayment.data);
+                const data = await _this.$axios.$post('/api/paymentSlip/create', newData);
+                if (data.success) {
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    _this.dialogPayment.visible = false;
+                    _this.dialogPayment.data = new PaymentSlip();
+                    _this.getData(_this.searchQuery);
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
                 _this.$message({
-                    message: data.message,
-                    type: 'success',
+                    type: 'error',
+                    message: error,
                 });
-                _this.dialogPayment.visible = false;
-                _this.dialogPayment.data = new PaymentSlip();
-                _this.getData(_this.searchQuery);
-            } else {
-                _this.$message.error(data.error);
             }
         }),
         getSummaries(param){
@@ -805,7 +814,7 @@ export default {
                         console.log('Error: ', error);
                         _this.$message({
                             type: 'error',
-                            message: 'Có lỗi xảy ra',
+                            message: error,
                         });
                     }
                 );
