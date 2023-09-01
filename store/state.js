@@ -1,5 +1,6 @@
 const state = {
   accesses: [],
+  informationConfig: {},
   socketUser: null,
 }
 

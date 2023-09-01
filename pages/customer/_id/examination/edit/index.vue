@@ -9,7 +9,7 @@
                     </button>
                     <button
                         v-if="
-                            checkRight('printExamination') && $route.query.examinationId 
+                            checkRight('cancelExamination') && $route.query.examinationId 
                             && $route.query.examinationId != 'create' && formData._id && formData.status != 'cancelled'
                         "
                         type="button" 
@@ -604,7 +604,7 @@
                     </button>
                     <button
                         v-if="
-                            checkRight('printExamination') && $route.query.examinationId 
+                            checkRight('cancelExamination') && $route.query.examinationId 
                             && $route.query.examinationId != 'create' && formData._id && formData.status != 'cancelled'
                         "
                         type="button" 
@@ -674,30 +674,32 @@
             <section slot="pdf-content">
                 <div v-if="printData && printData._id" class="container mt-3" style="color:#000;font-size:13px;">
                     <div class="row">
-                        <div class="col-md-3">
-                            <el-image
-                                style="width: 100%; height: auto"
-                                src="/images/logoclinic.png"
-                                fit="cover">
-                            </el-image>
+                        <div class="col-md-2">
+                            <img style="width:100%;height:auto;object-fit: cover;" :src="informationConfig.img" crossorigin="anonymous" />
                         </div>
-                        <div class="col-md-9">
-                            <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
-                            <div class="mt-3">
-                                <span style="font-weight:bold;">Địa chỉ:</span>
-                                <span>Quận 3, HCM</span>
-                            </div>
-                            <div class="mt-2">
-                                <span style="font-weight:bold;">Số điện thoại:</span>
-                                <span>0703260457</span>
-                            </div>
-                            <div class="mt-2">
-                                <span style="font-weight:bold;">Email:</span>
-                                <span>dentalclinic@gmail.com</span>
-                            </div>
-                            <div class="mt-2">
-                                <span style="font-weight:bold;">Website:</span>
-                                <span>https://www.google.com</span>
+                        <div class="col-md-10">
+                            <div style="font-weight:bold;font-size:16px;text-transform: uppercase;">{{ informationConfig.name }}</div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Số điện thoại:</span>
+                                        <span>{{ informationConfig.phone }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Địa chỉ:</span>
+                                        <span>{{ informationConfig.address }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Email:</span>
+                                        <span>{{ informationConfig.email }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Website:</span>
+                                        <span>{{ informationConfig.website }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -968,36 +970,32 @@
             <section slot="pdf-content">
                 <div v-if="prescriptionData && prescriptionData._id" class="container mt-3" style="color:#000;font-size:13px;">
                     <div class="row">
-                        <div class="col-md-3">
-                            <el-image
-                                style="width: 100%; height: auto"
-                                src="/images/logoclinic.png"
-                                fit="cover">
-                            </el-image>
+                        <div class="col-md-2">
+                            <img style="width:100%;height:auto;object-fit: cover;" :src="informationConfig.img" crossorigin="anonymous" />
                         </div>
-                        <div class="col-md-9">
-                            <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
-                            <div class="mt-2">
-                                <span style="font-weight:bold;">Địa chỉ:</span>
-                                <span>Quận 3, HCM</span>
-                            </div>
+                        <div class="col-md-10">
+                            <div style="font-weight:bold;font-size:16px;text-transform: uppercase;">{{ informationConfig.name }}</div>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="mt-2">
-                                        <span style="font-weight:bold;">SĐT:</span>
-                                        <span>0703260457</span>
+                                        <span style="font-weight:bold;">Số điện thoại:</span>
+                                        <span>{{ informationConfig.phone }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Địa chỉ:</span>
+                                        <span>{{ informationConfig.address }}</span>
                                     </div>
                                 </div>
-                                <div class="col-md-8">
+                                <div class="col-md-6">
                                     <div class="mt-2">
                                         <span style="font-weight:bold;">Email:</span>
-                                        <span>dentalclinic@gmail.com</span>
+                                        <span>{{ informationConfig.email }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Website:</span>
+                                        <span>{{ informationConfig.website }}</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-2">
-                                <span style="font-weight:bold;">Website:</span>
-                                <span>https://www.google.com</span>
                             </div>
                         </div>
                     </div>
@@ -1104,6 +1102,7 @@ export default {
 		...mapState({
 			accesses: (state) => state.accesses,
             userInfo: (state) => state.auth.user,
+            informationConfig: (state) => state.informationConfig,
 		}),
 	},
     data(){

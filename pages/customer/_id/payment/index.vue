@@ -438,33 +438,29 @@
                     <div v-if="receiptsData && receiptsData._id" class="container mt-3" style="color:#000;font-size:13px;">
                         <div class="row">
                             <div class="col-md-2">
-                                <el-image
-                                    style="width: 100%; height: auto"
-                                    src="/images/logoclinic.png"
-                                    fit="cover">
-                                </el-image>
+                                <img style="width:100%;height:auto;object-fit: cover;" :src="informationConfig.img" crossorigin="anonymous" />
                             </div>
                             <div class="col-md-10">
-                                <div style="font-weight:bold;font-size:16px;">NHA KHOA AN TÂM</div>
+                                <div style="font-weight:bold;font-size:16px;text-transform: uppercase;">{{ informationConfig.name }}</div>
                                 <div class="row">
                                     <div class="col-md-5">
-                                        <div class="mt-3">
-                                            <span style="font-weight:bold;">Địa chỉ:</span>
-                                            <span>Quận 3, HCM</span>
-                                        </div>
                                         <div class="mt-2">
                                             <span style="font-weight:bold;">Số điện thoại:</span>
-                                            <span>0703260457</span>
+                                            <span>{{ informationConfig.phone }}</span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span style="font-weight:bold;">Địa chỉ:</span>
+                                            <span>{{ informationConfig.address }}</span>
                                         </div>
                                     </div>
                                     <div class="col-md-5">
                                         <div class="mt-2">
                                             <span style="font-weight:bold;">Email:</span>
-                                            <span>dentalclinic@gmail.com</span>
+                                            <span>{{ informationConfig.email }}</span>
                                         </div>
                                         <div class="mt-2">
                                             <span style="font-weight:bold;">Website:</span>
-                                            <span>https://www.google.com</span>
+                                            <span>{{ informationConfig.website }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -593,6 +589,7 @@ export default {
 		...mapState({
 			accesses: (state) => state.accesses,
             userInfo: (state) => state.auth.user,
+            informationConfig: (state) => state.informationConfig,
 		}),
 	},
     data(){

@@ -154,6 +154,12 @@
                         <span slot="title">Cấu hình chung</span>
                     </el-menu-item>
                 </nuxt-link>
+                <nuxt-link v-if="checkAccessRight('informationConfig')" to="/informationConfig" class="sidebar-nav-link">
+                    <el-menu-item index="informationConfig">
+                        <i class='bx bxs-info-circle'></i>
+                        <span slot="title">Cấu hình thông tin</span>
+                    </el-menu-item>
+                </nuxt-link>
                 <nuxt-link v-if="checkAccessRight('smtpConfig')" to="/smtpConfig" class="sidebar-nav-link">
                     <el-menu-item index="smtpConfig">
                         <i class='bx bxs-envelope'></i>

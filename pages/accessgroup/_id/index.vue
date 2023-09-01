@@ -366,6 +366,12 @@ export default {
                                     hideDefaultRights: false,
 								},
                                 {
+                                    name: 'Cấu hình thông tin',
+									value: 'informationConfig',
+                                    customRights: [],
+                                    hideDefaultRights: false,
+                                },
+                                {
                                     name: 'Cấu hình SMTP',
 									value: 'smtpConfig',
                                     customRights: [],

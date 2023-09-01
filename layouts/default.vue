@@ -21,6 +21,7 @@ export default {
   async created() {
 		const _this = this;
 		await _this.$store.dispatch('getAccesses');
+		await _this.$store.dispatch('getInformationConfig');
 	},
   // beforeUnmount() {
   //   SocketioService.disconnect();
