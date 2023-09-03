@@ -66,6 +66,7 @@
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>
+
             <el-submenu 
                 v-if="
                     checkAccessRight('receipts') ||
@@ -164,6 +165,26 @@
                     <el-menu-item index="smtpConfig">
                         <i class='bx bxs-envelope'></i>
                         <span slot="title">Cấu hình SMTP</span>
+                    </el-menu-item>
+                </nuxt-link>
+            </el-submenu>
+            <el-submenu 
+                v-if="
+                    checkAccessRight('register') ||
+                    checkAccessRight('appointment') ||
+                    checkAccessRight('workingCalendar') ||
+                    checkAccessRight('appointmentConfig')
+                "
+                index="7"
+            >
+                <template slot="title">
+                    <i class='bx bxs-calendar-event'></i>
+                    <span>Lịch hẹn V2</span>
+                </template>
+                <nuxt-link v-if="checkAccessRight('appointmentConfig')" to="/appointmentConfigV2" class="sidebar-nav-link">
+                    <el-menu-item index="appointmentConfigV2">
+                        <i class='bx bxs-cog'></i>
+                        <span slot="title">Cấu hình lịch hẹn</span>
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>

@@ -968,13 +968,13 @@
             ref="html2Pdf_prescription"
         >
             <section slot="pdf-content">
-                <div v-if="prescriptionData && prescriptionData._id" class="container mt-3" style="color:#000;font-size:13px;">
+                <div v-if="prescriptionData && prescriptionData._id" class="container mt-3" style="color:#000;font-size:12px;">
                     <div class="row">
                         <div class="col-md-2">
                             <img style="width:100%;height:auto;object-fit: cover;" :src="informationConfig.img" crossorigin="anonymous" />
                         </div>
                         <div class="col-md-10">
-                            <div style="font-weight:bold;font-size:16px;text-transform: uppercase;">{{ informationConfig.name }}</div>
+                            <div style="font-weight:bold;font-size:15px;text-transform: uppercase;">{{ informationConfig.name }}</div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mt-2">
@@ -1002,7 +1002,7 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-12 text-center">
-                            <div style="font-weight:bold;font-size:16px;">ĐƠN THUỐC</div>
+                            <div style="font-weight:bold;font-size:15px;">ĐƠN THUỐC</div>
                         </div>
                         <div class="col-md-12 mt-1">
                             <div class="text-right">Mã phiếu khám: {{prescriptionData.examinationCode}}</div>

@@ -492,7 +492,7 @@
                         <hr>
                         <div class="row">
                             <div class="col-md-12 text-center">
-                                <div style="font-weight:bold;font-size:20px;">PHIẾU CHI</div>
+                                <div style="font-weight:bold;font-size:18px;">PHIẾU CHI</div>
                             </div>
                             <div class="col-md-12 mt-2 text-center">
                                 <div class="row">

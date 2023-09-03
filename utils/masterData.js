@@ -192,6 +192,29 @@ export const appointmentStatus = [
   }
 ];
 
+export const appointmentStatusV2 = [
+  {
+    label: 'Mới',
+    value: 'new',
+  },
+  {
+    label: 'Đã đến',
+    value: 'arrived',
+  },
+  {
+    label: 'Không đến',
+    value: 'notarrived',
+  },
+  {
+    label: 'Hoàn thành',
+    value: 'completed',
+  },
+  {
+    label: 'Đã hủy',
+    value: 'cancelled',
+  },
+]
+
 export const anamnesisList = [
   {
     label: 'Chảy máu lâu',
