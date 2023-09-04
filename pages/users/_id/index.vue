@@ -201,7 +201,7 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-md-4">
+                                    <!-- <div class="col-md-4">
                                         <div class="col-form-label">Chức vụ</div>
                                         <el-select v-model="formData.position" placeholder="Chức vụ" name="position">
                                             <el-option
@@ -211,8 +211,8 @@
                                                 :value="item.value"
                                             ></el-option>
                                         </el-select>
-                                    </div>
-                                    <div class="col-md-4">
+                                    </div> -->
+                                    <div class="col-md-6">
                                         <div class="col-form-label">Nhóm người dùng *</div>
                                         <el-select v-model="formData.accessId" placeholder="Quyền tài khoản" name="accessId">
                                             <el-option
@@ -223,7 +223,13 @@
                                             ></el-option>
                                         </el-select>
                                     </div>
-                                    <div class="col-md-4" style="display: flex; align-items: center;">
+                                    <div class="col-md-3" style="display: flex; align-items: center;">
+                                        <div class="mt-4">
+                                            <el-switch v-model="formData.isDentist" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                            Nha sĩ
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" style="display: flex; align-items: center;">
                                         <div class="mt-4">
                                             <el-switch v-model="formData.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                                             Hoạt động

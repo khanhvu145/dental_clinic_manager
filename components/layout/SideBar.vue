@@ -170,7 +170,6 @@
             </el-submenu>
             <el-submenu 
                 v-if="
-                    checkAccessRight('register') ||
                     checkAccessRight('appointment') ||
                     checkAccessRight('workingCalendar') ||
                     checkAccessRight('appointmentConfig')
@@ -181,6 +180,12 @@
                     <i class='bx bxs-calendar-event'></i>
                     <span>Lịch hẹn V2</span>
                 </template>
+                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointmentBooking" class="sidebar-nav-link">
+                    <el-menu-item index="appointmentBooking">
+                        <i class='bx bxs-calendar-plus'></i>
+                        <span slot="title">Đặt lịch hẹn</span>
+                    </el-menu-item>
+                </nuxt-link>
                 <nuxt-link v-if="checkAccessRight('appointmentConfig')" to="/appointmentConfigV2" class="sidebar-nav-link">
                     <el-menu-item index="appointmentConfigV2">
                         <i class='bx bxs-cog'></i>

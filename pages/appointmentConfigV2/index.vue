@@ -375,7 +375,7 @@ export default {
                         ]
                     },
                     {
-                        key: 7,
+                        key: 0,
                         label: 'Chủ nhật',
                         active: false,
                         session: []

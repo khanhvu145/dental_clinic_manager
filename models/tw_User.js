@@ -20,5 +20,6 @@ export default function() {
 	this.img = '';
 	this.imageFile = null;
     this.accessId = '';
-    this.position = '';
+    // this.position = '';
+	this.isDentist = false;
 }
