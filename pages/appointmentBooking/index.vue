@@ -319,6 +319,7 @@ export default {
             const _this = this;
             _this.dataLoading = true;
             try{
+                console.log(_this.data)
                 var newData = cloneDeep(_this.data);
                 const response = await _this.$axios.$post('/api/appointmentBooking/create', newData);
                 if (response.success) {
@@ -414,6 +415,7 @@ export default {
             _this.data.date = new Date(moment(e.start).format('YYYY/MM/DD'));
             _this.data.timeFrom = moment(e.start).format('HH:mm');
             _this.data.timeTo = moment(e.end).format('HH:mm');
+            _this.data.session = e.session;
             _this.dialogViewEmptyCalendar.visible = false;
         },
         cancelForm(){

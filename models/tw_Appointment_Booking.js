@@ -10,5 +10,6 @@ export default function() {
     this.status = 'new';
     this.note = '';
 	this.content = '';
+	this.session = '';
 	this.mainCustomer = new Customer();
 }

@@ -294,7 +294,7 @@ export default {
 
             var fullAddress = building + " " + ward + " " + district + " " + province;
 
-            return fullAddress;
+            return fullAddress.trim();
         }
      }
 }

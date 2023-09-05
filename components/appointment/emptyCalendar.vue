@@ -381,6 +381,7 @@ export default {
                 }
             }).then((action) => {
                 if(action === 'confirm'){
+                    clickInfo.session = _this.tabActive;
                     _this.$emit('selectEmptyCalendar', clickInfo);
                 }
             });
