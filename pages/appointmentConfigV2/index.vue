@@ -160,6 +160,20 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3">
+                                        <div class="col-form-label">Thời gian</div>
+                                        <el-time-select
+                                            class="w-100"
+                                            v-model="AUTO_REMIND_TIME.value"
+                                            :picker-options="{
+                                                start: '00:00',
+                                                step: '00:30',
+                                                end: '23:30',
+                                            }"
+                                            placeholder="Chọn thời gian"
+                                            :disabled="AUTO_REMIND_DURATION_TYPE.value != 'day'"
+                                        ></el-time-select>
+                                    </div>
+                                    <div class="col-md-3">
                                         <div class="col-form-label">Gửi đến</div>
                                         <el-select v-model="AUTO_REMIND_TYPE.value">
                                             <el-option label="Email" value="email"></el-option>
@@ -390,6 +404,10 @@ export default {
                 key: 'AUTO_REMIND_DURATION',
                 value: "1",
             },
+            AUTO_REMIND_TIME: {
+                key: 'AUTO_REMIND_TIME',
+                value: "07:00",
+            },
             AUTO_REMIND_DURATION_TYPE: {
                 key: 'AUTO_REMIND_DURATION_TYPE',
                 value: "day",
@@ -477,6 +495,7 @@ export default {
                     _this.AUTO_REMIND_APPLY,
                     _this.AUTO_REMIND_DURATION,
                     _this.AUTO_REMIND_DURATION_TYPE,
+                    _this.AUTO_REMIND_TIME,
                     _this.AUTO_REMIND_TYPE,
                     {
                         key: _this.DISPLAY_CONFIG_NEW.key,
@@ -560,6 +579,7 @@ export default {
                     _this.AUTO_REMIND_APPLY.key,
                     _this.AUTO_REMIND_DURATION.key,
                     _this.AUTO_REMIND_DURATION_TYPE.key,
+                    _this.AUTO_REMIND_TIME.key,
                     _this.AUTO_REMIND_TYPE.key,
                     _this.DISPLAY_CONFIG_NEW.key,
                     _this.DISPLAY_CONFIG_ARRIVED.key,
@@ -593,6 +613,9 @@ export default {
                     });
                     _this.AUTO_REMIND_DURATION_TYPE = _.find(configs, f => {
                         return f.key === _this.AUTO_REMIND_DURATION_TYPE.key;
+                    });
+                    _this.AUTO_REMIND_TIME = _.find(configs, f => {
+                        return f.key === _this.AUTO_REMIND_TIME.key;
                     });
                     _this.AUTO_REMIND_TYPE = _.find(configs, f => {
                         return f.key === _this.AUTO_REMIND_TYPE.key;

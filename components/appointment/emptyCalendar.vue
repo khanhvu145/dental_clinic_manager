@@ -88,6 +88,10 @@ export default {
         diaglogVisible: {
 			type: Boolean,
 			default: false
+		},
+        currentId: {
+			type: String,
+			default: null
 		}
     },
     watch: {
@@ -99,6 +103,7 @@ export default {
                     _this.searchQuery = {
                         dentistsF: [],
                         dateF: new Date(),
+                        currentId: _this.currentId
                     };
                     await _this.getAppointmentConfig();
                     await _this.changeCurrentDate();
@@ -114,6 +119,7 @@ export default {
             searchQuery: {
                 dentistsF: [],
                 dateF: new Date(),
+                currentId: null
             },
             dentistData: [],
             calendarOptions: {
@@ -144,7 +150,7 @@ export default {
                 expandRows: true,
                 scrollTime: moment().format('HH:mm:ss'),
                 events: [],
-                slotDuration: "00:05:00",
+                slotDuration: "00:15:00",
                 slotMinTime: "00:00:00",
                 slotMaxTime: "12:00:00",
 				slotLabelInterval: "00:15:00",
@@ -180,7 +186,7 @@ export default {
                 expandRows: true,
                 scrollTime: moment().format('HH:mm:ss'),
                 events: [],
-                slotDuration: "00:05:00",
+                slotDuration: "00:15:00",
                 slotMinTime: "12:00:00",
                 slotMaxTime: "24:00:00",
 				slotLabelInterval: "00:15:00",
@@ -193,6 +199,13 @@ export default {
             data: [],
             morningDisabled: false,
             affternoonDisabled: false,
+            viewConfig: {
+                new: {},
+                arrived: {},
+                notArrived: {},
+                completed: {},
+                cancelled: {}
+            }
         }
     },
     async created() { 
@@ -239,6 +252,41 @@ export default {
                 _this.calendarOptions.hiddenDays = _this.dayOff;
                 _this.calendarOptions2.hiddenDays = _this.dayOff;
             });
+            
+            const viewConfigs = await _this.$axios.$post(`/api/appointmentConfig/getDataByListKey`, [
+                'DISPLAY_CONFIG_NEW',
+                'DISPLAY_CONFIG_ARRIVED',
+                'DISPLAY_CONFIG_NOTARRIVED',
+                'DISPLAY_CONFIG_COMPLETED',
+                'DISPLAY_CONFIG_CANCELLED'
+            ]);
+            if(viewConfigs && viewConfigs.length > 0){
+                _this.viewConfig.new = _.find(viewConfigs, f => {
+                    return f.key === 'DISPLAY_CONFIG_NEW';
+                });
+                _this.viewConfig.new.value = JSON.parse(_this.viewConfig.new.value);
+
+                _this.viewConfig.arrived = _.find(viewConfigs, f => {
+                    return f.key === 'DISPLAY_CONFIG_ARRIVED';
+                });
+                _this.viewConfig.arrived.value = JSON.parse(_this.viewConfig.arrived.value);
+
+                _this.viewConfig.notArrived = _.find(viewConfigs, f => {
+                    return f.key === 'DISPLAY_CONFIG_NOTARRIVED';
+                });
+                _this.viewConfig.notArrived.value = JSON.parse(_this.viewConfig.notArrived.value);
+
+                _this.viewConfig.completed = _.find(viewConfigs, f => {
+                    return f.key === 'DISPLAY_CONFIG_COMPLETED';
+                });
+                _this.viewConfig.completed.value = JSON.parse(_this.viewConfig.completed.value);
+
+                _this.viewConfig.cancelled = _.find(viewConfigs, f => {
+                    return f.key === 'DISPLAY_CONFIG_CANCELLED';
+                });
+                _this.viewConfig.cancelled.value = JSON.parse(_this.viewConfig.cancelled.value);
+            }
+
             _this.dataLoading = false;
         },
         disabledDate(date){
@@ -345,6 +393,66 @@ export default {
                 }
             });
 
+            // Lấy danh sách lịch hẹn
+            await _this.$axios.$post('/api/appointmentBooking/getEmptyCalendar', _this.searchQuery).then(
+                (response) => {
+                    if(response.data.length > 0){
+                        var dataMorning = response.data.filter(f => {
+                            return f.session == 'morning';
+                        });
+                        if(dataMorning && dataMorning.length > 0){
+                            _this.calendarOptions.events = _.map(dataMorning, item => {
+                                var config = _this.getValueViewConfig(item.status);
+                                return { 
+                                    resourceId: item.dentistId,
+                                    start: item.dateTimeFrom,
+                                    end: item.dateTimeTo,
+                                    color: config ? config.backgroundColor : '#8fdf82',
+                                    textColor: config ? config.textColor : '#fff',
+                                    borderColor: config ? config.borderColor : '#8fdf82',
+                                    extendedProps: item
+                                }
+                            });
+                        }
+                        else{
+                            _this.calendarOptions.events = [];
+                        }
+
+                        var dataAfternoon = response.data.filter(f => {
+                            return f.session == 'afternoon';
+                        });
+                        if(dataAfternoon && dataAfternoon.length > 0){
+                            _this.calendarOptions2.events = _.map(dataAfternoon, item => {
+                                var config = _this.getValueViewConfig(item.status);
+                                return { 
+                                    resourceId: item.dentistId,
+                                    start: item.dateTimeFrom,
+                                    end: item.dateTimeTo,
+                                    color: config ? config.backgroundColor : '#8fdf82',
+                                    textColor: config ? config.textColor : '#fff',
+                                    borderColor: config ? config.borderColor : '#8fdf82',
+                                    extendedProps: item
+                                }
+                            });
+                        }
+                        else{
+                            _this.calendarOptions2.events = [];
+                        }
+                    }
+                    else{
+                        _this.calendarOptions.events = [];
+                        _this.calendarOptions2.events = [];
+                    }
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: error,
+                    });
+                }
+            );
+
             _this.dataLoading = false;
         },
         handleSelectDate(clickInfo){
@@ -385,6 +493,27 @@ export default {
                     _this.$emit('selectEmptyCalendar', clickInfo);
                 }
             });
+        },
+        getValueViewConfig(type){
+            const _this = this;
+            switch(type) {
+                case 'new':
+                    return _this.viewConfig.new.value;
+                case 'arrived':
+                    return _this.viewConfig.arrived.value;
+                case 'notarrived':
+                    return _this.viewConfig.notArrived.value;
+                case 'completed':
+                    return _this.viewConfig.completed.value;
+                case 'cancelled':
+                    return _this.viewConfig.cancelled.value;
+                default:
+                    return {
+                        textColor: '#fff',
+                        backgroundColor: '#8fdf82',
+                        borderColor: '#8fdf82',
+                    }
+            }
         }
     }
 }
