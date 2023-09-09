@@ -19,9 +19,9 @@
                                             <div class="col-md-12">
                                                 <div class="col-form-label">Khách hàng *</div>
                                                 <div class="row">
-                                                    <div class="col-md-8">
+                                                    <div class="col-sm-9 col-md-8">
                                                         <el-select 
-                                                            v-model="data.mainCustomer._id" 
+                                                            v-model="customerSelected" 
                                                             placeholder="Chọn khách hàng" 
                                                             name="customerId" 
                                                             style="width: 100%"
@@ -40,7 +40,7 @@
                                                             ></el-option>
                                                         </el-select>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-sm-3 col-md-4">
                                                         <button
                                                             type="button" 
                                                             class="control-btn blue"
@@ -112,6 +112,15 @@
                                                     ></el-option>
                                                 </el-select>
                                             </div>
+                                            <div class="col-md-12">
+                                                <div class="col-form-label">Địa chỉ</div>
+                                                <el-input
+                                                    name="address"
+                                                    placeholder="Địa chỉ"
+                                                    v-model="data.mainCustomer.fullAddress"
+                                                    disabled
+                                                ></el-input>
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- Thông tin lịch hẹn -->
@@ -125,7 +134,7 @@
                                             <div class="col-md-12">
                                                 <div class="col-form-label">Nha sĩ *</div>
                                                 <div class="row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-sm-7 col-md-6">
                                                         <el-select v-model="data.dentistId" placeholder="Nha sĩ" name="dentistId" disabled>
                                                             <el-option
                                                                 v-for="item in dentistData"
@@ -135,7 +144,7 @@
                                                             ></el-option>
                                                         </el-select>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-sm-5 col-md-6">
                                                         <button
                                                             type="button" 
                                                             class="control-btn blue"
@@ -181,6 +190,10 @@
                                                             disabled
                                                         ></el-time-picker>
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="col-form-label">Loại lịch hẹn</div>
                                                         <el-select v-model="data.type" placeholder="Loại lịch hẹn" name="type" filterable>
@@ -292,7 +305,8 @@ export default {
                 visible: false,
                 data: [],
                 configs: {}
-            }
+            },
+            customerSelected: ''
         }
     },
     async created(){

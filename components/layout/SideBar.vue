@@ -186,6 +186,12 @@
                         <span slot="title">Đặt lịch hẹn</span>
                     </el-menu-item>
                 </nuxt-link>
+                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointmentV2" class="sidebar-nav-link">
+                    <el-menu-item index="appointmentV2">
+                        <i class='bx bxs-calendar-edit' ></i>
+                        <span slot="title">Quản lý lịch hẹn</span>
+                    </el-menu-item>
+                </nuxt-link>
                 <nuxt-link v-if="checkAccessRight('appointmentConfig')" to="/appointmentConfigV2" class="sidebar-nav-link">
                     <el-menu-item index="appointmentConfigV2">
                         <i class='bx bxs-cog'></i>
