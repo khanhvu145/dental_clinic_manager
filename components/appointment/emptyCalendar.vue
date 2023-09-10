@@ -92,20 +92,37 @@ export default {
         currentId: {
 			type: String,
 			default: null
-		}
+		},
+        currentDate: {
+            type: Date,
+            default: function () { return new Date() }
+        },
+        session: {
+			type: String,
+			default: 'morning'
+		},
+        dentistIds: {
+			type: Array,
+			default: function () { return [] }
+		},
+        dentistName: {
+			type: String,
+			default: ''
+		},
     },
     watch: {
 		diaglogVisible: {
 			async handler(newVal, oldVal) {
 				const _this = this;
                 if(newVal == true) {
-                    _this.tabActive = 'morning';
+                    await _this.getAppointmentConfig();
+                    _this.tabActive = _this.session;
+                    _this.filterDentist(_this.dentistName);
                     _this.searchQuery = {
-                        dentistsF: [],
-                        dateF: new Date(),
+                        dentistsF: _this.dentistIds,
+                        dateF: _this.checkCurrentDate(_this.currentDate),
                         currentId: _this.currentId
                     };
-                    await _this.getAppointmentConfig();
                     await _this.changeCurrentDate();
                 }
 			},
@@ -297,23 +314,25 @@ export default {
             const _this = this;
             if(type == "next")
 			{
+                var oldDate = new Date(_this.$moment(_.cloneDeep(_this.searchQuery.dateF)));
 				var date = new Date(_this.$moment(_.cloneDeep(_this.searchQuery.dateF)).add(1, 'days'));
                 if(_this.dayOff.includes(moment(date).day())){
                     date = new Date(_this.$moment(_.cloneDeep(date)).add(1, 'days'));
                 }
                 if(moment(moment(date).format('YYYY/MM/DD')).isBefore(moment().format('YYYY/MM/DD'))){
-                    date = new Date();
+                    date = oldDate;
                 }
                 _this.searchQuery.dateF = date;
 			}
 			else if (type == "prev")
 			{
+                var oldDate = new Date(_this.$moment(_.cloneDeep(_this.searchQuery.dateF)));
 				var date = new Date(_this.$moment(_.cloneDeep(_this.searchQuery.dateF)).add(-1, 'days'));
                  if(_this.dayOff.includes(moment(date).day())){
                     date = new Date(_this.$moment(_.cloneDeep(date)).add(-1, 'days'));
                 }
                 if(moment(moment(date).format('YYYY/MM/DD')).isBefore(moment().format('YYYY/MM/DD'))){
-                    date = new Date();
+                    date = oldDate;
                 }
                 _this.searchQuery.dateF = date;
 			}
@@ -514,6 +533,14 @@ export default {
                         borderColor: '#8fdf82',
                     }
             }
+        },
+        checkCurrentDate(date){
+            const _this = this;
+            if(_this.dayOff.includes(moment(date).day())){
+                date = new Date(_this.$moment(_.cloneDeep(date)).add(1, 'days'));
+                _this.checkCurrentDate(date);
+            }
+            return date;
         }
     }
 }

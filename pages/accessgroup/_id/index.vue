@@ -252,17 +252,13 @@ export default {
 											name: 'Xác nhận đến khám',
 											value: 'confirmBooking',
 										},
-                                        // {
-										// 	name: 'Hủy xác nhận',
-										// 	value: 'cancelConfirmBooking',
-										// },
+                                        {
+											name: 'Hoàn thành lịch hẹn',
+											value: 'completeBooking',
+										},
                                         {
 											name: 'Hủy lịch hẹn',
 											value: 'cancelBooking',
-										},
-                                        {
-											name: 'Chuyển lịch hẹn',
-											value: 'transferBooking',
 										},
                                         {
 											name: 'Gửi nhắc hẹn',

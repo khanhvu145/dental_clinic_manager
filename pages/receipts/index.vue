@@ -499,40 +499,41 @@ export default {
                     inputPlaceholder: 'Nhập lý do hủy',
                     inputValidator: this.validateInput
                 }).then(async ({ value }) => {
-                    if (value) {
-                        const data = await _this.$axios.$post('/api/receipts/cancel', {
-                            id: id,
-                            cancelReason: value,
-                            cancelledBy: _this.userInfo.data.username
-                        });
-                        if (data.success) {
-                            await _this.getData(_this.searchQuery);
-                            _this.$message({
-                                message: 'Hủy phiếu thu thành công',
-                                type: 'success',
+                    _this.dataLoading = true;
+                    try{
+                        if (value) {
+                            const data = await _this.$axios.$post('/api/receipts/cancel', {
+                                id: id,
+                                cancelReason: value,
+                                cancelledBy: _this.userInfo.data.username
                             });
-                            _this.dataLoading = false;
-                        } else {
-                            _this.$message.error(data.error);
-                            _this.dataLoading = false;
+                            if (data.success) {
+                                await _this.getData(_this.searchQuery);
+                                _this.$message({
+                                    message: 'Hủy phiếu thu thành công',
+                                    type: 'success',
+                                });
+                            } else {
+                                _this.$message.error(data.error);
+                            }
+                        }
+                        else{
+                            _this.$message({
+                                type: 'error',
+                                message: 'Vui lòng nhập lý do hủy',
+                            });
                         }
                     }
-                    else{
-                        _this.dataLoading = false;
+                    catch(error){
+                        console.log('Error: ', error);
                         _this.$message({
                             type: 'error',
-                            message: 'Vui lòng nhập lý do hủy',
+                            message: error,
                         });
                     }
-                })
-                .catch((error) => {
                     _this.dataLoading = false;
-                    console.log(error);
-                    _this.$message({
-                        type: 'error',
-                        message: error,
-                    });
-                });
+                })
+                .catch(() => {});
         },
         validateInput (input) {
             if (input) return true;

@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="row mt-4">
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-select v-model="searchQuery.sorts" filterable name="sorts" v-on:change="onChangeSorts($event)">
                             <template slot="prefix">
                                 <i class='el-input__icon bx bx-sort'></i>
@@ -90,7 +90,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-dropdown :hide-on-click="false" trigger="click" style="width:100%;">
                             <el-button class="elButtonCustom" style="width:100%; text-align:left;font-weight:400;padding:12px 10px">
                                 <i class="el-icon-view el-icon--left" style="color:#C0C4CC;"></i>
@@ -104,18 +104,34 @@
                             </el-dropdown-menu>
                         </el-dropdown>
                     </div>
-                    <div class="col-md-3"></div>
-                    <div class="col-md-3">
-                        <div v-if="checkRight('create')" style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                            <button class="control-btn blue" @click="createAppointment">
+                    <div class="col-md-6">
+                        <div style="text-align:right;">
+                            <button v-if="checkRight('sendMail')" class="control-btn mb-2 red" @click="cancelBookingMultiple">
+                                <i class='bx bx-calendar-x' ></i>
+                            <span>Hủy hẹn</span>
+                            </button>
+                            <button v-if="checkRight('sendMail')" class="control-btn mb-2 yellow" @click="sendMailMultiple">
+                                <i class='bx bx-mail-send'></i>
+                                <span>Gửi nhắc hẹn</span>
+                            </button>
+                            <button v-if="checkRight('sendMail')" class="control-btn mb-2 blue2" @click="confirmBookingMultiple">
+                                <i class='bx bx-check'></i>
+                                <span>Xác nhận đến khám</span>
+                            </button>
+                            <button v-if="checkRight('sendMail')" class="control-btn mb-2 blue" @click="completeBookingMultiple">
+                                <i class='bx bx-calendar-check'></i>
+                                <span>Hoàn thành</span>
+                            </button>
+                            <button v-if="checkRight('create')" class="control-btn mb-2 green" @click="createAppointment">
                                 <i class='bx bx-plus' ></i>
-                                Đặt lịch hẹn
+                                <span>Đặt hẹn</span>
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-4">
-                    <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border>
+                <div class="row mt-3">
+                    <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" @selection-change="handleSelectionChange" stripe border>
+                        <el-table-column type="selection" width="50" align="center"></el-table-column>
                         <el-table-column v-if="columns[0].isShow" :label="columns[0].name" min-width="200">
                             <template slot-scope="scope">
                                 <div style="font-weight: bold;"> 
@@ -163,14 +179,41 @@
                         </el-table-column>
                         <el-table-column v-if="columns[6].isShow" :label="columns[6].name" width="100">
                             <template slot-scope="scope">
-                                <div class="row">
-                                    <div class="col-6 mb-1">
+                                <div class="row" style="width:100%;">
+                                    <div v-if="checkRight('view')" class="col-6 mb-1">
                                         <el-tooltip effect="dark" content="Chỉnh sửa" placement="right-start">
                                             <nuxt-link :to="`/appointmentV2/${scope.row._id}`">
                                                 <button class="control-btn blue2" style="padding: 4px 6px;">
                                                     <i class="el-icon-edit-outline"></i>
                                                 </button>
                                             </nuxt-link>
+                                        </el-tooltip>
+                                    </div>
+                                    <div v-if="checkRight('view')" class="col-6 mb-1">
+                                        <el-tooltip effect="dark" content="Xem lịch sử" placement="top-start">
+                                            <button class="control-btn yellow" style="padding: 4px 6px;" @click="openDialogLogs(scope.row._id)">
+                                                <i class='bx bx-history' ></i>
+                                            </button>
+                                        </el-tooltip>
+                                    </div>
+                                    <div 
+                                        class="col-md-6 mb-1"
+                                        v-if="
+                                            checkRight('sendMail') 
+                                            && scope.row.status == 'new'
+                                        " 
+                                    >
+                                        <el-tooltip effect="dark" content="Gửi nhắc hẹn" placement="top-start">
+                                            <button class="control-btn blue" style="padding: 4px 6px;" @click="sendMail(scope.row._id)">
+                                                <i class='bx bx-mail-send'></i>
+                                            </button>
+                                        </el-tooltip>
+                                    </div>
+                                    <div class="col-md-6 mb-1">
+                                        <el-tooltip effect="dark" content="Gọi điện KH" placement="top-start">
+                                            <a class="control-btn green" style="padding: 4px 6px;" :href="`tel:${scope.row.mainCustomer.phone}`">
+                                                <i class='bx bx-phone'></i>
+                                            </a>
                                         </el-tooltip>
                                     </div>
                                 </div>
@@ -247,6 +290,50 @@
                     </div>
                 </div>
             </div>
+            <!-- Dialog logs appointment -->
+            <el-dialog title="Xem lịch sử" :visible.sync="dialogLogsAppointment.visible" :close-on-click-modal="false" width="70%">
+                <div class="row">
+                    <div class="col-md-12">
+                        <el-table :data="dialogLogsAppointment.data" v-loading="dataLoading" style="width: 100%" stripe border>
+                            <el-table-column label="Thời gian" min-width="60">
+                                <template slot-scope="scope">
+                                    <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Tạo/Cập nhật bởi" min-width="60">
+                                <template slot-scope="scope">
+                                    <div>{{ scope.row.createdBy || 'System' }}</div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Ghi chú" min-width="60">
+                                <template slot-scope="scope">
+                                    <div>{{ getLogsType(scope.row.type) }}</div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Nội dung" min-width="120">
+                                <template slot-scope="scope">
+                                    <ul v-if="scope.row.note.length > 0">
+                                        <li v-for="(item, index) in scope.row.note" :key="index">
+                                            <div>
+                                                &#9900; 
+                                                <span style="font-weight: bold;">
+                                                    {{ item.column }}: 
+                                                </span>
+                                                {{ (item.oldvalue != '') ? (item.oldvalue + ' &#10142;') : '' }}  {{ item.newvalue }}
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <button type="button" class="control-btn gray" @click="dialogLogsAppointment.visible = false">
+                        <span>Đóng</span>
+                    </button>
+                </span>
+            </el-dialog>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -319,7 +406,12 @@ export default {
                 notArrived: {},
                 completed: {},
                 cancelled: {}
-            }
+            },
+            dialogLogsAppointment: {
+                visible: false,
+                data: []
+            },
+            multipleSelection: []
         }
     },
     async created(){
@@ -506,6 +598,246 @@ export default {
             const _this = this;
             let route = _this.$router.resolve({path: '/appointmentBooking'});
             window.open(route.href, '_blank');
+        },
+        async openDialogLogs(id){
+            const _this = this;
+            _this.dialogLogsAppointment.visible = true;
+            await _this.$axios.$get(`/api/appointmentBooking/getLogs/${id}`).then(
+				(response) => {
+                    _this.dialogLogsAppointment.data = response.data || [];
+				},
+				(error) => {
+                    console.log('Error: ', error);
+					_this.$message({
+						type: 'error',
+						message: error,
+					});
+				}
+			);
+
+            _this.dataLoading = false;
+        },
+        getLogsType(type){
+            if(type == 'create'){
+                return 'Đặt hẹn';
+            }
+            else if(type == 'update'){
+                return 'Chỉnh sửa';
+            }
+            else if(type == 'cancel'){
+                return 'Hủy';
+            }
+            else {
+                return type;
+            }
+        },
+        async sendMail(id){
+            const _this = this;
+            _this.$confirm('Bạn có chắc muốn gửi email nhắc hẹn cho lịch hẹn này?', 'Xác nhận', {
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Đóng',
+                type: 'warning',
+                closeOnClickModal: false
+            }).then(async () => {
+                _this.dataLoading = true;
+                try{
+                    const data = await _this.$axios.$post('/api/appointmentBooking/sendMail', { ids: [id] });
+                    if(data.success && data.successCount > 0){
+                        _this.$message({
+                            message: 'Gửi nhắc hẹn thành công',
+                            type: 'success',
+                        });
+                        _this.getData(_this.searchQuery);
+                    }else {
+                        _this.$message.error('Gửi nhắc hẹn thất bại');
+                    }
+                }
+                catch(error){
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: error,
+                    });
+                }
+                _this.dataLoading = false;
+            }).catch(() => {});
+        },
+        async sendMailMultiple(){
+            const _this = this;
+            var ids = _.map(_.filter(_this.multipleSelection, { status: 'new' }), (item) => {
+				return item._id;
+			});
+            if (ids && ids.length > 0) {
+                _this.$confirm(`Bạn có chắc muốn gửi email nhắc hẹn cho ${ids.length} lịch hẹn?`, 'Xác nhận', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Đóng',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/sendMail', { ids: ids });
+                        if(data.success){
+                            _this.$message({
+                                message: `Gửi nhắc hẹn thành công ${data.successCount} lịch hẹn, thất bại ${data.errorCount} lịch hẹn`,
+                                type: 'success',
+                            });
+                            _this.getData(_this.searchQuery);
+                        }else {
+                            _this.$message.error('Có lỗi xảy ra');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});
+            }
+            else {
+				_this.$message({
+					type: 'error',
+					message: 'Hãy chọn dữ liệu',
+				});
+			}
+        },
+        handleSelectionChange(val) {
+			const _this = this;
+			_this.multipleSelection = val;
+		},
+        async confirmBookingMultiple(){
+            const _this = this;
+            var ids = _.map(_.filter(_this.multipleSelection, { status: 'new' }), (item) => {
+				return item._id;
+			});
+            if (ids && ids.length > 0) {
+                _this.$confirm(`Bạn có chắc muốn xác nhận đến khám cho ${ids.length} lịch hẹn?`, 'Xác nhận', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Đóng',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/confirmBooking', { ids: ids });
+                        if(data.success){
+                            _this.$message({
+                                message: `Xác nhận đến khám thành công ${data.successCount} lịch hẹn, thất bại ${data.errorCount} lịch hẹn`,
+                                type: 'success',
+                            });
+                            _this.getData(_this.searchQuery);
+                        }else {
+                            _this.$message.error('Có lỗi xảy ra');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});
+            }
+            else {
+				_this.$message({
+					type: 'error',
+					message: 'Hãy chọn dữ liệu',
+				});
+			}
+        },
+        async completeBookingMultiple(){
+            const _this = this;
+            var ids = _.map(_.filter(_this.multipleSelection, { status: 'arrived' }), (item) => {
+				return item._id;
+			});
+            if (ids && ids.length > 0){
+                _this.$confirm(`Bạn có chắc muốn hoàn thành ${ids.length} lịch hẹn?`, 'Xác nhận', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Đóng',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/completeBooking', { ids: ids });
+                        if(data.success){
+                            _this.$message({
+                                message: `Hoàn thành lịch hẹn thành công ${data.successCount} lịch hẹn, thất bại ${data.errorCount} lịch hẹn`,
+                                type: 'success',
+                            });
+                            _this.getData(_this.searchQuery);
+                        }else {
+                            _this.$message.error('Có lỗi xảy ra');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});;
+            }
+            else {
+				_this.$message({
+					type: 'error',
+					message: 'Hãy chọn dữ liệu',
+				});
+			}
+        },
+        async cancelBookingMultiple(){
+            const _this = this;
+            var ids = _.map(_this.multipleSelection.filter(f => f.status == 'new' || f.status == 'arrived'), (item) => {
+				return item._id;
+			});
+            if (ids && ids.length > 0){
+                _this.$prompt('Lý do hủy *', `Xác nhận hủy ${ids.length} lịch hẹn`, {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập lý do hủy',
+                    inputValidator: _this.validateInput
+                }).then(async ({ value }) => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/cancelBooking', { ids: ids, cancelReason: value });
+                        if(data.success){
+                            _this.$message({
+                                message: `Hủy thành công ${data.successCount} lịch hẹn, thất bại ${data.errorCount} lịch hẹn`,
+                                type: 'success',
+                            });
+                            _this.getData(_this.searchQuery);
+                        }else {
+                            _this.$message.error('Có lỗi xảy ra');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});
+            }
+            else {
+				_this.$message({
+					type: 'error',
+					message: 'Hãy chọn dữ liệu',
+				});
+			}
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
         },
     }
 }

@@ -5,8 +5,8 @@
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="title titleAfter mb-0">
-                            <nuxt-link to="/accessgroup" class="sidebar-nav-link" style="color:#364d67">Quản lý lịch hẹn</nuxt-link>
-                            <span> / </span> <span>Chỉnh sửa</span>
+                            <nuxt-link to="/appointmentV2" class="sidebar-nav-link" style="color:#364d67">Quản lý lịch hẹn</nuxt-link>
+                            <span> / </span> <span>Chỉnh sửa</span> <span> / </span> <span>{{ `${data.code} - ${getStatusName(data.status)}` }}</span>
                         </div>
                     </div>
                 </div>
@@ -163,15 +163,72 @@
                         </button>
                         <button
                             type="button" 
+                            class="control-btn red"
+                            @click="cancelBooking"
+                            v-if="
+                                checkRight('cancelBooking') &&
+                                (data.status == 'new' || data.status == 'arrived')
+                            "
+                        >
+                            <i class='bx bx-calendar-x' ></i>
+                            <span>Hủy hẹn</span>
+                        </button>
+                        <button
+                            type="button" 
+                            class="control-btn blue2"
+                            @click="confirmBooking"
+                            v-if="
+                                checkRight('confirmBooking') &&
+                                data.status == 'new'
+                            "
+                        >
+                            <i class='bx bx-check'></i>
+                            <span>Xác nhận đến khám</span>
+                        </button>
+                        <button
+                            type="button" 
+                            class="control-btn blue"
+                            @click="completeBooking"
+                            v-if="
+                                checkRight('completeBooking') &&
+                                data.status == 'arrived'
+                            "
+                        >
+                            <i class='bx bx-calendar-check'></i>
+                            <span>Hoàn thành</span>
+                        </button>
+                        <button
+                            type="button" 
                             class="control-btn green"
                             @click="submitForm"
-                            v-if="checkRight('create')"
+                            v-if="
+                                checkRight('create') &&
+                                data.status == 'new'
+                            "
                         >
                             <i class='bx bxs-calendar-plus'></i>
                             <span>Lưu lại</span>
                         </button>
                     </div>
                 </form>
+
+                <!-- Dialog view empty calendar -->
+                <el-dialog title="Xem lịch trống" :visible.sync="dialogViewEmptyCalendar.visible" :close-on-click-modal="false" width="95%">
+                    <EmptyCalendar 
+                        ref="emptyCalendarComponent" 
+                        @selectEmptyCalendar = "selectEmptyCalendar" :diaglogVisible="dialogViewEmptyCalendar.visible" 
+                        :currentId="$route.params.id"
+                        :currentDate="new Date(data.date)"
+                        :session="data.session"
+                        :dentistIds="[data.dentistId]"
+                        :dentistName="data.dentistName"
+                    />
+                    <span slot="footer" class="dialog-footer">
+                        <button type="button" class="control-btn gray" @click="dialogViewEmptyCalendar.visible = false">
+                            <span>Đóng</span>
+                        </button>
+                    </span>
+                </el-dialog>
             </div>
         </div>
         <div v-else>
@@ -206,6 +263,11 @@ export default {
             dentistData: [],
             apointmentType: [],
             appointmentContent: [],
+            dialogViewEmptyCalendar: {
+                visible: false,
+                data: {},
+                configs: {}
+            },
         }
     },
     async created(){
@@ -257,10 +319,151 @@ export default {
         },
         viewEmptyCalendar(){
             const _this = this;
+            _this.dialogViewEmptyCalendar.visible = true;
+        },
+        selectEmptyCalendar(e){
+            const _this = this;
+            _this.data.dentistId = e.resource.id;
+            _this.data.date = new Date(moment(e.start).format('YYYY/MM/DD'));
+            _this.data.timeFrom = moment(e.start).format('HH:mm');
+            _this.data.timeTo = moment(e.end).format('HH:mm');
+            _this.data.session = e.session;
+            _this.dialogViewEmptyCalendar.visible = false;
         },
         submitForm: debounce(async function () {
             const _this = this;
+            _this.dataLoading = true;
+            try{
+                var newData = cloneDeep(_this.data);
+                const response = await _this.$axios.$post('/api/appointmentBooking/update', newData);
+                if (response.success) {
+                    _this.data = response.data;
+                    _this.$message({
+                        message: response.message,
+                        type: 'success',
+                    });
+                    await _this.getData();
+                } else {
+                    _this.$message.error(response.error);
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
+                _this.$message({
+                    type: 'error',
+                    message: error,
+                });
+            }
+            _this.dataLoading = false;
         }),
+        async confirmBooking(){
+            const _this = this;
+            if(_this.data._id){
+                _this.$confirm('Bạn có chắc muốn xác nhận đến khám cho lịch hẹn này?', 'Xác nhận', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Đóng',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/confirmBooking', { ids: [_this.data._id] });
+                        if(data.success && data.successCount > 0){
+                            _this.$message({
+                                message: 'Xác nhận đến khám thành công',
+                                type: 'success',
+                            });
+                            await _this.getData();
+                        }else {
+                            _this.$message.error('Xác nhận đến khám không thành công');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});
+            }
+        },
+        async cancelBooking(){
+            const _this = this;
+            if(_this.data._id){
+                _this.$prompt('Lý do hủy *', 'Xác nhận hủy đặt hẹn', {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập lý do hủy',
+                    inputValidator: _this.validateInput
+                }).then(async ({ value }) => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/cancelBooking', { ids: [_this.data._id], cancelReason: value });
+                        if(data.success && data.successCount > 0){
+                            _this.$message({
+                                message: 'Hủy lịch hẹn thành công',
+                                type: 'success',
+                            });
+                            await _this.getData();
+                        }else {
+                            _this.$message.error('Hủy lịch hẹn không thành công');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});
+            }
+        },
+        async completeBooking(){
+            const _this = this;
+            if(_this.data._id){
+                _this.$confirm('Bạn có chắc muốn hoàn thành lịch hẹn này?', 'Xác nhận', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Đóng',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/appointmentBooking/completeBooking', { ids: [_this.data._id] });
+                        if(data.success && data.successCount > 0){
+                            _this.$message({
+                                message: 'Hoàn thành lịch hẹn thành công',
+                                type: 'success',
+                            });
+                            await _this.getData();
+                        }else {
+                            _this.$message.error('Hoàn thành lịch hẹn không thành công');
+                        }
+                    }
+                    catch(error){
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: error,
+                        });
+                    }
+                    _this.dataLoading = false;
+                }).catch(() => {});;
+            }
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
+        },
+        getStatusName(status){
+            const _this = this;
+            return appointmentStatusV2.find(f => f.value == status).label || '';
+        }
     }
 }
 </script>
