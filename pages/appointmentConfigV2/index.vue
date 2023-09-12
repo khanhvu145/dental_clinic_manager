@@ -13,7 +13,7 @@
                             <button
                                 v-if="checkRight('create') || checkRight('update')"
                                 type="button" 
-                                class="control-btn green" 
+                                class="control-btn blue" 
                                 @click="submitForm"
                             >
                                 <i class='bx bx-save' ></i>
@@ -21,6 +21,7 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Cấu hình thời gian làm việc -->
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="appointmentConfigContent yellow">
@@ -120,6 +121,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Cấu hình nhắc hẹn tự động -->
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="appointmentConfigContent green">
@@ -185,10 +187,11 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Cấu hình hiển thị -->
                     <div class="row mt-3">
                         <div class="col-md-12">
                             <div class="appointmentConfigContent blue">
-                                Cấu hình hiện thị
+                                Cấu hình hiển thị
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -280,12 +283,89 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Cấu hình thông báo -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="appointmentConfigContent red">
+                                Cấu hình thông báo
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="appointmentConfigItem" style="font-size:14px;">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span style="font-weight:bold;">Gửi email thông báo khách hàng</span>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 col-xl-2">
+                                        <div class="col-form-label">Đặt lịch hẹn</div> 
+                                        <el-radio-group 
+                                            :fill="NOTIFY_CREATE_APPOINTMENT.value == 'yes' ? '#74bc20' : '#ff4949'" 
+                                            v-model="NOTIFY_CREATE_APPOINTMENT.value"
+                                        >
+                                            <el-radio-button label="yes">Có</el-radio-button>
+                                            <el-radio-button label="no">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 col-xl-2">
+                                        <div class="col-form-label">Cập nhật thời gian</div>
+                                        <el-radio-group 
+                                            :fill="NOTIFY_UPDATE_APPOINTMENT.value == 'yes' ? '#74bc20' : '#ff4949'" 
+                                            v-model="NOTIFY_UPDATE_APPOINTMENT.value"
+                                        >
+                                            <el-radio-button label="yes">Có</el-radio-button>
+                                            <el-radio-button label="no">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <!-- <div class="col-sm-6 col-md-3 col-xl-2">
+                                        <div class="col-form-label">Xác nhận đến khám</div>
+                                        <el-radio-group 
+                                            :fill="NOTIFY_ARRIVED_APPOINTMENT.value == 'yes' ? '#74bc20' : '#ff4949'" 
+                                            v-model="NOTIFY_ARRIVED_APPOINTMENT.value"
+                                        >
+                                            <el-radio-button label="yes">Có</el-radio-button>
+                                            <el-radio-button label="no">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div> -->
+                                    <div class="col-sm-6 col-md-3 col-xl-2">
+                                        <div class="col-form-label">Hoàn thành lịch hẹn</div>
+                                        <el-radio-group 
+                                            :fill="NOTIFY_COMPLETE_APPOINTMENT.value == 'yes' ? '#74bc20' : '#ff4949'" 
+                                            v-model="NOTIFY_COMPLETE_APPOINTMENT.value"
+                                        >
+                                            <el-radio-button label="yes">Có</el-radio-button>
+                                            <el-radio-button label="no">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 col-xl-2">
+                                        <div class="col-form-label">Hủy lịch hẹn</div>
+                                        <el-radio-group 
+                                            :fill="NOTIFY_CANCEL_APPOINTMENT.value == 'yes' ? '#74bc20' : '#ff4949'" 
+                                            v-model="NOTIFY_CANCEL_APPOINTMENT.value"
+                                        >
+                                            <el-radio-button label="yes">Có</el-radio-button>
+                                            <el-radio-button label="no">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <!-- <div class="col-sm-6 col-md-3 col-xl-2">
+                                        <div class="col-form-label">Xác nhận không đến</div>
+                                        <el-radio-group 
+                                            :fill="NOTIFY_NOTARRIVED_APPOINTMENT.value == 'yes' ? '#74bc20' : '#ff4949'" 
+                                            v-model="NOTIFY_NOTARRIVED_APPOINTMENT.value"
+                                        >
+                                            <el-radio-button label="yes">Có</el-radio-button>
+                                            <el-radio-button label="no">Không</el-radio-button>
+                                        </el-radio-group>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row mt-4">
                         <div class="col-md-12" style="text-align: right;">
                             <button
                                 v-if="checkRight('create') || checkRight('update')"
                                 type="button" 
-                                class="control-btn green" 
+                                class="control-btn blue" 
                                 @click="submitForm"
                             >
                                 <i class='bx bx-save' ></i>
@@ -466,6 +546,30 @@ export default {
                     textColor: "#909399"
                 },
             },
+            NOTIFY_CREATE_APPOINTMENT: {
+                key: 'NOTIFY_CREATE_APPOINTMENT',
+                value: 'yes'
+            },
+            NOTIFY_UPDATE_APPOINTMENT: {
+                key: 'NOTIFY_UPDATE_APPOINTMENT',
+                value: 'yes'
+            },
+            NOTIFY_ARRIVED_APPOINTMENT: {
+                key: 'NOTIFY_ARRIVED_APPOINTMENT',
+                value: 'yes'
+            },
+            NOTIFY_COMPLETE_APPOINTMENT: {
+                key: 'NOTIFY_COMPLETE_APPOINTMENT',
+                value: 'yes'
+            },
+            NOTIFY_CANCEL_APPOINTMENT: {
+                key: 'NOTIFY_CANCEL_APPOINTMENT',
+                value: 'yes'
+            },
+            NOTIFY_NOTARRIVED_APPOINTMENT: {
+                key: 'NOTIFY_NOTARRIVED_APPOINTMENT',
+                value: 'yes'
+            },
         }
     },
     async created(){
@@ -517,6 +621,12 @@ export default {
                         key: _this.DISPLAY_CONFIG_CANCELLED.key,
                         value: JSON.stringify(_this.DISPLAY_CONFIG_CANCELLED.value),
                     },
+                    _this.NOTIFY_CREATE_APPOINTMENT,
+                    _this.NOTIFY_UPDATE_APPOINTMENT,
+                    _this.NOTIFY_ARRIVED_APPOINTMENT,
+                    _this.NOTIFY_COMPLETE_APPOINTMENT,
+                    _this.NOTIFY_CANCEL_APPOINTMENT,
+                    _this.NOTIFY_NOTARRIVED_APPOINTMENT
                 ]);
                 if (response.success) {
                     _this.$message({
@@ -585,7 +695,13 @@ export default {
                     _this.DISPLAY_CONFIG_ARRIVED.key,
                     _this.DISPLAY_CONFIG_NOTARRIVED.key,
                     _this.DISPLAY_CONFIG_COMPLETED.key,
-                    _this.DISPLAY_CONFIG_CANCELLED.key
+                    _this.DISPLAY_CONFIG_CANCELLED.key,
+                    _this.NOTIFY_CREATE_APPOINTMENT.key,
+                    _this.NOTIFY_UPDATE_APPOINTMENT.key,
+                    _this.NOTIFY_ARRIVED_APPOINTMENT.key,
+                    _this.NOTIFY_COMPLETE_APPOINTMENT.key,
+                    _this.NOTIFY_CANCEL_APPOINTMENT.key,
+                    _this.NOTIFY_NOTARRIVED_APPOINTMENT.key
                 ]);
 
                 if(configs && configs.length > 0){
@@ -640,6 +756,24 @@ export default {
                         return f.key === _this.DISPLAY_CONFIG_CANCELLED.key;
                     });
                     _this.DISPLAY_CONFIG_CANCELLED.value = JSON.parse(_this.DISPLAY_CONFIG_CANCELLED.value);
+                    _this.NOTIFY_CREATE_APPOINTMENT = _.find(configs, f => {
+                        return f.key === _this.NOTIFY_CREATE_APPOINTMENT.key;
+                    });
+                    _this.NOTIFY_UPDATE_APPOINTMENT = _.find(configs, f => {
+                        return f.key === _this.NOTIFY_UPDATE_APPOINTMENT.key;
+                    });
+                    _this.NOTIFY_ARRIVED_APPOINTMENT = _.find(configs, f => {
+                        return f.key === _this.NOTIFY_ARRIVED_APPOINTMENT.key;
+                    });
+                    _this.NOTIFY_COMPLETE_APPOINTMENT = _.find(configs, f => {
+                        return f.key === _this.NOTIFY_COMPLETE_APPOINTMENT.key;
+                    });
+                    _this.NOTIFY_CANCEL_APPOINTMENT = _.find(configs, f => {
+                        return f.key === _this.NOTIFY_CANCEL_APPOINTMENT.key;
+                    });
+                    _this.NOTIFY_NOTARRIVED_APPOINTMENT = _.find(configs, f => {
+                        return f.key === _this.NOTIFY_NOTARRIVED_APPOINTMENT.key;
+                    });
                 }
             }
             catch(err){
@@ -676,6 +810,6 @@ export default {
 .appointmentConfigItem{
     border: 1px solid rgb(219, 219, 219);
     border-top: none;
-    padding: 12px 24px;
+    padding: 16px 24px;
 }
 </style>
