@@ -40,7 +40,7 @@
                                     ></el-option>
                                 </el-select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <div class="col-form-label">Trạng thái</div>
                                 <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." filterable multiple clearable name="statusF">
                                     <el-option
@@ -51,16 +51,26 @@
                                     ></el-option>
                                 </el-select>
                             </div>
-                             <div class="col-md-4">
+                             <div class="col-md-5">
                                 <div class="col-form-label">Ngày đặt hẹn</div>
                                 <el-date-picker
+                                    v-model="searchQuery.filters.dateF"
+                                    type="datetimerange"
+                                    :picker-options="pickerOptions"
+                                    range-separator="-"
+                                    start-placeholder="Từ"
+                                    end-placeholder="Đến"
+                                    align="right"
+                                    format="dd/MM/yyyy HH:mm"
+                                ></el-date-picker>
+                                <!-- <el-date-picker
                                     v-model="searchQuery.filters.dateF"
                                     type="daterange"
                                     range-separator="-"
                                     start-placeholder="Từ ngày"
                                     end-placeholder="Đến ngày"
                                     format="dd/MM/yyyy">
-                                </el-date-picker>
+                                </el-date-picker> -->
                             </div>
                         </div>
                     </div>
@@ -366,7 +376,7 @@ export default {
                     customersF: '',
                     dentistsF: [],
                     statusF: ['new', 'arrived', 'completed'],
-                    dateF: [new Date(moment().format('YYYY-MM-DD')), new Date(moment().add(10, 'd').format('YYYY-MM-DD'))]
+                    dateF: [moment().startOf('day'), moment().endOf('day')]
                 },
                 sorts: 'dateTimeFrom&&1',
                 pages:{
@@ -411,7 +421,43 @@ export default {
                 visible: false,
                 data: []
             },
-            multipleSelection: []
+            multipleSelection: [],
+            pickerOptions: {
+                shortcuts: [
+                    {
+                        text: 'Today',
+                        onClick(picker) {
+                            const start = moment().startOf('day');
+                            const end = moment().endOf('day');
+                            picker.$emit('pick', [start, end]);
+                        },
+                    },
+                    {
+                        text: 'This week',
+                        onClick(picker) {
+                            const startOfWeek = moment().startOf('week');
+                            const endOfWeek   = moment().endOf('week');
+                            picker.$emit('pick', [startOfWeek, endOfWeek]);
+                        },
+                    },
+                    {
+                        text: 'This month',
+                        onClick(picker) {
+                            const start = moment().startOf('month');
+                            const end   = moment().endOf('month');
+                            picker.$emit('pick', [start, end]);
+                        },
+                    },
+                    {
+                        text: 'This year',
+                        onClick(picker) {
+                            const start = moment().startOf('year');
+                            const end   = moment().endOf('year');
+                            picker.$emit('pick', [start, end]);
+                        },
+                    },
+                ]
+            }
         }
     },
     async created(){

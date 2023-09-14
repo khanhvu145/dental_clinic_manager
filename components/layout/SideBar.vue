@@ -30,7 +30,6 @@
             </nuxt-link>
             <el-submenu 
                 v-if="
-                    checkAccessRight('register') ||
                     checkAccessRight('appointment') ||
                     checkAccessRight('workingCalendar') ||
                     checkAccessRight('appointmentConfig')
@@ -41,32 +40,31 @@
                     <i class='bx bxs-calendar-event'></i>
                     <span>Lịch hẹn</span>
                 </template>
-                <nuxt-link v-if="checkAccessRight('register')" to="/register" class="sidebar-nav-link">
-                    <el-menu-item index="register">
+                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointmentBooking" class="sidebar-nav-link">
+                    <el-menu-item index="appointmentBooking">
                         <i class='bx bxs-calendar-plus'></i>
-                        <span slot="title">Đăng ký khám</span>
+                        <span slot="title">Đặt lịch hẹn</span>
                     </el-menu-item>
                 </nuxt-link>
-                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointment" class="sidebar-nav-link">
-                    <el-menu-item index="appointment">
+                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointmentV2" class="sidebar-nav-link">
+                    <el-menu-item index="appointmentV2">
                         <i class='bx bxs-calendar-edit' ></i>
                         <span slot="title">Quản lý lịch hẹn</span>
                     </el-menu-item>
                 </nuxt-link>
-                <nuxt-link v-if="checkAccessRight('workingCalendar')" to="/workingCalendar" class="sidebar-nav-link">
-                    <el-menu-item index="workingCalendar">
+                <nuxt-link v-if="checkAccessRight('workingCalendar')" to="/workingCalendarV2" class="sidebar-nav-link">
+                    <el-menu-item index="workingCalendarV2">
                         <i class='bx bxs-calendar'></i>
                         <span slot="title">Lịch làm việc</span>
                     </el-menu-item>
                 </nuxt-link>
-                <nuxt-link v-if="checkAccessRight('appointmentConfig')" to="/appointmentConfig" class="sidebar-nav-link">
-                    <el-menu-item index="appointmentConfig">
+                <nuxt-link v-if="checkAccessRight('appointmentConfig')" to="/appointmentConfigV2" class="sidebar-nav-link">
+                    <el-menu-item index="appointmentConfigV2">
                         <i class='bx bxs-cog'></i>
                         <span slot="title">Cấu hình lịch hẹn</span>
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>
-
             <el-submenu 
                 v-if="
                     checkAccessRight('receipts') ||
@@ -165,37 +163,6 @@
                     <el-menu-item index="smtpConfig">
                         <i class='bx bxs-envelope'></i>
                         <span slot="title">Cấu hình SMTP</span>
-                    </el-menu-item>
-                </nuxt-link>
-            </el-submenu>
-            <el-submenu 
-                v-if="
-                    checkAccessRight('appointment') ||
-                    checkAccessRight('workingCalendar') ||
-                    checkAccessRight('appointmentConfig')
-                "
-                index="7"
-            >
-                <template slot="title">
-                    <i class='bx bxs-calendar-event'></i>
-                    <span>Lịch hẹn V2</span>
-                </template>
-                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointmentBooking" class="sidebar-nav-link">
-                    <el-menu-item index="appointmentBooking">
-                        <i class='bx bxs-calendar-plus'></i>
-                        <span slot="title">Đặt lịch hẹn</span>
-                    </el-menu-item>
-                </nuxt-link>
-                <nuxt-link v-if="checkAccessRight('appointment')" to="/appointmentV2" class="sidebar-nav-link">
-                    <el-menu-item index="appointmentV2">
-                        <i class='bx bxs-calendar-edit' ></i>
-                        <span slot="title">Quản lý lịch hẹn</span>
-                    </el-menu-item>
-                </nuxt-link>
-                <nuxt-link v-if="checkAccessRight('appointmentConfig')" to="/appointmentConfigV2" class="sidebar-nav-link">
-                    <el-menu-item index="appointmentConfigV2">
-                        <i class='bx bxs-cog'></i>
-                        <span slot="title">Cấu hình lịch hẹn</span>
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>

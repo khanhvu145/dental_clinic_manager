@@ -58,12 +58,62 @@
         </div>
         <div v-loading="dataLoading" v-if="tabActive=='morning'" class="col-md-12 mt-4" :style="{ pointerEvents: morningDisabled ? 'none' : 'auto' }">
             <FullCalendar ref="fullCalendar" :options="calendarOptions" id="fullCalendar">
-
+                <template #eventContent="item">
+				    <el-tooltip content="Top center">
+                        <div slot="content">
+                            <div v-if="item.event.extendedProps.mainCustomer">
+                                <div style="font-weigh:bold;margin-bottom:8px;">THÔNG TIN KHÁCH HÀNG</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Mã KH: {{item.event.extendedProps.mainCustomer.code || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Họ tên: {{item.event.extendedProps.mainCustomer.name || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Số điện thoại: {{item.event.extendedProps.mainCustomer.phone || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">CMND/CCCD: {{item.event.extendedProps.mainCustomer.physicalId || ''}}</div>
+                                <div style="margin-left:8px;">Ngày sinh: {{item.event.extendedProps.mainCustomer.birthday ? $moment(item.event.extendedProps.mainCustomer.birthday).format('DD/MM/YYYY') : ''}}</div>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <div style="font-weigh:bold;margin-bottom:8px;">THÔNG TIN LỊCH HẸN</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Mã lịch hẹn: {{item.event.extendedProps.code || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Trạng thái: {{getStatusName(item.event.extendedProps.status)}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Ngày hẹn: {{item.event.extendedProps.date ? $moment(item.event.extendedProps.date).format('DD/MM/YYYY') : ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Thời gian: {{item.event.extendedProps.timeFrom || ''}} - {{item.event.extendedProps.timeTo || ''}}</div>
+                                <div style="margin-left:8px;">Nha sĩ phụ trách: {{item.event.extendedProps.dentistName || ''}}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div>{{item.event.extendedProps.code}}</div>
+                            <div v-if="item.event.extendedProps.mainCustomer" style="margin-top:6px;">{{item.event.extendedProps.mainCustomer.name}}</div>
+                        </div>
+                    </el-tooltip>
+                </template>
             </FullCalendar>
         </div>
         <div v-loading="dataLoading" v-if="tabActive=='afternoon'" class="col-md-12 mt-4" :style="{ pointerEvents: affternoonDisabled ? 'none' : 'auto' }">
             <FullCalendar ref="fullCalendar2" :options="calendarOptions2" id="fullCalendar2">
-
+                <template #eventContent="item">
+				    <el-tooltip content="Top center">
+                        <div slot="content">
+                            <div v-if="item.event.extendedProps.mainCustomer">
+                                <div style="font-weigh:bold;margin-bottom:8px;">THÔNG TIN KHÁCH HÀNG</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Mã KH: {{item.event.extendedProps.mainCustomer.code || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Họ tên: {{item.event.extendedProps.mainCustomer.name || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Số điện thoại: {{item.event.extendedProps.mainCustomer.phone || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">CMND/CCCD: {{item.event.extendedProps.mainCustomer.physicalId || ''}}</div>
+                                <div style="margin-left:8px;">Ngày sinh: {{item.event.extendedProps.mainCustomer.birthday ? $moment(item.event.extendedProps.mainCustomer.birthday).format('DD/MM/YYYY') : ''}}</div>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <div style="font-weigh:bold;margin-bottom:8px;">THÔNG TIN LỊCH HẸN</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Mã lịch hẹn: {{item.event.extendedProps.code || ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Trạng thái: {{getStatusName(item.event.extendedProps.status)}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Ngày hẹn: {{item.event.extendedProps.date ? $moment(item.event.extendedProps.date).format('DD/MM/YYYY') : ''}}</div>
+                                <div style="margin-left:8px; margin-bottom:4px;">Thời gian: {{item.event.extendedProps.timeFrom || ''}} - {{item.event.extendedProps.timeTo || ''}}</div>
+                                <div style="margin-left:8px;">Nha sĩ phụ trách: {{item.event.extendedProps.dentistName || ''}}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div>{{item.event.extendedProps.code}}</div>
+                            <div v-if="item.event.extendedProps.mainCustomer" style="margin-top:6px;">{{item.event.extendedProps.mainCustomer.name}}</div>
+                        </div>
+                    </el-tooltip>
+                </template>
             </FullCalendar>
         </div>
     </div>
@@ -80,6 +130,7 @@ import moment from 'moment';
 import scrollgridPlugin from '@fullcalendar/scrollgrid';
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
+import { appointmentStatusV2 } from '@/utils/masterData';
 export default {
     components: {
 		FullCalendar,
@@ -312,6 +363,11 @@ export default {
         },
         async changeCurrentDate(type){
             const _this = this;
+
+            if(_this.searchQuery.dateF == null || _this.searchQuery.dateF == ''){
+                _this.searchQuery.dateF = _this.checkCurrentDate(new Date());
+            }
+
             if(type == "next")
 			{
                 var oldDate = new Date(_this.$moment(_.cloneDeep(_this.searchQuery.dateF)));
@@ -541,6 +597,13 @@ export default {
                 _this.checkCurrentDate(date);
             }
             return date;
+        },
+        getStatusName(value){
+            const _this = this;
+            var data = _.find(appointmentStatusV2, item => {
+                return item.value == value;
+            });
+            return data ? data.label : '';
         }
     }
 }
