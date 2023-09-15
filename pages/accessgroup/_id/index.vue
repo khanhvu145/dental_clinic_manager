@@ -270,8 +270,17 @@ export default {
                                 {
 									name: 'Lịch làm việc',
 									value: 'workingCalendar',
-									customRights: [],
-                                    hideDefaultRights: false,
+									customRights: [
+                                        {
+                                            name: 'Tất cả',
+                                            value: 'all',
+                                        },
+                                        {
+                                            name: 'Xem',
+                                            value: 'view',
+                                        },
+                                    ],
+                                    hideDefaultRights: true,
 								},
                                 {
                                     name: 'Cấu hình lịch hẹn',

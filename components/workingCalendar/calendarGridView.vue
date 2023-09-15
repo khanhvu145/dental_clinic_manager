@@ -2,23 +2,23 @@
     <div class="row" v-loading="dataLoading">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-md-6" style="font-weight:500;font-size:28px;text-transform:capitalize;">
+                <div class="col-md-6 mt-2" style="font-weight:500;font-size:27px;text-transform:capitalize;">
                     {{$moment(dateF).format("dddd, DD/MM/YYYY")}}
                 </div>
-                <div v-if="!dataLoading" class="col-md-6" style="text-align:right;">
-                    <el-tag :style="getValueViewConfigV2('new')" size="medium">
+                <div v-if="!dataLoading" class="col-md-6 mt-2" style="text-align:right;">
+                    <el-tag :style="getValueViewConfigV2('new')">
                         {{ getStatusName('new') }}
                     </el-tag>
-                    <el-tag :style="getValueViewConfigV2('arrived')" size="medium">
+                    <el-tag :style="getValueViewConfigV2('arrived')">
                         {{ getStatusName('arrived') }}
                     </el-tag>
-                    <el-tag :style="getValueViewConfigV2('notarrived')" size="medium">
+                    <el-tag :style="getValueViewConfigV2('notarrived')">
                         {{ getStatusName('notarrived') }}
                     </el-tag>
-                    <el-tag :style="getValueViewConfigV2('completed')" size="medium">
+                    <el-tag :style="getValueViewConfigV2('completed')">
                         {{ getStatusName('completed') }}
                     </el-tag>
-                    <el-tag :style="getValueViewConfigV2('cancelled')" size="medium">
+                    <el-tag :style="getValueViewConfigV2('cancelled')">
                         {{ getStatusName('cancelled') }}
                     </el-tag>
                 </div>
@@ -46,7 +46,7 @@
                                 <div style="margin-left:8px;">Nha sĩ phụ trách: {{item.event.extendedProps.dentistName || ''}}</div>
                             </div>
                         </div>
-                        <div style="height:100%;">
+                        <div style="height:100%;cursor:pointer;">
                             <span>{{item.event.extendedProps.timeFrom || ''}} - {{item.event.extendedProps.timeTo || ''}}</span> - 
                             <span style="margin-left:6px;">{{item.event.extendedProps.code || ''}}</span> - 
                             <span v-if="item.event.extendedProps.mainCustomer" style="margin-left:6px;">{{item.event.extendedProps.mainCustomer.name || ''}}</span>

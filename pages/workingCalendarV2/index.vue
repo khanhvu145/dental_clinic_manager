@@ -8,11 +8,12 @@
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-button @click="changeCurrentDate('prev')"><i class='bx bx-left-arrow-alt font-20'></i></el-button>
+                        <el-button @click="changeCurrentDate('today')"><i class='bx bx-calendar-check font-20'></i></el-button>
                         <el-button @click="changeCurrentDate('next')"><i class='bx bx-right-arrow-alt font-20'></i></el-button>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-select v-model="searchQuery.statusF" placeholder="Trạng thái..." filterable multiple clearable name="statusF" @change="getData">
                             <el-option
                                 v-for="item in statusData"
@@ -22,7 +23,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-date-picker
                             name="dateF"
                             v-validate="'required'"
@@ -33,7 +34,7 @@
                             @change="changeCurrentDate"
                         />
                     </div>
-                    <div class="col-md-3" style="text-align:right;">
+                    <div class="col-md-3 mb-2" style="text-align:right;">
                         <el-radio-group v-model="tabActive" @change="changeCurrentDate">
                             <el-radio-button label="timeLine">
                                 <i class='bx bxs-grid-alt' ></i>
@@ -44,7 +45,7 @@
                         </el-radio-group>
                     </div>
                 </div>
-                <div v-if="tabActive=='timeLine'" class="row mt-4 mb-3">
+                <div v-if="tabActive=='timeLine'" class="row mt-2 mb-4">
                     <div class="col-md-12">
                         <CalendarTimeLineView
                             :appointmentData="data"
@@ -54,7 +55,7 @@
                         ></CalendarTimeLineView>
                     </div>
                 </div>
-                <div v-if="tabActive=='grid'" class="row mt-4 mb-3">
+                <div v-if="tabActive=='grid'" class="row mt-2 mb-4">
                     <div class="col-md-12">
                         <CalendarTimeGridView
                             :appointmentData="data"
@@ -237,7 +238,7 @@ export default {
         async getData(){
             const _this = this;
             _this.dataLoading = true;
-            await _this.$axios.$post('/api/appointmentBooking/getWorkingCalendar', _this.searchQuery).then( 
+            await _this.$axios.$post('/api/workingCalendar/getWorkingCalendar', _this.searchQuery).then( 
                 (response) => {
                     if(response.success){
                         _this.data = response.data || [];
@@ -274,6 +275,10 @@ export default {
 			{
                 _this.searchQuery.dateF = new Date(_this.$moment(_.cloneDeep(_this.searchQuery.dateF)).add(-1, 'days'));
 			}
+            else if (type == "today")
+			{
+                _this.searchQuery.dateF = new Date(_this.$moment());
+			}
 
             await _this.getData()
         },
@@ -301,7 +306,7 @@ export default {
         async openDialogDetail(e){
             const _this = this;
             if(e){
-                await _this.$axios.$post('/api/appointmentBooking/getById', { 
+                await _this.$axios.$post('/api/workingCalendar/getById', { 
                     id: e
                 }).then(
                     (response) => {
@@ -343,6 +348,8 @@ export default {
                                 message: 'Hoàn thành lịch hẹn thành công',
                                 type: 'success',
                             });
+                            _this.dialogDetail.visible = false;
+                            _this.dialogDetail.data = new Appointment();
                             await _this.getData();
                         }else {
                             _this.$message.error('Hoàn thành lịch hẹn không thành công');
