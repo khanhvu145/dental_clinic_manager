@@ -3,33 +3,31 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6 col-xl-5">
-                    <form @submit.prevent="userLogin" class="login-form">
+                    <form @submit.prevent="forgotPassword" class="login-form">
                         <div class="logo">
                             <img src="/images/logoclinic.png" alt="">
                         </div>
-                        <div class="mt-4" style="opacity:0.6; font-size:14px; text-align:center;">
-                            Nhập tài khoản & mật khẩu để đăng nhập
+                        <div v-if="!done" class="mt-4" style="opacity:0.6; font-size:14px; text-align:center;">
+                            Nhập tài khoản để lấy lại mật khẩu
                         </div>
-                        <div class="input-box">
+                        <div v-else class="mt-4" style="opacity:0.6; font-size:14px; text-align:center;">
+                            Vui lòng kiếm tra email phục hồi mật khẩu được gửi từ hệ thống
+                        </div>
+                        <div v-if="!done" class="input-box">
                             <div class="usename_box">
-                                <el-input placeholder="Tài khoản" v-model="login.username">
+                                <el-input placeholder="Tài khoản" v-model="username">
                                     <i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
                                 </el-input>
                             </div>
-                            <div class="password_box mt-3">
-                                <el-input placeholder="Mật khẩu" v-model="login.password" show-password>
-                                    <i slot="prefix" class='el-input__icon bx bxs-lock' ></i>
-                                </el-input>
-                            </div>
                         </div>
-                        <!-- <button type="submit" class="login-button mt-4">Đăng nhập</button> -->
-                        <el-button native-type="submit" :loading="loading" class="login-button mt-4">
-                            Đăng nhập
+                        <!-- <button v-if="!done" :loading="true" type="submit" class="login-button mt-4">Lấy lại mật khẩu</button> -->
+                        <el-button v-if="!done" native-type="submit" :loading="loading" class="login-button mt-4">
+                            Lấy lại mật khẩu
                         </el-button>
                         <div class="text-center mt-4" style="opacity:0.8; font-size:14px;">
-                            <nuxt-link to="/forgotpassword" class="sidebar-nav-link">
+                            <nuxt-link to="/login" class="sidebar-nav-link">
                                 <a href="javascript:void(0)">
-                                    <span>Quên mật khẩu?</span>
+                                    <span>Về trang đăng nhập</span>
                                 </a>
                             </nuxt-link>
                         </div>
@@ -41,42 +39,32 @@
 </template>
 
 <script>
-import SocketioService from '../../services/socketio.service.js';
 export default {
+    auth: false,
     layout: 'blank',
-    name: 'Login',
+    name: 'ForgotPassword',
     data() {
 		return {
-			login: {
-				username: '',
-				password: '',
-			},
+			username: '',
+			done: false,
             loading: false,
 		};
 	},
     methods: {
-        async userLogin() {
-			const _this = this;
+        async forgotPassword() {
+            const _this = this;
             _this.loading = true;
-			try {
-				const response = await this.$auth.loginWith('local', { data: _this.login });
-				if (response.data.success) {
-                    await SocketioService.setupSocketConnection(_this.$store, _this.login.username);
-                    _this.$message({
-						showClose: true,
-						message: response.data.message,
-						type: 'success',
-					});
-                    _this.$router.push('/');
+            try{
+                const response = await _this.$axios.$post(`/api/account/forgotPassword`, {
+					username: _this.username
+				});
+                if (response && response.success) {
+					_this.done = true;
+				} else {
+					_this.$message.error(response.error);
 				}
-                else {
-                    _this.$message({
-						showClose: true,
-						message: response.data.error,
-						type: 'error',
-					});
-                }
-			} catch (err) {
+            }
+            catch (err) {
 				console.log(err);
                 _this.$message({
                     showClose: true,
@@ -85,8 +73,8 @@ export default {
                 });
 			}
             _this.loading = false;
-		},
-    },
+        }
+    }
 }
 </script>
 

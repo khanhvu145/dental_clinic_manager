@@ -22,19 +22,28 @@
                     </el-menu-item>
                 </nuxt-link>
             </el-submenu>
-            <nuxt-link v-if="checkAccessRight('customer')" to="/customer" class="sidebar-nav-link">
-                <el-menu-item index="customer">
+            <el-submenu
+                v-if="checkAccessRight('customer')"
+                index="2"
+            >
+                <template slot="title">
                     <i class='bx bxs-user-badge'></i>
                     <span slot="title">Khách hàng</span>
-                </el-menu-item>
-            </nuxt-link>
+                </template>
+                <nuxt-link v-if="checkAccessRight('customer')" to="/customer" class="sidebar-nav-link">
+                    <el-menu-item index="customer">
+                        <i class='bx bxs-user-rectangle'></i>
+                        <span slot="title">Khách hàng</span>
+                    </el-menu-item>
+                </nuxt-link>
+            </el-submenu>
             <el-submenu 
                 v-if="
                     checkAccessRight('appointment') ||
                     checkAccessRight('workingCalendar') ||
                     checkAccessRight('appointmentConfig')
                 "
-                index="2"
+                index="3"
             >
                 <template slot="title">
                     <i class='bx bxs-calendar-event'></i>
@@ -70,7 +79,7 @@
                     checkAccessRight('receipts') ||
                     checkAccessRight('payment')
                 "
-                index="3"
+                index="4"
             >
                 <template slot="title">
                     <i class='bx bxs-food-menu'></i>
@@ -93,7 +102,7 @@
                 v-if="
                     checkAccessRight('service')
                 "
-                index="4"
+                index="5"
             >
                 <template slot="title">
                     <i class='bx bxs-category-alt'></i>
@@ -117,7 +126,7 @@
                     checkAccessRight('accessgroup') ||
                     checkAccessRight('users')
                 "
-                index="5"
+                index="6"
             >
                 <template slot="title">
                     <i class='bx bxs-user-account'></i>
@@ -141,7 +150,7 @@
                     checkAccessRight('generalconfig') ||
                     checkAccessRight('smtpConfig')
                 "
-                index="6"
+                index="7"
             >
                 <template slot="title">
                     <i class='bx bxs-cog'></i>
