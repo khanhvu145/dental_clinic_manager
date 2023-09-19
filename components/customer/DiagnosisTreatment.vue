@@ -222,7 +222,27 @@ export default {
         serviceData: {
             type: Array,
         },
+        diaglogVisible: {
+			type: Boolean,
+			default: false
+		},
     },
+    watch: {
+		diaglogVisible: {
+			async handler(newVal, oldVal) {
+				const _this = this;
+                if(_this.data && _this.data.serviceGroupId){
+                    var service = _.filter([..._this.serviceData] || [], {'groupId': _this.data.serviceGroupId});
+                    _this.serviceByGroupData = service.map(item => {
+                        return {
+                            ...item,
+                        }
+                    })
+                }
+			},
+			immediate: true,
+		},
+	},
     data(){
         return {
             permanentTeethData: permanentTeeth,

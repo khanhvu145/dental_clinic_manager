@@ -75,6 +75,7 @@
                                             type="button" 
                                             class="control-btn blue"
                                             @click="viewEmptyCalendar()"
+                                            :disabled="data.status != 'new'"
                                             v-if="checkRight('view')"
                                         >
                                             <i class='bx bxs-calendar'></i>
@@ -122,7 +123,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="col-form-label">Loại lịch hẹn</div>
-                                        <el-select v-model="data.type" placeholder="Loại lịch hẹn" name="type" filterable>
+                                        <el-select v-model="data.type" placeholder="Loại lịch hẹn" name="type" :disabled="data.status != 'new'" filterable>
                                             <el-option
                                                 v-for="item in apointmentType"
                                                 :key="item.value"
@@ -133,7 +134,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="col-form-label">Nội dung *</div>
-                                        <el-select v-model="data.content" placeholder="Nội dung" name="content" filterable>
+                                        <el-select v-model="data.content" placeholder="Nội dung" name="content" :disabled="data.status != 'new'" filterable>
                                             <el-option
                                                 v-for="item in appointmentContent"
                                                 :key="item.value"
@@ -148,6 +149,7 @@
                                             type="textarea"
                                             :rows="6"
                                             placeholder="Ghi chú"
+                                            :disabled="data.status != 'new'"
                                             v-model="data.note">
                                         </el-input>
                                     </div>

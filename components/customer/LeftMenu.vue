@@ -26,6 +26,16 @@
                         </nuxt-link>
                         <nuxt-link
                             tag="li"
+                            :to="`/customer/${$route.params.id}/examinationV2`"
+                            :class="{ 'submenu-active': isRouteActive('examinationV2') }"
+                            class="list-group-item list-group-item-action border-0"
+                        >
+                            <a href="javascript:void(0)">
+                                <span>Khám và điều trị V2</span>
+                            </a>
+                        </nuxt-link>
+                        <nuxt-link
+                            tag="li"
                             :to="`/customer/${$route.params.id}/payment`"
                             :class="{ 'submenu-active': isRouteActive('payment') }"
                             class="list-group-item list-group-item-action border-0"
