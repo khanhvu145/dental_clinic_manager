@@ -84,7 +84,7 @@
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <el-table :data="data.data" v-loading="dataLoading" style="width: 100%" stripe border>
-                            <el-table-column v-if="columns[0].isShow" label="Thông tin khách hàng" min-width="150">
+                            <el-table-column v-if="columns[0].isShow" label="Khách hàng" min-width="150">
                                 <template slot-scope="scope">
                                     <div style="font-weight: bold;">  
                                         <i class='bx bx-code-alt'></i>
@@ -95,27 +95,37 @@
                                         {{ scope.row.name || '' }}
                                     </div>
                                     <div>
-                                        <i class='bx bx-id-card'></i>
-                                        {{ scope.row.physicalId || '' }}
-                                    </div>
-                                    <div>
-                                        <i class='bx bx-calendar-event'></i>
-                                        {{ scope.row.birthday ? $moment(scope.row.birthday).format('DD/MM/YYYY') : '' }}
-                                    </div>
-                                    <div>
                                         <i class='bx bx-phone' ></i>
-                                        {{ scope.row.phone || '' }}
+                                        <a class="href-custom" v-if="scope.row.phone" :href="`tel:${scope.row.phone}`">{{scope.row.phone}}</a>
                                     </div>
 								</template>
                             </el-table-column>
-                            <el-table-column v-if="columns[1].isShow" label="Trạng thái" min-width="80">
+                            <el-table-column v-if="columns[1].isShow" label="Thông tin thêm" min-width="220">
+                                <template slot-scope="scope">
+                                    <div>
+                                        <i class='bx bx-id-card'></i>
+                                        <span>{{ scope.row.physicalId || '' }}</span>
+                                        <span v-if="scope.row.dateOfIssue"> | {{ $moment(scope.row.dateOfIssue).format('DD/MM/YYYY') }}</span>
+                                        <span v-if="scope.row.placeOfIssue"> | {{ scope.row.placeOfIssue }}</span>
+                                    </div>
+                                    <div>
+                                        <i class='bx bx-cake'></i>
+                                        {{ scope.row.birthday ? $moment(scope.row.birthday).format('DD/MM/YYYY') : '' }}
+                                    </div>
+                                    <div>
+                                        <i class="el-icon-location-information"></i>
+                                        {{ scope.row.fullAddress || '' }}
+                                    </div>
+								</template>
+                            </el-table-column>
+                            <el-table-column v-if="columns[2].isShow" label="Trạng thái" min-width="80">
                                 <template slot-scope="scope">
                                     <el-tag :type="scope.row.isActive ? 'success' : 'danger'">
                                         {{ scope.row.isActive ? 'Hoạt động' : 'Ngưng hoạt động' }}
                                     </el-tag>
 								</template>
                             </el-table-column>
-                            <el-table-column v-if="columns[2].isShow" label="Nhóm/Nguồn" min-width="120">
+                            <el-table-column v-if="columns[3].isShow" label="Nhóm/Nguồn" min-width="120">
                                 <template slot-scope="scope">
                                     <div>  
                                         <i class='bx bx-heart-circle'
@@ -135,13 +145,13 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column v-if="columns[3].isShow" label="Hoạt động" min-width="150">
+                            <el-table-column v-if="columns[4].isShow" label="Hoạt động" min-width="150">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.recentActivity ? $moment(scope.row.recentActivity).format('DD/MM/YYYY HH:mm') : 'Chưa có hoạt động' }}</div>
                                     <div style="font-style: italic;color:#98a6ad;">{{ scope.row.recentActivity ? `Hoạt động - ${$moment(scope.row.recentActivity).fromNow()}` : '' }}</div>
 								</template>
                             </el-table-column>
-                            <el-table-column v-if="columns[4].isShow" label="Thao tác" min-width="80">
+                            <el-table-column v-if="columns[5].isShow" label="Thao tác" min-width="80">
                                 <template slot-scope="scope">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -160,13 +170,13 @@
                                     </div>
 								</template>
                             </el-table-column>
-                            <el-table-column v-if="columns[5].isShow" label="Tạo bởi-lúc" min-width="120">
+                            <el-table-column v-if="columns[6].isShow" label="Tạo bởi-lúc" min-width="120">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.createdBy || 'System' }}</div>
                                     <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
 								</template>
                             </el-table-column>
-                            <el-table-column v-if="columns[6].isShow" label="Cập nhật bởi-lúc" min-width="120">
+                            <el-table-column v-if="columns[7].isShow" label="Cập nhật bởi-lúc" min-width="120">
                                 <template slot-scope="scope">
                                     <div>{{ scope.row.updatedBy }}</div>
                                     <div>{{ scope.row.updatedAt ? $moment(scope.row.updatedAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
@@ -318,3 +328,12 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.href-custom{
+    color: #00a582;
+}
+.href-custom:hover{
+    color: #015d49;
+}
+</style>

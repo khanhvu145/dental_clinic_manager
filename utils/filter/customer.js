@@ -1,9 +1,13 @@
 
 export const columns = [
     {
-        name: 'Thông tin khách hàng',
+        name: 'Khách hàng',
         isShow: true,
     },
+    {
+      name: 'Thông tin thêm',
+      isShow: true,
+  },
     {
       name: 'Trạng thái',
       isShow: true,

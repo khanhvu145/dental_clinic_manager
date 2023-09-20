@@ -1,12 +1,72 @@
 <template>
     <LeftMenu>
-        <form class="mt-3 mb-4" v-loading="dataLoading" v-on:submit.prevent="submitExaminationForm">
+        <form class="mt-3 mb-4" v-if="checkRight('viewExamination') " v-loading="dataLoading" v-on:submit.prevent="submitExaminationForm">
             <!-- Thao tác -->
             <div class="row mt-3">
                 <div class="col-md-12" style="text-align: right;">
                     <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examination`)">
                         <i class='bx bx-arrow-back'></i>
                         <span>Quay lại</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('printExamination') && 
+                            (formData.status == 'confirm' || formData.status == 'completed')
+                        "
+                        type="button" 
+                        class="control-btn yellow" 
+                        @click="exportPDF"
+                    >
+                        <i class='bx bx-printer'></i>
+                        <span>In phiếu khám</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('cancelExamination') && 
+                            (formData.status == 'new' || formData.status == 'confirm')
+                        "
+                        type="button" 
+                        class="control-btn red" 
+                        @click="cancelExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-x'></i>
+                        <span>Hủy</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') &&
+                            formData.status == 'confirm'
+                        "
+                        type="button" 
+                        class="control-btn blue2" 
+                        @click="completeExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-check-double'></i>
+                        <span>Hoàn thành</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') &&
+                            formData.status == 'new'
+                        "
+                        type="button" 
+                        class="control-btn blue" 
+                        @click="confirmExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-list-check'></i>
+                        <span>Xác nhận điều trị</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') &&
+                            formData.status == 'new'
+                        "
+                        type="button" 
+                        class="control-btn green" 
+                        @click="submitExaminationForm"
+                    >
+                        <i class='bx bx-save' ></i>
+                        <span>Lưu</span>
                     </button>
                 </div>
             </div>
@@ -291,7 +351,7 @@
                                                     {{ (scope.row.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column v-if="formData.status == 'new'" label="Thao tác" min-width="100">
+                                            <el-table-column v-if="(formData.status == 'new' || formData.status == 'confirm')" label="Thao tác" min-width="100">
                                                 <template slot-scope="scope">
                                                     <a class="btn control-btn blue2" style="padding: 4px 6px;" @click="openExaminationDialog('update', scope.row)">
                                                         <i class="el-icon-edit-outline"></i>
@@ -344,7 +404,7 @@
                         </el-tab-pane>
                         <!-- Đơn thuốc -->
                         <el-tab-pane label="Đơn thuốc" name="prescription">
-                            <el-card class="box-card mb-4">
+                            <el-card class="box-card mb-4" :style="{ 'pointer-events': (formData.status == 'new' || formData.status == 'confirm') ? 'auto' : 'none' }">
                                 <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                                     
                                 </div>
@@ -360,9 +420,72 @@
                         <i class='bx bx-arrow-back'></i>
                         <span>Quay lại</span>
                     </button>
+                    <button
+                        v-if="
+                            checkRight('printExamination') && 
+                            (formData.status == 'confirm' || formData.status == 'completed')
+                        "
+                        type="button" 
+                        class="control-btn yellow" 
+                        @click="exportPDF"
+                    >
+                        <i class='bx bx-printer'></i>
+                        <span>In phiếu khám</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('cancelExamination') && 
+                            (formData.status == 'new' || formData.status == 'confirm')
+                        "
+                        type="button" 
+                        class="control-btn red" 
+                        @click="cancelExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-x'></i>
+                        <span>Hủy</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') &&
+                            formData.status == 'confirm'
+                        "
+                        type="button" 
+                        class="control-btn blue2" 
+                        @click="completeExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-check-double'></i>
+                        <span>Hoàn thành</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') &&
+                            formData.status == 'new'
+                        "
+                        type="button" 
+                        class="control-btn blue" 
+                        @click="confirmExamination($route.query.examinationId)"
+                    >
+                        <i class='bx bx-list-check'></i>
+                        <span>Xác nhận điều trị</span>
+                    </button>
+                    <button
+                        v-if="
+                            checkRight('updateExamination') &&
+                            formData.status == 'new'
+                        "
+                        type="button" 
+                        class="control-btn green" 
+                        @click="submitExaminationForm"
+                    >
+                        <i class='bx bx-save' ></i>
+                        <span>Lưu</span>
+                    </button>
                 </div>
             </div>
         </form>
+        <div v-else>
+            <el-empty description="Bạn không có quyền !!"></el-empty>
+        </div>
 
         <!-- ------------------ Dialog ------------------- -->
         <!-- Dialog thêm/chỉnh sửa chỉ định -->
@@ -485,6 +608,304 @@
             </span>
         </el-dialog>
 
+        <!-- ------------------ Print template ------------------- -->
+        <!-- Template in phiếu khám -->
+        <vue-html2pdf 
+            class="print-content"
+            id="print-content-pdf"
+            :show-layout="false"
+            :float-layout="true"
+            :preview-modal="true"
+            :enable-download="false"
+            :paginate-elements-by-height="1500"
+            filename="examination"
+            :pdf-quality="2"
+            :manual-pagination="false"
+            pdf-format="a4"
+            pdf-orientation="portrait"
+            pdf-content-width="100%"
+            ref="html2Pdf_examinationForm"
+        >
+            <section slot="pdf-content">
+                <div v-if="printData && printData._id" class="container mt-3" style="color:#000;font-size:13px;">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <img style="width:100%;height:auto;object-fit: cover;" :src="informationConfig.img" crossorigin="anonymous" />
+                        </div>
+                        <div class="col-md-10">
+                            <div style="font-weight:bold;font-size:16px;text-transform: uppercase;">{{ informationConfig.name }}</div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Số điện thoại:</span>
+                                        <span>{{ informationConfig.phone }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Địa chỉ:</span>
+                                        <span>{{ informationConfig.address }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Email:</span>
+                                        <span>{{ informationConfig.email }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span style="font-weight:bold;">Website:</span>
+                                        <span>{{ informationConfig.website }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <div style="font-weight:bold;font-size:24px;">PHIẾU KHÁM VÀ ĐIỀU TRỊ</div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="row">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4 text-center">Ngày {{$moment(printData.createdAt).format('DD')}} tháng {{$moment(printData.createdAt).format('MM')}} năm {{$moment(printData.createdAt).format('YYYY')}}</div>
+                                <div class="col-md-4 text-right">Mã: {{printData.code}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Mã khách hàng: </span>
+                            {{ printData.customerCode || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Họ và tên: </span>
+                            {{ printData.customerName || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Ngày sinh: </span>
+                            {{ $moment(printData.customerBirthday).format('DD/MM/YYYY') || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">Giới tính: </span>
+                            {{ printData.customerGender == 'male' ? 'Nam' : 'Nữ' || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span style="font-weight: bold;">CMND/CCCD: </span>
+                            {{ printData.customerPhysicalId || '' }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                                <span style="font-weight: bold;">Số điện thoại: </span>
+                            {{ printData.customerPhone || '' }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    TIỀN SỬ BỆNH
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="printData.anamnesis != null && printData.anamnesis.length > 0" class="ml-3">
+                                        <li v-for="item in printData.anamnesis" :key="item.value" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{item.label}} {{item.note ? ` - ${item.note}` : ''}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    DỊ ỨNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="printData.allergy != null && printData.allergy.allergies != null && printData.allergy.allergies.length > 0" class="ml-3">
+                                        <li v-for="item in printData.allergy.allergies" :key="item" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{getAllergyName(item)}}
+                                        </li>
+                                        <li v-if="printData.allergy.other" class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{printData.allergy.other}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    KHÁM LÂM SÀNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul v-if="printData.clinicalExam" class="ml-3">
+                                        <li  class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            {{printData.clinicalExam}}
+                                        </li>
+                                    </ul>
+                                    <ul v-else class="ml-3">
+                                        <li class="mb-5 pb-2">- Không có thông tin khám</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                                    KHÁM CẬN LÂM SÀNG
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul class="ml-3">
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            X-quang:
+                                            <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.xquang != null && printData.preclinicalExam.xquang.length > 0">
+                                                <span v-for="(item, index) in printData.preclinicalExam.xquang" :key="index">
+                                                    {{index > 0 ? ', ' : ' '}} {{getXquangName(item)}}
+                                                </span>
+                                            </span> 
+                                        </li>
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            Xét nghiệm:
+                                            <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.test != null && printData.preclinicalExam.test.length > 0">
+                                                <span v-for="(item, index) in printData.preclinicalExam.test" :key="index">
+                                                    {{index > 0 ? ', ' : ' '}} {{getTestName(item)}}
+                                                </span>
+                                            </span>
+                                        </li>
+                                        <li class="mb-2">
+                                            <span style="font-family:Wingdings">&#118;</span>
+                                            Khác: 
+                                            <span v-if="printData.preclinicalExam != null && printData.preclinicalExam.other != null">
+                                                {{printData.preclinicalExam.other}}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                            <i class='bx bx-check-circle' style="font-size:20px;" ></i>
+                            CHẨN ĐOÁN VÀ ĐIỀU TRỊ
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="table-secondary" style="text-align:center;font-weight:bold;"> 
+                                        <th scope="col">Răng/hàm</th>
+                                        <th scope="col">Chẩn đoán</th>
+                                        <th scope="col">Điều trị</th>
+                                        <th scope="col">Đơn giá</th>
+                                        <th scope="col">SL</th>
+                                        <th scope="col">Giảm giá</th>
+                                        <th scope="col">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in printData.diagnosisTreatment" :key="item.key">
+                                        <td>
+                                            {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }}
+                                        </td>
+                                        <td>
+                                            {{ item.diagnose }}
+                                        </td>
+                                        <td>
+                                            {{ getServiceName(item.serviceId) }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.unitPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                        <td style="text-align:center;">
+                                            {{ item.isJaw ? item.quantityJaw : item.quantity }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {{ (item.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                    GHI CHÚ
+                                </div>
+                                <div class="col-md-12 ml-3 mt-2">
+                                    {{printData.note}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size:16px;font-weight:bold;">
+                                    <i class='bx bx-check-circle' style="font-size:20px;"></i>
+                                    TỔNG CHI PHÍ ĐIỀU TRỊ
+                                </div>
+                                <div class="col-md-12 ml-2">
+                                    <table class="table table-borderless" style="font-size:14px;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Chi phí điều trị</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ printData.treatmentAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Giảm giá</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ printData.totalDiscountAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:40%;font-weight:bold;">Thành tiền</td>
+                                                <td style="width:5%">:</td>
+                                                <td style="text-align:right;width:55%">
+                                                    <span>{{ printData.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }} VND</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mt-4">
+                        <div class="col-md-6" style="text-align:center;">
+                            <div>Nha sĩ điều trị</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div>
+                        <div class="col-md-6" style="text-align:center;">
+                            <div>Khách hàng</div>
+                            <div style="font-style:italic;">(Ký và ghi rõ họ tên)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </vue-html2pdf>
+
     </LeftMenu>
 </template>
 
@@ -567,6 +988,7 @@ export default {
                     totalPrice: 0,
                 }
             },
+            printData: {},
         }
     },
     async created(){
@@ -670,6 +1092,31 @@ export default {
         },
         submitExaminationForm: debounce(async function () {
             const _this = this;
+            _this.dataLoading = true;
+            try{
+                _this.formData.anamnesis = _this.anamnesisSelected;
+                _this.formData.diagnosisTreatment = _this.tableData;
+                var oldData = cloneDeep(_this.formData);
+                var newData = new FormData();
+                buildFormData(newData, oldData);
+                const data = await _this.$axios.$post('/api/customer/updateExamination', newData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                if (data.success) {
+                    _this.$message({
+                        message: data.message,
+                        type: 'success',
+                    });
+                    await _this.getData();
+                } else {
+                    _this.$message.error(data.error);
+                }
+            }
+            catch (e){
+                console.log(e);
+                _this.$message.error(e);
+            }
+            _this.dataLoading = false;
         }),
         handleSelectionChange(val) {
             const _this = this;
@@ -1049,6 +1496,145 @@ export default {
                 return accumulator + object.discount;
             }, 0);
             _this.formData.totalAmount = _this.formData.treatmentAmount - _this.formData.totalDiscountAmount;
+        },
+        async confirmExamination(id){
+            const _this = this;
+            _this
+                .$confirm(`Bạn có chắc muốn xác nhận điều trị?`, 'Xác nhận', {
+					confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+					type: 'warning',
+				})
+                .then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/customer/confirmExamination', {
+                            id: id
+                        });
+                        if (data.success) {
+                            await _this.getData();
+                            _this.$message({
+                                message: 'Xác nhận điều trị thành công',
+                                type: 'success',
+                            });
+                        } else {
+                            _this.$message.error(data.error);
+                        }
+                    }
+                    catch (e){
+                        console.log(e);
+                        _this.$message.error(e);
+                    }
+                    _this.dataLoading = false;
+                });
+        },
+        async cancelExamination(id){
+            const _this = this;
+            _this.
+                $prompt('Lý do hủy *', 'Xác nhận hủy phiếu khám', {
+                    confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+                    type: 'warning',
+                    inputPlaceholder: 'Nhập lý do hủy',
+                    inputValidator: this.validateInput
+                }).then(async ({ value }) => {
+                    _this.dataLoading = true;
+                    if (value) {
+                        const data = await _this.$axios.$post('/api/customer/cancelExamination', {
+                            id: id,
+                            cancelReason: value
+                        });
+                        if (data.success) {
+                            await _this.getData();
+                            _this.$message({
+                                message: 'Hủy phiếu khám thành công',
+                                type: 'success',
+                            });
+                        } else {
+                            _this.$message.error(data.error);
+                        }
+                    }
+                    else{
+                        _this.$message({
+                            type: 'error',
+                            message: 'Vui lòng nhập lý do hủy',
+                        });
+                    }
+                    _this.dataLoading = false;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
+        },
+        async completeExamination(id){
+            const _this = this;
+            _this
+                .$confirm(`Bạn có chắc muốn hoàn thành điều trị?`, 'Xác nhận', {
+					confirmButtonText: 'Xác nhận',
+					cancelButtonText: 'Hủy',
+					type: 'warning',
+				})
+                .then(async () => {
+                    _this.dataLoading = true;
+                    try{
+                        const data = await _this.$axios.$post('/api/customer/completeExamination', {
+                            id: id
+                        });
+                        if (data.success) {
+                            await _this.getData();
+                            _this.$message({
+                                message: 'Hoàn thành điều trị thành công',
+                                type: 'success',
+                            });
+                        } else {
+                            _this.$message.error(data.error);
+                        }
+                    }
+                    catch (e){
+                        console.log(e);
+                        _this.$message.error(e);
+                    }
+                    _this.dataLoading = false;
+                });
+        },
+        async exportPDF(){
+            const _this = this;
+            if (_this.$route.query.examinationId) {
+                await _this.$axios.$get(`/api/customer/getExaminationById/${_this.$route.query.examinationId}`).then(
+                    async (response) => {
+                        if(response.data){
+                            _this.printData = response.data;
+                            _this.$refs.html2Pdf_examinationForm.generatePdf();
+                        }
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
+            }
+        },
+        getAllergyName(value){
+            const _this = this;
+            let data = _.find(_this.allergyData, { value: value });
+			return data ? data.label : '';
+        },
+        getXquangName(value){
+            const _this = this;
+            let data = _.find(_this.xquangData, { value: value });
+			return data ? data.label : '';
+        },
+        getTestName(value){
+            const _this = this;
+            let data = _.find(_this.testData, { value: value });
+			return data ? data.label : '';
         },
     }
 }
