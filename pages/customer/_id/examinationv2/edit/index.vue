@@ -1,10 +1,10 @@
 <template>
     <LeftMenu>
-        <form class="mt-3 mb-4" v-if="checkRight('viewExamination') " v-loading="dataLoading" v-on:submit.prevent="submitExaminationForm">
+        <form class="mt-3 mb-4" v-if="checkRight('viewExamination') && formData._id" v-loading="dataLoading" v-on:submit.prevent="submitExaminationForm">
             <!-- Thao tác -->
             <div class="row mt-3">
                 <div class="col-md-12" style="text-align: right;">
-                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examination`)">
+                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examinationV2`)">
                         <i class='bx bx-arrow-back'></i>
                         <span>Quay lại</span>
                     </button>
@@ -403,20 +403,20 @@
                             </el-card>
                         </el-tab-pane>
                         <!-- Đơn thuốc -->
-                        <el-tab-pane label="Đơn thuốc" name="prescription">
+                        <!-- <el-tab-pane label="Đơn thuốc" name="prescription">
                             <el-card class="box-card mb-4" :style="{ 'pointer-events': (formData.status == 'new' || formData.status == 'confirm') ? 'auto' : 'none' }">
                                 <div slot="header" class="card-header-custom" style="font-size:14px;font-weight:bold;">
                                     
                                 </div>
                             </el-card>
-                        </el-tab-pane>
+                        </el-tab-pane> -->
                     </el-tabs>
                 </div>
             </div>
             <!-- Thao tác -->
             <div class="row mt-3">
                 <div class="col-md-12" style="text-align: right;">
-                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examination`)">
+                    <button type="button" class="control-btn gray" @click="$router.push(`/customer/${$route.params.id}/examinationV2`)">
                         <i class='bx bx-arrow-back'></i>
                         <span>Quay lại</span>
                     </button>
@@ -483,6 +483,9 @@
                 </div>
             </div>
         </form>
+        <div v-else-if="!formData._id">
+            <el-empty description="Có lỗi xảy ra !!"></el-empty>
+        </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
         </div>

@@ -209,8 +209,12 @@ export default {
 											value: 'printReceipt',
 										},
                                         {
-											name: 'Thêm đơn thuốc',
-											value: 'createPrescription',
+											name: 'Cập nhật đơn thuốc',
+											value: 'createUpdatePrescription',
+										},
+                                        {
+											name: 'Lịch sử đơn thuốc',
+											value: 'viewPrescriptionHistory',
 										},
                                         {
 											name: 'In đơn thuốc',

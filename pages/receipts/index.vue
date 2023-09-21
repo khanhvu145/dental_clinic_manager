@@ -28,8 +28,8 @@
                                     v-model="searchQuery.filters.dateF"
                                     type="daterange"
                                     range-separator="-"
-                                    start-placeholder="Ngày bắt đầu"
-                                    end-placeholder="Ngày kết thúc"
+                                    start-placeholder="Từ"
+                                    end-placeholder="Đến"
                                     format="dd/MM/yyyy">
                                 </el-date-picker>
                             </div>

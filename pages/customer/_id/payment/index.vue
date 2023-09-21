@@ -28,8 +28,8 @@
                         v-model="searchQuery.filters.createdAtF"
                         type="daterange"
                         range-separator="-"
-                        start-placeholder="Ngày bắt đầu"
-                        end-placeholder="Ngày kết thúc"
+                        start-placeholder="Từ"
+                        end-placeholder="Đến"
                         format="dd/MM/yyyy">
                     </el-date-picker>
                 </div>
@@ -724,7 +724,6 @@ export default {
 				});
             }
             receiptData.paymentId = _this.paymentDialog.data._id;
-            receiptData.updatedBy = _this.userInfo.data.username;
             var oldData = cloneDeep(receiptData);
             var newData = new FormData();
             buildFormData(newData, oldData);

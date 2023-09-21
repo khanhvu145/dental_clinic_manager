@@ -46,6 +46,16 @@
                         </nuxt-link>
                         <nuxt-link
                             tag="li"
+                            :to="`/customer/${$route.params.id}/prescription`"
+                            :class="{ 'submenu-active': isRouteActive('prescription') }"
+                            class="list-group-item list-group-item-action border-0"
+                        >
+                            <a href="javascript:void(0)">
+                                <span>Đơn thuốc</span>
+                            </a>
+                        </nuxt-link>
+                        <nuxt-link
+                            tag="li"
                             :to="`/customer/${$route.params.id}/diary`"
                             :class="{ 'submenu-active': isRouteActive('diary') }"
                             class="list-group-item list-group-item-action border-0"

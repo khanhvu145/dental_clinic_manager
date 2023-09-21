@@ -26,8 +26,8 @@
                         v-model="searchQuery.filters.dateF"
                         type="daterange"
                         range-separator="-"
-                        start-placeholder="Ngày bắt đầu"
-                        end-placeholder="Ngày kết thúc"
+                        start-placeholder="Từ"
+                        end-placeholder="Đến"
                         format="dd/MM/yyyy">
                     </el-date-picker>
                 </div>
@@ -124,11 +124,11 @@
                                         <span v-if="item.action == 'cancel'">Hủy đặt hẹn</span>
                                         <span v-if="item.action == 'checkin'">Đã đến khám</span>
                                         <span v-if="item.action == 'completed'">Hoàn thành lịch hẹn</span>
-                                        <span v-if="item.action == 'transfer'">Chuyển lịch hẹn</span>
+                                        <!-- <span v-if="item.action == 'transfer'">Chuyển lịch hẹn</span> -->
                                         <span v-if="item.action != 'transfer'">({{ (item.note && item.note.length > 0) ? item.note[0].newvalue : '' }})</span>
                                         <i class='bx bxs-edit-alt'></i>
                                     </div>
-                                    <div v-if="item.action == 'transfer'" class="mt-2">
+                                    <!-- <div v-if="item.action == 'transfer'" class="mt-2">
                                         <a class='text-info' href='javascript:void(0)'>
                                             {{ (item.note && item.note.length > 0) ? item.note[0].oldvalue : '' }}
                                         </a>
@@ -136,7 +136,7 @@
                                         <a class='text-info' href='javascript:void(0)'>
                                             {{ (item.note && item.note.length > 0) ? item.note[0].newvalue : '' }}
                                         </a>
-                                    </div>
+                                    </div> -->
                                     <div class="mt-2" style="font-style: italic;color:#98a6ad;">
                                         {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
                                     </div>
@@ -148,10 +148,18 @@
                                         <span v-if="item.action == 'create'">Tạo mới phiếu khám</span>
                                         <span v-if="item.action == 'update'">Cập nhật phiếu khám</span>
                                         <span v-if="item.action == 'confirm'">Xác nhận điều trị</span>
+                                        <span v-if="item.action == 'completed'">Hoàn thành khám và điều trị</span>
                                         <span v-if="item.action == 'cancel'">Hủy phiếu khám</span>
                                         <i class='bx bxs-edit-alt'></i>
                                     </div>
-                                    <div v-if="item.action == 'create' || item.action == 'update'" class="mt-2">
+                                    <div class="mt-2">
+                                        <el-tooltip class="item" effect="dark" content="Xem dữ liệu" placement="top">
+                                            <a class='text-info' title="Xem dữ liệu" href='javascript:void(0)' @click="viewExaminationLog(item.note)">
+                                                Chi tiết phiếu khám <i class='el-icon-view'></i>
+                                            </a>
+                                        </el-tooltip>
+                                    </div>
+                                    <!-- <div v-if="item.action == 'create' || item.action == 'update'" class="mt-2">
                                         <el-tooltip class="item" effect="dark" content="Xem dữ liệu mới" placement="top">
                                             <a class='text-info' title="Xem sự thay đổi" href='javascript:void(0)' @click="viewExaminationLog(item.note, 'new')">
                                                 Dữ liệu mới <i class='el-icon-view'></i>
@@ -169,7 +177,7 @@
                                                 Chi tiết phiếu khám <i class='el-icon-view'></i>
                                             </a>
                                         </el-tooltip>
-                                    </div>
+                                    </div> -->
                                     <div class="mt-2" style="font-style: italic;color:#98a6ad;">
                                         {{ item.createdBy }} - {{ $moment(item.createdAt).fromNow() }} ({{ $moment(item.createdAt).format('DD/MM/YY HH:mm') }})
                                     </div>
@@ -721,19 +729,14 @@ export default {
             _this.detailProfileLog.data = data;
             _this.detailProfileLog.visible = true;
         },
-        viewExaminationLog(data, type){
+        viewExaminationLog(data){
             const _this = this;
-            if(type == 'new'){
-                if(data && data.length > 0){
-                    _this.examinationLog.data = data[0].newvalue;
-                    _this.examinationLog.visible = true;
-                }
-            }
-            else if(type == 'old'){
-                if(data && data.length > 0){
-                    _this.examinationLog.data = data[0].oldvalue;
-                    _this.examinationLog.visible = true;
-                }
+            if(_this.$route.params.id && data && data.length > 0){
+                const routeData = this.$router.resolve({
+                    path: `/customer/${_this.$route.params.id}/examinationV2/edit`,
+                    query: { examinationId: data[0].newvalue }
+                });
+                window.open(routeData.href, '_blank');
             }
         }
     }
