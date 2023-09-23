@@ -36,7 +36,7 @@
                             <div class="col-md-4">
                                 <div class="col-form-label">Trạng thái</div>
                                 <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
-                                    <el-option label="Tất cả" value="all"></el-option>
+                                    <el-option label="Tất cả..." value="all"></el-option>
                                     <el-option label="Đã thanh toán" value="paid"></el-option>
                                     <el-option label="Đã hủy" value="cancelled"></el-option>
                                 </el-select>
@@ -132,6 +132,7 @@
                                         <el-tooltip class="item" effect="dark" placement="top">
                                             <div slot="content">
                                                 <div>Hủy lúc: {{ scope.row.cancelledAt ? $moment(scope.row.cancelledAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+                                                <div class="mt-1">Hủy bởi: {{ scope.row.cancelledBy ? scope.row.cancelledBy : '' }}</div>
                                                 <div class="mt-1">Lý do: {{ scope.row.cancelReason || '' }}</div>
                                             </div>
                                             <el-tag type="info">Đã hủy</el-tag>

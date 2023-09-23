@@ -326,6 +326,10 @@ export default {
 									value: 'payment',
                                     customRights: [
                                         {
+											name: 'Hủy phiếu chi',
+											value: 'cancel',
+										},
+                                        {
 											name: 'In phiếu chi',
 											value: 'print',
 										},

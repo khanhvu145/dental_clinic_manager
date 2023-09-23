@@ -31,7 +31,12 @@ export default {
         // The chart's options.
         options: {
             type: Object
-        }
+        },
+        // The type
+        type: {
+            type: String,
+            default: 'bar'
+        },
     },
     data() {
         return {
@@ -53,7 +58,7 @@ export default {
         Chart.plugins.register(ChartDataLabels);
         _this.chart = new Chart(_this.$refs.myChart, {
             plugins: [ChartDataLabels],
-            type: 'bar',
+            type: _this.type,
             data: {
                 labels: _this.labels,
                 datasets: _this.datasets

@@ -29,6 +29,7 @@
                             <el-option label="Tất cả..." value="all"></el-option>
                             <el-option label="Mới" value="new"></el-option>
                             <el-option label="Hoàn tất" value="completed"></el-option>
+                            <el-option label="Đã hủy" value="cancelled"></el-option>
                         </el-select>
                     </div>
                     <!-- <div class="col-md-4 col-lg-2">
@@ -139,6 +140,16 @@
                                     <div v-if="scope.row.status == 'completed'" style="text-align:center;">
                                         <el-tag type="success">Hoàn tất</el-tag>
                                     </div>
+                                    <div v-if="scope.row.status == 'cancelled'" style="text-align:center;">
+                                        <el-tooltip class="item" effect="dark" placement="top">
+                                            <div slot="content">
+                                                <div>Hủy lúc: {{ scope.row.cancelledAt ? $moment(scope.row.cancelledAt).format('HH:mm DD/MM/YYYY') : '' }}</div>
+                                                <div class="mt-1">Hủy bởi: {{ scope.row.cancelledBy ? scope.row.cancelledBy : '' }}</div>
+                                                <div class="mt-1">Lý do: {{ scope.row.cancelReason || '' }}</div>
+                                            </div>
+                                            <el-tag type="info">Đã hủy</el-tag>
+                                        </el-tooltip>
+                                    </div>
                                 </template>
                             </el-table-column>
                             <!-- <el-table-column v-if="columns[4].isShow" label="Loại" min-width="100">
@@ -163,13 +174,13 @@
                                                 </a>
                                             </el-tooltip>
                                         </div>
-                                        <div v-if="(checkRight('print') && scope.row.status == 'completed')">
+                                        <!-- <div v-if="(checkRight('print') && scope.row.status == 'completed')">
                                             <el-tooltip class="item" effect="dark" content="In phiếu chi" placement="top">
                                                 <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printPayment(scope.row)">
                                                     <i class='bx bxs-printer'></i>
                                                 </a>
                                             </el-tooltip>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </template>
                             </el-table-column>
@@ -295,12 +306,17 @@
                     </div>
                     <div class="col-md-6">
                         <div class="col-form-label">Trạng thái</div>
-                        <el-input 
+                        <el-select v-model="dialogEdit.data.status" placeholder="Trạng thái..." name="status" disabled>
+                            <el-option label="Mới" value="new"></el-option>
+                            <el-option label="Hoàn tất" value="completed"></el-option>
+                            <el-option label="Đã hủy" value="cancelled"></el-option>
+                        </el-select>
+                        <!-- <el-input 
                             name="status"
                             placeholder="Trạng thái"
                             :value="dialogEdit.data.status == 'completed' ? 'Hoàn tất' : 'Mới'"
                             readonly
-                        ></el-input>
+                        ></el-input> -->
                     </div>
                     <div class="col-md-6">
                         <div class="col-form-label">Đơn vị nhận tiền</div>
@@ -383,21 +399,30 @@
                     </button>
                     <button
                         type="button" 
-                        class="control-btn green"
-                        @click="submitEditPayment"
-                        v-if="(checkRight('update') && dialogEdit.data.status == 'new')"
-                    >
-                        <i class='bx bx-save' ></i>
-                        <span>Hoàn tất</span>
-                    </button>
-                    <button
-                        type="button" 
                         class="control-btn yellow"
                         @click="printPayment(dialogEdit.data)"
                         v-if="(checkRight('print') && dialogEdit.data.status == 'completed')"
                     >
                         <i class='bx bx-save' ></i>
                         <span>In phiếu chi</span>
+                    </button>
+                    <button
+                        type="button" 
+                        class="control-btn red"
+                        @click="cancelPayment(dialogEdit.data)"
+                        v-if="(checkRight('cancel') && dialogEdit.data.status == 'new')"
+                    >
+                        <i class='bx bx-x'></i>
+                        <span>Hủy</span>
+                    </button>
+                    <button
+                        type="button" 
+                        class="control-btn green"
+                        @click="submitEditPayment"
+                        v-if="(checkRight('update') && dialogEdit.data.status == 'new')"
+                    >
+                        <i class='bx bx-save' ></i>
+                        <span>Hoàn tất</span>
                     </button>
                 </span>
             </el-dialog>
@@ -851,7 +876,60 @@ export default {
                 }
                 _this.dataLoading = false;
             }
-        }
+        },
+        async cancelPayment(data){
+            const _this = this;
+            if(data){
+                _this.
+                    $prompt('Lý do hủy *', 'Xác nhận hủy phiếu chi', {
+                        confirmButtonText: 'Xác nhận',
+                        cancelButtonText: 'Hủy',
+                        type: 'warning',
+                        inputPlaceholder: 'Nhập lý do hủy',
+                        inputValidator: this.validateInput
+                    }).then(async ({ value }) => {
+                        _this.dataLoading = true;
+                        try{
+                            if (value) {
+                                const response = await _this.$axios.$post('/api/paymentSlip/cancel', {
+                                    id: data._id,
+                                    cancelReason: value
+                                });
+                                if (response.success) {
+                                    _this.dialogEdit.data = new PaymentSlip(),
+                                    _this.dialogEdit.visible = false;
+                                    await _this.getData(_this.searchQuery);
+                                    _this.$message({
+                                        message: 'Hủy phiếu chi thành công',
+                                        type: 'success',
+                                    });
+                                } else {
+                                    _this.$message.error(response.error);
+                                }
+                            }
+                            else{
+                                _this.$message({
+                                    type: 'error',
+                                    message: 'Vui lòng nhập lý do hủy',
+                                });
+                            }
+                        }
+                        catch(error){
+                            console.log('Error: ', error);
+                            _this.$message({
+                                type: 'error',
+                                message: error,
+                            });
+                        }
+                        _this.dataLoading = false;
+                    })
+                    .catch(() => {});
+            }
+        },
+        validateInput (input) {
+            if (input) return true;
+            else return 'Vui lòng nhập lý do hủy.';
+        },
     }
 }
 </script>

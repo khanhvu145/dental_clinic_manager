@@ -9,7 +9,7 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-3">
-                        <el-select v-model="searchQuery.typeF" filterable name="typeF">
+                        <el-select v-model="searchQuery.typeF" filterable name="typeF" @change="getData()">
                             <el-option label="Theo ngày" value="day"></el-option>
                             <el-option label="Theo tháng" value="month"></el-option>
                             <el-option label="Theo năm" value="year"></el-option>
@@ -55,6 +55,7 @@
                                     align="right"
                                     style="width: 100%"
                                     :clearable="false"
+                                    required
                                 ></el-date-picker>
                             </div>
                             <div class="col-6">
@@ -80,7 +81,7 @@
                 <div class="row mt-4">
                     <!-- Doanh thu -->
                     <div class="col-md-6 col-xl-4 mb-2">
-                        <el-card class="box-card">
+                        <el-card class="box-card" v-loading="dataLoading">
                             <div class="row">
                                 <div class="col-4">
                                     <div class="avatar-lg rounded-circle" style="background-color:#278664;">
@@ -88,7 +89,7 @@
                                     </div>
                                 </div>
                                 <div class="col-8">
-                                    <div class="text-right d-flex flex-column justify-content-center" style="height:100%;">
+                                    <div class="text-right d-flex flex-column" style="height:100%;">
                                         <div style="font-weight:bold;color:rgb(104 102 102);">Tổng doanh thu (VND)</div>
                                         <div class="mt-2" style="font-weight:bold;color:#278664;font-size:24px;">{{ replaceNumber(overviewData.revenue) }}</div>
                                         <div class="mt-2" style="font-style:italic;color:rgb(152, 166, 173);font-size:14px;">{{ `${convertAmountToWord(overviewData.revenue)}` }}</div>
@@ -99,7 +100,7 @@
                     </div>
                     <!-- Lịch hẹn -->
                     <div class="col-md-6 col-xl-4 mb-2">
-                        <el-card class="box-card">
+                        <el-card class="box-card" v-loading="dataLoading">
                             <div class="row">
                                 <div class="col-4">
                                     <div class="avatar-lg rounded-circle" style="background-color:#f0bc68;">
@@ -107,14 +108,14 @@
                                     </div>
                                 </div>
                                 <div class="col-8">
-                                    <div class="text-right d-flex flex-column justify-content-center" style="height:100%;">
+                                    <div class="text-right d-flex flex-column" style="height:100%;">
                                         <div style="font-weight:bold;color:rgb(104 102 102);">Tổng số cuộc hẹn (Lịch hẹn)</div>
-                                        <div class="mt-2" style="font-weight:bold;color:#f0bc68;font-size:24px;">{{ replaceNumber(overviewData.appointment.total) }}</div>
-                                        <div class="mt-2" style="font-style:italic;color:rgb(152, 166, 173);font-size:14px;">
+                                        <div class="mt-2" style="font-weight:bold;color:#f0bc68;font-size:24px;">{{ replaceNumber(overviewData.appointment) }}</div>
+                                        <!-- <div class="mt-2" style="font-style:italic;color:rgb(152, 166, 173);font-size:14px;">
                                            <span>Đã đến: {{ overviewData.appointment.checkin }}</span> |
                                            <span>Hoàn thành: {{ overviewData.appointment.completed }}</span> |
                                            <span>Đã hủy: {{ overviewData.appointment.cancelled }}</span>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -122,7 +123,7 @@
                     </div>
                     <!-- Khách mới -->
                     <div class="col-md-6 col-xl-4 mb-2">
-                        <el-card class="box-card">
+                        <el-card class="box-card" v-loading="dataLoading">
                             <div class="row">
                                 <div class="col-4">
                                     <div class="avatar-lg rounded-circle" style="background-color:#55cbcd;">
@@ -130,12 +131,12 @@
                                     </div>
                                 </div>
                                 <div class="col-8">
-                                    <div class="text-right d-flex flex-column justify-content-center" style="height:100%;">
+                                    <div class="text-right d-flex flex-column" style="height:100%;">
                                         <div style="font-weight:bold;color:rgb(104 102 102);">Khách hàng mới (Khách hàng)</div>
-                                        <div class="mt-2" style="font-weight:bold;color:#55cbcd;font-size:24px;">{{ replaceNumber(overviewData.customer.totalNew) }}</div>
-                                        <div class="mt-2" style="font-style:italic;color:rgb(152, 166, 173);font-size:14px;">
+                                        <div class="mt-2" style="font-weight:bold;color:#55cbcd;font-size:24px;">{{ replaceNumber(overviewData.customer) }}</div>
+                                        <!-- <div class="mt-2" style="font-style:italic;color:rgb(152, 166, 173);font-size:14px;">
                                            <span>Tổng khách hàng: {{ overviewData.customer.total }}</span>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -145,14 +146,17 @@
                 <!-- Doanh thu -->
                 <div class="row mt-3">
                     <!-- Thu/chi -->
-                    <div class="col-md-9">
-                        <el-card class="box-card">
+                    <div class="col-md-12">
+                        <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Thu/chi phòng khám</span>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <bar-chart
+                                        v-if="!dataLoading"
+                                        :width="500"
+                                        :height="200"
 										:options="revenueReport.options"
 										:labels="revenueReport.labels"
 										:datasets="revenueReport.datasets"
@@ -161,18 +165,53 @@
                             </div>
                         </el-card>
                     </div>
+                </div>
+                <div class="row mt-3">
                     <!-- Công nợ -->
-                    <div class="col-md-3">
-                        <el-card class="box-card">
+                    <div class="col-md-6">
+                        <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Công nợ phòng khám</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <pie-chart
+                                        v-if="!dataLoading"
+                                        :width="500"
+                                        :height="200"
+                                        :labels="debtReport.labels"
+                                        :datasets="debtReport.datasets"
+                                        :options="debtReport.options"
+                                    />
+                                </div>
+                            </div>
+                        </el-card>
+                    </div>
+                    <!-- Lịch hẹn -->
+                    <div class="col-md-6">
+                        <el-card class="box-card" style="height:100%;">
+                            <div slot="header" class="clearfix">
+                                <span style="font-weight:bold;color:rgb(104 102 102);">Thống kê lịch hẹn</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <pie-chart
+                                        v-if="!dataLoading"
+                                        :width="500"
+                                        :height="200"
+                                        :labels="debtReport.labels"
+                                        :datasets="debtReport.datasets"
+                                        :options="debtReport.options"
+                                    />
+                                </div>
                             </div>
                         </el-card>
                     </div>
                 </div>
                 <!-- Khám và điều trị -->
-                <div class="row mt-4">
+                <div class="row mt-3">
                     <!-- Thời gian điều trị -->
+
                 </div>
             </div>
         </div>
@@ -210,7 +249,7 @@ export default {
                 dateF: [moment().startOf('month').toDate(), moment().endOf('month').toDate()],
                 monthF: [moment().startOf('year').toDate(), moment().endOf('year').toDate()],
                 yearF: [moment().subtract(5, 'years').format('YYYY'), moment().format('YYYY')],
-                typeF: 'day'
+                typeF: 'month'
             },
             pickerOptions_Day: {
                 shortcuts: [
@@ -318,22 +357,20 @@ export default {
             },
             overviewData: {
                 revenue: 0,
-                appointment: {
-                    total: 0,
-                    checkin: 0,
-                    completed: 0,
-                    cancelled: 0
-                },
-                customer: {
-                    total: 0,
-                    totalNew: 0
-                }
+                appointment: 0,
+                customer: 0
             },
             revenueReport: {
                 options: {
                     responsive: true,
                     legend: {
                         display: true,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+						    fontStyle: '700',
+                        },
                     },
                     title: {
                         display: false
@@ -341,8 +378,15 @@ export default {
                     scales: {
                         xAxes: [
                             {
-                                stacked: true,
+                                barThickness: 33, // number (pixels) or 'flex'
+                                maxBarThickness: 30, // number (pixels)
+                            },
+                        ],
+                        yAxes: [
+                            {
+                                id: 'y-axis-density',
                                 ticks: {
+                                    min: 0, // minimum value
                                     callback: function (label, index, labels) {
                                         if (label >= 1000000000) {
                                             return Number(label / 1000000000).toLocaleString() + 'B';
@@ -354,17 +398,100 @@ export default {
                                 },
                             },
                         ],
-                        yAxes: [
-                            {
-                                stacked: true,
-                            },
-                        ],
                     },
                     plugins: {
                         datalabels: {
-                            formatter: (value) => {
-                                return Number(value).toLocaleString();
+                            display: false,
+                            align: 'end',
+                            anchor: 'end',
+                            offset: 2,
+                            color: '#aaaaaa',
+                            font: function (context) {
+                                var w = context.chart.width;
+                                return {
+                                    size: w < 512 ? 12 : 14,
+                                    weight: 'bold',
+                                };
                             },
+                            formatter: function (value, index, values) {
+                                if (value > 0) {
+                                    return Number(value).toLocaleString();
+                                } else {
+                                    return '';
+                                }
+                            },
+                        },
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += Number(tooltipItem.yLabel).toLocaleString();
+                                return label;
+                            },
+                        },
+                    },
+                },
+                labels: [],
+                datasets: []
+            },
+            debtReport: {
+                options: {
+                    responsive: true,
+				    maintainAspectRatio: false,
+                    title: {
+                        display: false
+                    },
+                    //aspectRatio: 1 ,
+                    legend: {
+                        position: 'bottom',
+                        align: 'center',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+                        },
+                        fullSize: true,
+                        labels: {
+                            filter: (legendItem, data) => {
+                                // First, retrieve the data corresponding to that label
+                                const label = legendItem.text;
+                                const labelIndex = _.findIndex(data.labels, (labelName) => labelName === label); // I'm using lodash here
+                                const qtd = data.datasets[0].data[labelIndex];
+
+                                // Second, mutate the legendItem to include the new text
+                                legendItem.text = `${legendItem.text} : ${qtd}`;
+
+                                // Third, the filter method expects a bool, so return true to show the modified legendItem in the legend
+                                return true;
+                            },
+                            fontSize: 13,
+                            fontStyle: '700',
+                        },
+                    },
+                    tooltips: {
+                        enabled: true,
+                    },
+                    plugins: {
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                if (value > 0) {
+                                    let sum = 0;
+                                    let dataArr = ctx.chart.data.datasets[0].data;
+                                    dataArr.map((data) => {
+                                        sum += data;
+                                    });
+                                    return ((value * 100) / sum).toFixed(2) + '%';
+                                } else {
+                                    value = '';
+                                    return value;
+                                }
+                            },
+                            display: true,
+                            color: '#fff',
                         },
                     },
                 },
@@ -375,6 +502,7 @@ export default {
     },
     async created(){
         const _this = this;
+       await _this.getData();
     },
     methods: {
         checkRight(right) {
@@ -386,7 +514,8 @@ export default {
         async getData(){
             const _this = this;
             _this.dataLoading = true;
-
+            await _this.getOverviewReport();
+            await _this.getRevenueExpenditure();
             _this.dataLoading = false;
         },
         replaceNumber(value){
@@ -402,13 +531,74 @@ export default {
             _this.dataLoading = true;
             await _this.$axios.$post('/api/report/getOverviewReport', _this.searchQuery).then(
                 (response) => {
-                    
+                    if(response.success){
+                        _this.overviewData = response.data;
+                    }
+                    else{
+                        console.log('Error (Báo cáo chung): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
                 },
                 (error) => {
-                    console.log('Error: ', error);
+                    console.log('Error (Báo cáo chung): ', error);
                     _this.$message({
                         type: 'error',
-                        message: 'Có lỗi xảy ra (Báo cáo chung)',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        async getRevenueExpenditure(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/report/getRevenueExpenditure', _this.searchQuery).then(
+                (response) => {
+                    if(response.success){
+                        // _this.overviewData = response.data;
+                        let labels = _.map(response.data, (m) => {
+                            return m?.label;
+                        });
+                        let revenueData = _.map(response.data, (m) => {
+                            return m.revenue;
+                        });
+                        let expenditureData = _.map(response.data, (m) => {
+                            return m.expenditure;
+                        });
+                        _this.revenueReport.labels = labels;
+                        _this.revenueReport.datasets = [
+                            {
+                                label: 'Doanh thu',
+                                backgroundColor: 'rgba(137, 196, 244)',
+                                borderColor: 'rgba(3, 138, 255)',
+                                borderWidth: 1,
+                                data: revenueData,
+                            },
+                            {
+                                label: 'Chi phí',
+                                backgroundColor: 'rgba(251, 192, 147)',
+                                borderColor: 'rgba(255, 148, 112)',
+                                borderWidth: 1,
+                                data: expenditureData,
+                            }
+                        ];
+                    }
+                    else{
+                        console.log('Error (Báo cáo chung): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                },
+                (error) => {
+                    console.log('Error (Báo cáo chung): ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
                     });
                 }
             );
