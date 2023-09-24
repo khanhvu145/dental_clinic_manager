@@ -177,8 +177,8 @@
                                 <div class="col-md-12">
                                     <pie-chart
                                         v-if="!dataLoading"
-                                        :width="500"
-                                        :height="200"
+                                        :width="600"
+                                        :height="300"
                                         :labels="debtReport.labels"
                                         :datasets="debtReport.datasets"
                                         :options="debtReport.options"
@@ -197,11 +197,11 @@
                                 <div class="col-md-12">
                                     <pie-chart
                                         v-if="!dataLoading"
-                                        :width="500"
-                                        :height="200"
-                                        :labels="debtReport.labels"
-                                        :datasets="debtReport.datasets"
-                                        :options="debtReport.options"
+                                        :width="600"
+                                        :height="300"
+                                        :labels="appointmentReport.labels"
+                                        :datasets="appointmentReport.datasets"
+                                        :options="appointmentReport.options"
                                     />
                                 </div>
                             </div>
@@ -211,7 +211,34 @@
                 <!-- Khám và điều trị -->
                 <div class="row mt-3">
                     <!-- Thời gian điều trị -->
+                    <div class="col-md-12">
+                         <el-card class="box-card" style="height:100%;">
+                            <div slot="header" class="clearfix">
+                                <span style="font-weight:bold;color:rgb(104 102 102);">Khám và điều trị</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <line-chart
+										v-if="!dataLoading"
+										:options="examinationReport.options"
+										:labels="examinationReport.labels"
+										:datasets="examinationReport.datasets"
+										:width="500"
+                                        :height="200"
+									/>
+                                </div>
+                            </div>
+                         </el-card>
+                    </div>
+                </div>
+                <!-- Dịch vụ -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        
+                    </div>
+                    <div class="col-md-6">
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -446,31 +473,68 @@ export default {
                     title: {
                         display: false
                     },
-                    //aspectRatio: 1 ,
                     legend: {
-                        position: 'bottom',
+                        position: 'top',
                         align: 'center',
                         labels: {
                             boxWidth: 50,
                             padding: 20,
+						    fontStyle: '700',
                         },
-                        fullSize: true,
-                        labels: {
-                            filter: (legendItem, data) => {
-                                // First, retrieve the data corresponding to that label
-                                const label = legendItem.text;
-                                const labelIndex = _.findIndex(data.labels, (labelName) => labelName === label); // I'm using lodash here
-                                const qtd = data.datasets[0].data[labelIndex];
+                        fullSize: true
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.labels[tooltipItem.index] || '';
 
-                                // Second, mutate the legendItem to include the new text
-                                legendItem.text = `${legendItem.text} : ${qtd}`;
-
-                                // Third, the filter method expects a bool, so return true to show the modified legendItem in the legend
-                                return true;
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += Number(data.datasets[0].data[tooltipItem.index] || 0).toLocaleString();
+                                return label;
                             },
-                            fontSize: 13,
-                            fontStyle: '700',
                         },
+                    },
+                    plugins: {
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                if (value > 0) {
+                                    let sum = 0;
+                                    let dataArr = ctx.chart.data.datasets[0].data;
+                                    dataArr.map((data) => {
+                                        sum += data;
+                                    });
+                                    return ((value * 100) / sum).toFixed(2) + '%';
+                                } else {
+                                    value = '';
+                                    return value;
+                                }
+                            },
+                            display: true,
+                            color: '#fff',
+                        },
+                    },
+                },
+                labels: [],
+                datasets: []
+            },
+            appointmentReport: {
+                options: {
+                    responsive: true,
+				    maintainAspectRatio: false,
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        position: 'top',
+                        align: 'center',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+						    fontStyle: '700',
+                        },
+                        fullSize: true
                     },
                     tooltips: {
                         enabled: true,
@@ -497,7 +561,59 @@ export default {
                 },
                 labels: [],
                 datasets: []
-            }
+            },
+            examinationReport: {
+                options: {
+                    responsive: true,
+                    // maintainAspectRatio: false,
+                    legend: {
+                        display: false,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+						    fontStyle: '700',
+                        },
+                    },
+                    title: {
+                        display: false
+                    },
+                    plugins: {
+                        datalabels: {
+                            display: false,
+                            align: 'end',
+                            anchor: 'end',
+                            offset: 2,
+                            color: '#aaaaaa',
+                            font: function (context) {
+                                var w = context.chart.width;
+                                return {
+                                    size: w < 512 ? 12 : 14,
+                                    weight: 'bold',
+                                };
+                            },
+                            formatter: function (value, index, values) {
+                                if (value > 0) {
+                                    return Number(value).toLocaleString();
+                                } else {
+                                    return '';
+                                }
+                            },
+                        },
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = 'Hoàn thành: '
+                                label += Number(tooltipItem.yLabel).toLocaleString();
+                                return label;
+                            },
+                        },
+                    },
+                },
+                labels: [],
+                datasets: []
+            },
         }
     },
     async created(){
@@ -515,7 +631,10 @@ export default {
             const _this = this;
             _this.dataLoading = true;
             await _this.getOverviewReport();
-            await _this.getRevenueExpenditure();
+            await _this.getRevenueExpenditureReport();
+            await _this.getDebtReport();
+            await _this.getAppointmentReport();
+            await _this.getExaminationReport();
             _this.dataLoading = false;
         },
         replaceNumber(value){
@@ -552,10 +671,10 @@ export default {
             );
             _this.dataLoading = false;
         },
-        async getRevenueExpenditure(){
+        async getRevenueExpenditureReport(){
             const _this = this;
             _this.dataLoading = true;
-            await _this.$axios.$post('/api/report/getRevenueExpenditure', _this.searchQuery).then(
+            await _this.$axios.$post('/api/report/getRevenueExpenditureReport', _this.searchQuery).then(
                 (response) => {
                     if(response.success){
                         // _this.overviewData = response.data;
@@ -587,7 +706,7 @@ export default {
                         ];
                     }
                     else{
-                        console.log('Error (Báo cáo chung): ', error);
+                        console.log('Error (Thu chi): ', error);
                         _this.$message({
                             type: 'error',
                             message: 'Có lỗi xảy ra',
@@ -595,7 +714,121 @@ export default {
                     }
                 },
                 (error) => {
-                    console.log('Error (Báo cáo chung): ', error);
+                    console.log('Error (Thu chi): ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        async getDebtReport(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/report/getDebtReport', _this.searchQuery).then(
+                (response) => {
+                    if(response.success){
+                        // _this.overviewData = response.data;
+                        let labels = _.map(response.data, (m) => {
+                            return m?.label;
+                        });
+                        let amountData = _.map(response.data, (m) => {
+                            return m.value;
+                        });
+                        _this.debtReport.labels = labels;
+                        let datasetOne = {
+                            data: amountData,
+                            backgroundColor: ['rgba(137, 196, 244)', 'rgba(251, 192, 147)', 'rgba(147, 250, 165)'],
+                        };
+                        _this.debtReport.datasets = [datasetOne];
+                    }
+                    else{
+                        console.log('Error (Công nợ): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                },
+                (error) => {
+                    console.log('Error (Công nợ): ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        async getAppointmentReport(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/report/getAppointmentReport', _this.searchQuery).then(
+                (response) => {
+                    if(response.success){
+                        // _this.overviewData = response.data;
+                        let labels = _.map(response.data, (m) => {
+                            return m?.label;
+                        });
+                        let countData = _.map(response.data, (m) => {
+                            return m.value;
+                        });
+                        _this.appointmentReport.labels = labels;
+                        let datasetOne = {
+                            data: countData,
+                            backgroundColor: ['rgba(147, 250, 165)', 'rgba(246, 71, 71)', 'rgba(171, 183, 183)'],
+                        };
+                        _this.appointmentReport.datasets = [datasetOne];
+                    }
+                    else{
+                        console.log('Error (Lịch hẹn): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                },
+                (error) => {
+                    console.log('Error (Lịch hẹn): ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        async getExaminationReport(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/report/getExaminationReport', _this.searchQuery).then(
+                (response) => {
+                    if(response.success){
+                        // _this.overviewData = response.data;
+                        let labels = _.map(response.data, (m) => {
+                            return m?.label;
+                        });
+                        let countData = _.map(response.data, (m) => {
+                            return m.count;
+                        });
+                        _this.examinationReport.labels = labels;
+                        let datasetOne = {
+                            data: countData,
+                            backgroundColor: ['rgba(147, 250, 165)'],
+                        };
+                        _this.examinationReport.datasets = [datasetOne];
+                    }
+                    else{
+                        console.log('Error (Khám và điều trị): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                },
+                (error) => {
+                    console.log('Error (Khám và điều trị): ', error);
                     _this.$message({
                         type: 'error',
                         message: 'Có lỗi xảy ra',

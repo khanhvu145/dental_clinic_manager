@@ -351,7 +351,7 @@
                                                     {{ (scope.row.totalPrice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column v-if="(formData.status == 'new' || formData.status == 'confirm')" label="Thao tác" min-width="100">
+                                            <el-table-column v-if="formData.status == 'new'" label="Thao tác" min-width="100">
                                                 <template slot-scope="scope">
                                                     <a class="btn control-btn blue2" style="padding: 4px 6px;" @click="openExaminationDialog('update', scope.row)">
                                                         <i class="el-icon-edit-outline"></i>
