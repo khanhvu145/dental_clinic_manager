@@ -212,32 +212,63 @@
                 <div class="row mt-3">
                     <!-- Thời gian điều trị -->
                     <div class="col-md-12">
-                         <el-card class="box-card" style="height:100%;">
-                            <div slot="header" class="clearfix">
-                                <span style="font-weight:bold;color:rgb(104 102 102);">Khám và điều trị</span>
+                        <el-card class="box-card" style="height:100%;">
+                        <div slot="header" class="clearfix">
+                            <span style="font-weight:bold;color:rgb(104 102 102);">Khám và điều trị</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <line-chart
+                                    v-if="!dataLoading"
+                                    :options="examinationReport.options"
+                                    :labels="examinationReport.labels"
+                                    :datasets="examinationReport.datasets"
+                                    :width="500"
+                                    :height="200"
+                                />
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <line-chart
-										v-if="!dataLoading"
-										:options="examinationReport.options"
-										:labels="examinationReport.labels"
-										:datasets="examinationReport.datasets"
-										:width="500"
-                                        :height="200"
-									/>
-                                </div>
-                            </div>
-                         </el-card>
+                        </div>
+                        </el-card>
                     </div>
                 </div>
                 <!-- Dịch vụ -->
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        
+                        <!-- Nhóm dịch vụ -->
+                        <el-card class="box-card" style="height:100%;">
+                            <div slot="header" class="clearfix">
+                                <span style="font-weight:bold;color:rgb(104 102 102);">Nhóm dịch vụ</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <bar-chart
+                                        v-if="!dataLoading"
+										:options="serviceGroupReport.options"
+										:labels="serviceGroupReport.labels"
+										:datasets="serviceGroupReport.datasets"
+                                        :type="`horizontalBar`"
+									/>
+                                </div>
+                            </div>
+                        </el-card>
                     </div>
                     <div class="col-md-6">
-
+                        <el-card class="box-card" style="height:100%;">
+                            <div slot="header" class="clearfix">
+                                <span style="font-weight:bold;color:rgb(104 102 102);">Nha sĩ</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <bar-chart
+                                        v-if="!dataLoading"
+										:options="dentistReport.options"
+										:labels="dentistReport.labels"
+										:datasets="dentistReport.datasets"
+                                        :type="`horizontalBar`"
+									/>
+                                </div>
+                            </div>
+                        </el-card>
                     </div>
                 </div>
             </div>
@@ -614,6 +645,152 @@ export default {
                 labels: [],
                 datasets: []
             },
+            serviceGroupReport: {
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+						    fontStyle: '700',
+                        },
+                    },
+                    title: {
+                        display: false
+                    },
+                    scales: {
+                        xAxes: [
+                            {
+                                stacked: true,
+                                ticks: {
+                                    callback: function (label, index, labels) {
+                                        if (label >= 1000000000) {
+                                            return Number(label / 1000000000).toLocaleString() + 'B';
+                                        } else if (label >= 1000000) {
+                                            return Number(label / 1000000).toLocaleString() + 'M';
+                                        }
+                                        return Number(label).toLocaleString();
+                                    },
+                                },
+                            },
+                        ],
+                        yAxes: [
+                            {
+                                stacked: true,
+                                barThickness: 40, // number (pixels) or 'flex'
+                                maxBarThickness: 40, // number (pixels)
+                                // autoSkip: false,
+                                // maxRotation: 90,
+                                // ticks: {
+                                //     minRotation: 35
+                                // }
+                            },
+                        ],
+                    },
+                    plugins: {
+                        datalabels: {
+                            // display: false,
+                            // align: 'end',
+                            // anchor: 'end',
+                            // offset: 2,
+                            // color: '#aaaaaa',
+                            formatter: function (value) {
+                                return Number(value).toLocaleString();
+                            },
+                        },
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += Number(tooltipItem.xLabel).toLocaleString();
+                                return label;
+                            },
+                        },
+                    },
+                },
+                labels: [],
+                datasets: []
+            },
+            dentistReport: {
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+						    fontStyle: '700',
+                        },
+                    },
+                    title: {
+                        display: false
+                    },
+                    scales: {
+                        xAxes: [
+                            {
+                                stacked: true,
+                                ticks: {
+                                    callback: function (label, index, labels) {
+                                        if (label >= 1000000000) {
+                                            return Number(label / 1000000000).toLocaleString() + 'B';
+                                        } else if (label >= 1000000) {
+                                            return Number(label / 1000000).toLocaleString() + 'M';
+                                        }
+                                        return Number(label).toLocaleString();
+                                    },
+                                },
+                            },
+                        ],
+                        yAxes: [
+                            {
+                                stacked: true,
+                                barThickness: 40, // number (pixels) or 'flex'
+                                maxBarThickness: 40, // number (pixels)
+                                // autoSkip: false,
+                                // maxRotation: 90,
+                                // ticks: {
+                                //     minRotation: 35
+                                // }
+                            },
+                        ],
+                    },
+                    plugins: {
+                        datalabels: {
+                            // display: false,
+                            // align: 'end',
+                            // anchor: 'end',
+                            // offset: 2,
+                            // color: '#aaaaaa',
+                            formatter: function (value) {
+                                return Number(value).toLocaleString();
+                            },
+                        },
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += Number(tooltipItem.xLabel).toLocaleString();
+                                return label;
+                            },
+                        },
+                    },
+                },
+                labels: [],
+                datasets: []
+            }
         }
     },
     async created(){
@@ -635,6 +812,8 @@ export default {
             await _this.getDebtReport();
             await _this.getAppointmentReport();
             await _this.getExaminationReport();
+            await _this.getServiceGroupReport();
+            await _this.getDentistReport();
             _this.dataLoading = false;
         },
         replaceNumber(value){
@@ -836,6 +1015,93 @@ export default {
                 }
             );
             _this.dataLoading = false;
+        },
+        async getServiceGroupReport(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/report/getServiceGroupReport', _this.searchQuery).then(
+                (response) => {
+                    if(response.success){
+                        let labels = _.map(response.data, (m) => {
+                            return m?.label;
+                        });
+                        let countData = _.map(response.data, (m) => {
+                            return m.count;
+                        });
+                        _this.serviceGroupReport.labels = labels;
+                        let datasetOne = {
+                            data: countData,
+                            backgroundColor: 'rgba(137, 196, 244)',
+                            // backgroundColor: _this.random_rgba(countData.length),
+                        };
+                        _this.serviceGroupReport.datasets = [datasetOne];
+                    }
+                    else{
+                        console.log('Error (Nhóm dịch vụ): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                },
+                (error) => {
+                    console.log('Error (Nhóm dịch vụ): ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        async getDentistReport(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/report/getDentistReport', _this.searchQuery).then(
+                (response) => {
+                    if(response.success){
+                        let labels = _.map(response.data, (m) => {
+                            return m?.label;
+                        });
+                        let countData = _.map(response.data, (m) => {
+                            return m.count;
+                        });
+                        _this.dentistReport.labels = labels;
+                        let datasetOne = {
+                            data: countData,
+                            backgroundColor: 'rgba(251, 192, 147)',
+                            // backgroundColor: _this.random_rgba(countData.length),
+                        };
+                        _this.dentistReport.datasets = [datasetOne];
+                    }
+                    else{
+                        console.log('Error (Nha sĩ): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                },
+                (error) => {
+                    console.log('Error (Nha sĩ): ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                }
+            );
+            _this.dataLoading = false;
+        },
+        random_rgba(length) {
+            var data = [];
+            for(let i = 0; i < length; i++){
+                var red = Math.floor(Math.random() * 255);
+                var green = Math.floor(Math.random() * 255);
+                var blue = Math.floor(Math.random() * 255);
+                var opacity = 0.8;
+                data.push(`rgba(${red}, ${green}, ${blue}, ${opacity})`);
+            }
+            return data;
         }
     }
 }
