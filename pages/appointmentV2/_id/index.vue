@@ -41,7 +41,7 @@
                             </div>
                             <div class="col-sm-6 col-md-6 mb-3">
                                 Giới tính:
-                                <span style="font-weight: bold;">{{ data.mainCustomer.gender == 'male' ? 'Nam' : 'Nữ' || '' }}</span>
+                                <span style="font-weight: bold;">{{ data.mainCustomer.gender == 'male' ? 'Nam' : data.mainCustomer.gender == 'female' ? 'Nữ' : 'Khác' || '' }}</span>
                             </div>
                             <div class="col-md-12 mb-3">
                                 Địa chỉ:

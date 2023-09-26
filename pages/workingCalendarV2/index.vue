@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3" style="word-break: break-word;">
                                         Giới tính:
-                                        <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.gender == 'male' ? 'Nam' : 'Nữ' }}</span>
+                                        <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.gender == 'male' ? 'Nam' : dialogDetail.data.mainCustomer.gender == 'female' ? 'Nữ' : 'Khác' }}</span>
                                     </div>
                                     <div class="col-md-12 mb-3" style="word-break: break-word;">
                                         Địa chỉ:

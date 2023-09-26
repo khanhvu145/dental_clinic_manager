@@ -236,7 +236,7 @@
                     <div class="col-md-6">
                         <!-- Nhóm dịch vụ -->
                         <el-card class="box-card" style="height:100%;">
-                            <div slot="header" class="clearfix">
+                            <div slot="header" class="clearfix" style="padding: 12px 0;">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nhóm dịch vụ</span>
                             </div>
                             <div class="row">
@@ -255,6 +255,50 @@
                     <div class="col-md-6">
                         <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
+                                <div class="row" style="align-items:center;">
+                                    <div class="col-md-4">
+                                        <span style="font-weight:bold;color:rgb(104 102 102);">Dịch vụ</span>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <el-select 
+                                            v-model="serviceGroupId" 
+                                            placeholder="Chọn nhóm dịch vụ" 
+                                            name="serviceGroupId" 
+                                            style="width: 100%"
+                                            clearable 
+                                            filterable
+                                            remote
+                                            :remote-method="(text) => filterServiceGroup(text)"
+                                            @focus="filterServiceGroup('')"
+                                            @change="handleChangeServiceGroup($event)"
+                                        >
+                                            <el-option
+                                                v-for="item in serviceGroupData"
+                                                :key="item._id"
+                                                :label="`${item.code} | ${item.name}`"
+                                                :value="item._id"
+                                            ></el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <bar-chart
+                                        v-if="!dataLoading"
+                                        v-loading="serviceReport.loading"
+										:options="serviceReport.options"
+										:labels="serviceReport.labels"
+										:datasets="serviceReport.datasets"
+                                        :type="`horizontalBar`"
+									/>
+                                </div>
+                            </div>
+                        </el-card>
+                    </div>
+                    <!-- <div class="col-md-6">
+                        <el-card class="box-card" style="height:100%;">
+                            <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nha sĩ</span>
                             </div>
                             <div class="row">
@@ -269,7 +313,7 @@
                                 </div>
                             </div>
                         </el-card>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -281,13 +325,13 @@
 
 <script>
 import { mapState } from 'vuex';
-import { intersection } from 'lodash';
 import BarChart from '@/components/report/BarChart.vue';
 import LineChart from '@/components/report/LineChart.vue';
 import PieChart from '@/components/report/PieChart.vue';
 import DoughnutChart from '@/components/report/DoughnutChart.vue';
 import moment from 'moment';
 import readAmountByWord from '@/utils/functions/readAmountByWord';
+import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 export default {
     computed: {
 		...mapState({
@@ -790,12 +834,88 @@ export default {
                 },
                 labels: [],
                 datasets: []
-            }
+            },
+            serviceReport: {
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 50,
+                            padding: 20,
+						    fontStyle: '700',
+                        },
+                    },
+                    title: {
+                        display: false
+                    },
+                    scales: {
+                        xAxes: [
+                            {
+                                stacked: true,
+                                ticks: {
+                                    callback: function (label, index, labels) {
+                                        if (label >= 1000000000) {
+                                            return Number(label / 1000000000).toLocaleString() + 'B';
+                                        } else if (label >= 1000000) {
+                                            return Number(label / 1000000).toLocaleString() + 'M';
+                                        }
+                                        return Number(label).toLocaleString();
+                                    },
+                                },
+                            },
+                        ],
+                        yAxes: [
+                            {
+                                stacked: true,
+                                barThickness: 40, // number (pixels) or 'flex'
+                                maxBarThickness: 40, // number (pixels)
+                                // autoSkip: false,
+                                // maxRotation: 90,
+                                // ticks: {
+                                //     minRotation: 35
+                                // }
+                            },
+                        ],
+                    },
+                    plugins: {
+                        datalabels: {
+                            // display: false,
+                            // align: 'end',
+                            // anchor: 'end',
+                            // offset: 2,
+                            // color: '#aaaaaa',
+                            formatter: function (value) {
+                                return Number(value).toLocaleString();
+                            },
+                        },
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += Number(tooltipItem.xLabel).toLocaleString();
+                                return label;
+                            },
+                        },
+                    },
+                },
+                labels: [],
+                datasets: [],
+                loading: true,
+            },
+            serviceGroupId: '',
+            serviceGroupData: []
         }
     },
     async created(){
         const _this = this;
-       await _this.getData();
+        await _this.getData();
     },
     methods: {
         checkRight(right) {
@@ -813,7 +933,8 @@ export default {
             await _this.getAppointmentReport();
             await _this.getExaminationReport();
             await _this.getServiceGroupReport();
-            await _this.getDentistReport();
+            await _this.getServiceReport(_this.serviceGroupId);
+            // await _this.getDentistReport();
             _this.dataLoading = false;
         },
         replaceNumber(value){
@@ -1092,6 +1213,51 @@ export default {
             );
             _this.dataLoading = false;
         },
+        async getServiceReport(groupId){
+            const _this = this;
+            _this.serviceReport.loading = true;
+            if(groupId){
+                _this.searchQuery.groupId = groupId;
+                await _this.$axios.$post('/api/report/getServiceReport', _this.searchQuery).then(
+                    (response) => {
+                        if(response.success){
+                            let labels = _.map(response.data, (m) => {
+                                return m?.label;
+                            });
+                            let countData = _.map(response.data, (m) => {
+                                return m.count;
+                            });
+                            _this.serviceReport.labels = labels;
+                            let datasetOne = {
+                                data: countData,
+                                backgroundColor: 'rgba(251, 192, 147)',
+                                // backgroundColor: _this.random_rgba(countData.length),
+                            };
+                            _this.serviceReport.datasets = [datasetOne];
+                        }
+                        else{
+                            console.log('Error (Dịch vụ): ', error);
+                            _this.$message({
+                                type: 'error',
+                                message: 'Có lỗi xảy ra',
+                            });
+                        }
+                    },
+                    (error) => {
+                        console.log('Error (Dịch vụ): ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
+            }
+            else{
+                _this.serviceReport.labels = [];
+                _this.serviceReport.datasets = [];
+            }
+            _this.serviceReport.loading = false;
+        },
         random_rgba(length) {
             var data = [];
             for(let i = 0; i < length; i++){
@@ -1102,6 +1268,25 @@ export default {
                 data.push(`rgba(${red}, ${green}, ${blue}, ${opacity})`);
             }
             return data;
+        },
+        filterServiceGroup: debounce(async function (text) {
+            const _this = this;
+            let query = {
+                filters: {
+                    textSearch: text
+                },
+                sorts: 'createdAt&&-1',
+                pages:{
+                    from: 0,
+                    size: 10
+                }
+            };
+            let serviceGroups = await _this.$axios.$post('/api/service/groupGetByTextSearch', query);
+            _this.serviceGroupData = serviceGroups && serviceGroups.data;
+        }, 200),
+        async handleChangeServiceGroup(e){
+            const _this = this;
+            _this.getServiceReport(e);
         }
     }
 }
