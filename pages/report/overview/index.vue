@@ -723,8 +723,8 @@ export default {
                         yAxes: [
                             {
                                 stacked: true,
-                                barThickness: 40, // number (pixels) or 'flex'
-                                maxBarThickness: 40, // number (pixels)
+                                barThickness: 30, // number (pixels) or 'flex'
+                                maxBarThickness: 30, // number (pixels)
                                 // autoSkip: false,
                                 // maxRotation: 90,
                                 // ticks: {
@@ -869,8 +869,8 @@ export default {
                         yAxes: [
                             {
                                 stacked: true,
-                                barThickness: 40, // number (pixels) or 'flex'
-                                maxBarThickness: 40, // number (pixels)
+                                barThickness: 30, // number (pixels) or 'flex'
+                                maxBarThickness: 30, // number (pixels)
                                 // autoSkip: false,
                                 // maxRotation: 90,
                                 // ticks: {
@@ -1143,19 +1143,22 @@ export default {
             await _this.$axios.$post('/api/report/getServiceGroupReport', _this.searchQuery).then(
                 (response) => {
                     if(response.success){
+                        let backgroundColors = _this.generateColors(response.data);
                         let labels = _.map(response.data, (m) => {
                             return m?.label;
                         });
-                        let countData = _.map(response.data, (m) => {
-                            return m.count;
-                        });
                         _this.serviceGroupReport.labels = labels;
-                        let datasetOne = {
-                            data: countData,
-                            backgroundColor: 'rgba(137, 196, 244)',
-                            // backgroundColor: _this.random_rgba(countData.length),
-                        };
-                        _this.serviceGroupReport.datasets = [datasetOne];
+                        let datasetOne = _.map(response.data, (m, index) => {
+                            let countData = _.map(response.data, (n) => {
+                                if(n.label === m.label) return n?.count;
+                            });
+                            return {
+                                label: m.label,
+                                backgroundColor: backgroundColors[index],
+                                data: countData,
+                            };
+                        });
+                        _this.serviceGroupReport.datasets = datasetOne || [];
                     }
                     else{
                         console.log('Error (Nhóm dịch vụ): ', error);
@@ -1221,19 +1224,22 @@ export default {
                 await _this.$axios.$post('/api/report/getServiceReport', _this.searchQuery).then(
                     (response) => {
                         if(response.success){
+                            let backgroundColors = _this.generateColors(response.data);
                             let labels = _.map(response.data, (m) => {
                                 return m?.label;
                             });
-                            let countData = _.map(response.data, (m) => {
-                                return m.count;
-                            });
                             _this.serviceReport.labels = labels;
-                            let datasetOne = {
-                                data: countData,
-                                backgroundColor: 'rgba(251, 192, 147)',
-                                // backgroundColor: _this.random_rgba(countData.length),
-                            };
-                            _this.serviceReport.datasets = [datasetOne];
+                            let datasetOne = _.map(response.data, (m, index) => {
+                                let countData = _.map(response.data, (n) => {
+                                    if(n.label === m.label) return n?.count;
+                                });
+                                return {
+                                    label: m.label,
+                                    backgroundColor: backgroundColors[index],
+                                    data: countData,
+                                };
+                            });
+                            _this.serviceReport.datasets = datasetOne || [];
                         }
                         else{
                             console.log('Error (Dịch vụ): ', error);
@@ -1258,17 +1264,6 @@ export default {
             }
             _this.serviceReport.loading = false;
         },
-        random_rgba(length) {
-            var data = [];
-            for(let i = 0; i < length; i++){
-                var red = Math.floor(Math.random() * 255);
-                var green = Math.floor(Math.random() * 255);
-                var blue = Math.floor(Math.random() * 255);
-                var opacity = 0.8;
-                data.push(`rgba(${red}, ${green}, ${blue}, ${opacity})`);
-            }
-            return data;
-        },
         filterServiceGroup: debounce(async function (text) {
             const _this = this;
             let query = {
@@ -1287,7 +1282,48 @@ export default {
         async handleChangeServiceGroup(e){
             const _this = this;
             _this.getServiceReport(e);
-        }
+        },
+        generateColors(data) {
+            var ict_unit = [];
+            var sampleColor = [
+                '#FFCAB7',
+                '#F4989B',
+                '#EBC559',
+                '#F9BB7E',
+                '#D6694D',
+                '#EE4040',
+                '#5DA1CA',
+                '#A9B5DD',
+                '#9187C6',
+                '#D16BA8',
+                '#A04DAD',
+                '#75C9CC',
+                '#A6C99F',
+                '#7AC5A1',
+                '#54938B',
+            ];
+
+            var efficiency = [];
+            var coloR = _.sampleSize(sampleColor, data.length);
+            if (coloR.length === data.length) {
+                return coloR;
+            } else {
+                var dynamicColors = function () {
+                    var r = Math.floor(Math.random() * 127 + 70);
+                    var g = Math.floor(Math.random() * 127 + 80);
+                    var b = Math.floor(Math.random() * 127 + 50);
+                    return 'rgb(' + r + ',' + g + ',' + b + ')';
+                };
+                var arrayList = [...data].slice(0, data.length - coloR.length);
+                for (var i in arrayList) {
+                    ict_unit.push('ICT Unit ' + data[i].ict_unit);
+                    efficiency.push(data[i].efficiency);
+                    coloR.push(dynamicColors());
+                }
+            }
+
+            return coloR;
+        },
     }
 }
 </script>
