@@ -80,7 +80,7 @@
                 <!-- Độ tuổi, giới tính -->
                 <div class="row mt-3">
                     <!-- Độ tuổi -->
-                    <div class="col-xl-6">
+                    <div class="col-xl-6 mb-3">
                         <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Độ tuổi</span>
@@ -100,7 +100,7 @@
                         </el-card>
                     </div>
                     <!-- Giới tính -->
-                    <div class="col-xl-6">
+                    <div class="col-xl-6 mb-3">
                         <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Giới tính</span>
@@ -121,24 +121,24 @@
                     </div>
                 </div>
                 <!-- Tỉnh/Thành phố -->
-                <div class="row mt-3">
+                <div class="row">
                     <div class="col-md-12">
                         <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Tỉnh, thành phố</span>
                             </div>
-                            <div class="row">
-                                <div class="col-md-7">
+                            <div class="row" style="justify-content:center;">
+                                <div class="col-xl-8 mb-3">
                                     <bar-chart
                                         v-if="!dataLoading"
-                                        :width="600"
-                                        :height="400"
+                                        :width="500"
+                                        :height="300"
 										:options="cityReport.options"
 										:labels="cityReport.labels"
 										:datasets="cityReport.datasets"
 									/>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-sm-10 col-xl-4 mb-3">
                                     <el-table :data="cityReportTable" v-loading="dataLoading" max-height="350" style="width: 100%" stripe>
                                         <el-table-column type="index" width="60" label="#"></el-table-column>
                                         <el-table-column label="Tỉnh/thành phố">
@@ -159,7 +159,7 @@
                 </div>
                 <div class="row mt-3">
                     <!-- Nhóm KH -->
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nhóm khách hàng</span>
@@ -179,7 +179,7 @@
                         </el-card>
                     </div>
                     <!-- Nguồn KH -->
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <el-card class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nguồn khách hàng</span>
