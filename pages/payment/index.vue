@@ -8,11 +8,11 @@
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
-                    <div class="col-md-4 col-lg-3">
+                    <div class="col-md-3">
                         <div class="col-form-label">Mã phiếu chi</div>
                         <el-input placeholder="Mã phiếu chi..." v-model="searchQuery.filters.codeF" name="codeF"></el-input>
                     </div>
-                    <div class="col-md-4 col-lg-3">
+                    <div class="col-md-3">
                         <div class="col-form-label">Ngày tạo</div>
                         <el-date-picker
                             v-model="searchQuery.filters.dateF"
@@ -23,7 +23,7 @@
                             format="dd/MM/yyyy">
                         </el-date-picker>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-2">
                         <div class="col-form-label">Trạng thái</div>
                         <el-select v-model="searchQuery.filters.statusF" placeholder="Trạng thái..." name="statusF">
                             <el-option label="Tất cả..." value="all"></el-option>
@@ -40,7 +40,7 @@
                             <el-option label="Khác" value="other"></el-option>
                         </el-select>
                     </div> -->
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-4">
                         <div style="display: flex; height: 100%; align-items: end; gap: 8px;">
                             <button type="button" class="control-btn gray" @click="refreshData()">
                                 <i class='bx bx-refresh'></i>
@@ -66,7 +66,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <el-dropdown :hide-on-click="false" trigger="click" style="width:100%;">
                             <el-button class="elButtonCustom" style="width:100%; text-align:left;font-weight:400;padding:12px 10px">
                                 <i class="el-icon-view el-icon--left" style="color:#C0C4CC;"></i>
@@ -80,13 +80,19 @@
                             </el-dropdown-menu>
                         </el-dropdown>
                     </div>
-                    <div class="col-md-7">
-                        <div style="display: flex; height: 100%; align-items: end; justify-content: right;">
-                            <button v-if="(checkRight('create'))" class="control-btn blue" @click="openCreateDialog()">
-                                <i class='bx bx-plus' ></i>
-                                Tạo phiếu chi
-                            </button>
-                        </div>
+                    <div class="col-md-6" style="text-align:right;">
+                        <button v-if="(checkRight('import'))" class="control-btn green2" @click="openDialogImport()">
+                            <i class='bx bx-import'></i>
+                            <span>Nhập dữ liệu</span>
+                        </button>
+                        <button v-if="(checkRight('export'))" class="control-btn blue" @click="exportData()">
+                            <i class='bx bx-export'></i>
+                            <span>Xuất dữ liệu</span>
+                        </button>
+                        <button v-if="(checkRight('create'))" class="control-btn blue2" @click="openCreateDialog()">
+                            <i class='bx bx-plus' ></i>
+                            Tạo phiếu chi
+                        </button>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -575,6 +581,51 @@
                     </div>
                 </section>
             </vue-html2pdf>
+            <!-- Dialog import phiếu chi -->
+            <el-dialog title="Nhập dữ liệu" :visible.sync="dialogImport.visible" :close-on-click-modal="false" width="40%">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-form-label">Chọn file excel *</div>
+                        <el-upload
+                            class="upload-demo"
+                            drag
+                            style="width: 100%"
+                            ref="importFile"
+                            action="#"
+                            :limit="2"
+                            :auto-upload="false"
+                            :show-file-list="true"
+                            list-type="text"
+                            :on-change="handleChange"
+                            :file-list="fileList"
+                        >
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">
+                                Kéo thả tệp vào đây hoặc <em>nhấn vào để tải lên</em>
+                            </div>
+                        </el-upload>
+                    </div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <button type="button" class="control-btn gray" @click="dialogImport.visible = false">
+                        <i class='bx bx-x'></i>
+                        <span>Đóng</span>
+                    </button>
+                    <button v-if="checkRight('import')" type="button" class="control-btn blue" @click="getTemplateImport">
+                        <i class='bx bxs-file-import' ></i>
+                        <span>Lấy mẫu nhập liệu</span>
+                    </button>
+                    <button
+                        type="button" 
+                        class="control-btn green"
+                        @click="submitEditOriginalDocuments"
+                        v-if="checkRight('import')"
+                    >
+                        <i class='bx bx-save' ></i>
+                        <span>Nhập dữ liệu</span>
+                    </button>
+                </span>
+            </el-dialog>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -589,6 +640,7 @@ import readAmountByWord from '@/utils/functions/readAmountByWord';
 import { columns } from '@/utils/filter/payment';
 import PaymentSlip from '@/models/tw_PaymentSlip';
 import VueAutonumeric from 'vue-autonumeric';
+import dataURLtoFile from '@/utils/functions/dataURLtoFile';
 export default {
     components: {
         'vue-autonumeric': VueAutonumeric,
@@ -649,7 +701,12 @@ export default {
             dialogEditOriginalDocuments: {
                 visible: false,
                 data: {}
-            }
+            },
+            dialogImport: {
+                visible: false,
+                file: null
+            },
+            fileList: []
         }
     },
     async created() {
@@ -930,6 +987,114 @@ export default {
             if (input) return true;
             else return 'Vui lòng nhập lý do hủy.';
         },
+        async exportData(){
+            const _this = this;
+            await _this
+                .$confirm('Bạn có chắc muốn xuất dữ liệu.', 'Xuất dữ liệu', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy'
+                })
+                .then(async () => {
+                    try{
+                        _this.$message({
+                            message: 'Quá trình xuất dữ liệu đang diễn ra',
+                            type: 'warning',
+                            duration: 0,
+                        });
+                        const response = await _this.$axios.$post('/api/paymentSlip/export', _this.searchQuery);
+                        if (response.success) {
+                            var base64 = response.data;
+                            var file = dataURLtoFile(base64, 'test.xlsx')
+                            var url = URL.createObjectURL(file)
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${_this.$nuxt.$route.path.split('/')[1]}_export_file_${Math.round(new Date().getTime() / 1000)}.xlsx`;
+                            document.body.appendChild(link);
+                            link.click();
+                            _this.$notify({
+                                title: 'Thành công',
+                                message: 'Xuất dữ liệu thành công',
+                                type: 'success',
+                            });
+                            _this.$message.closeAll();
+                        }
+                        else{
+                            _this.$message.error(data.error);
+                        }
+                    }
+                    catch(error){
+                        _this.$message.closeAll();
+                        _this.$notify({
+                            title: 'Thất bại',
+                            message: 'Xuất dữ liệu không thành công',
+                            type: 'error',
+                        });
+                    }
+                })
+                .catch(() => {});
+        },
+        openDialogImport(){
+            const _this = this;
+            if (_this.$refs.importFile) {
+                _this.$refs.importFile.clearFiles();
+            }
+            _this.dialogImport.file = null;
+            _this.dialogImport.visible = true;
+        },
+        handleChange(file, fileList) {
+            const _this = this;
+            const imageType = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(file.raw.type);
+            if (imageType){
+                if (_this.$refs.importFile) {
+                    _this.fileList = _this.$refs.importFile.uploadFiles;
+                    if(_this.fileList.length === 2) _this.fileList.splice(0, 1);
+                }
+                _this.dialogImport.file = file.raw;
+            }
+            else{
+                _this.fileList = [];
+                _this.dialogImport.file = null;
+                _this.$message.error('File không đúng định dạng!');
+            } 
+        },
+        async getTemplateImport(){
+            const _this = this;
+            try{
+                _this.$message({
+                    message: 'Quá trình lấy mẫu nhập liệu đang diễn ra',
+                    type: 'warning',
+                    duration: 0,
+                });
+                const response = await _this.$axios.$post('/api/paymentSlip/getTemplateImport');
+                if (response.success) {
+                    var base64 = response.data;
+                    var file = dataURLtoFile(base64, 'test.xlsx')
+                    var url = URL.createObjectURL(file)
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${_this.$nuxt.$route.path.split('/')[1]}_export_file_${Math.round(new Date().getTime() / 1000)}.xlsx`;
+                    document.body.appendChild(link);
+                    link.click();
+                    _this.$notify({
+                        title: 'Thành công',
+                        message: 'Lấy mẫu nhập liệu thành công',
+                        type: 'success',
+                    });
+                    _this.$message.closeAll();
+                }
+                else{
+                    _this.$message.error(data.error);
+                }
+            }
+            catch(error){
+                _this.$message.closeAll();
+                _this.$notify({
+                    title: 'Thất bại',
+                    message: 'Có lỗi xảy ra',
+                    type: 'error',
+                });
+            }
+        }
     }
 }
 </script>

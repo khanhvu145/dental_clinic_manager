@@ -83,6 +83,12 @@
                             </el-dropdown-menu>
                         </el-dropdown>
                     </div>
+                    <div class="col-md-6" style="text-align:right;">
+                        <button v-if="(checkRight('export'))" class="control-btn blue" @click="exportData()">
+                            <i class='bx bx-export'></i>
+                            <span>Xuất dữ liệu </span>
+                        </button>
+                    </div>
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-12">
@@ -359,6 +365,7 @@
 import { mapState } from 'vuex';
 import { intersection } from 'lodash';
 import readAmountByWord from '@/utils/functions/readAmountByWord';
+import dataURLtoFile from '@/utils/functions/dataURLtoFile';
 import { columns } from '@/utils/filter/receipts';
 export default {
     computed: {
@@ -539,6 +546,52 @@ export default {
         validateInput (input) {
             if (input) return true;
             else return 'Vui lòng nhập lý do hủy.';
+        },
+        async exportData(){
+            const _this = this;
+            await _this
+                .$confirm('Bạn có chắc muốn xuất dữ liệu.', 'Xuất dữ liệu', {
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy'
+                })
+                .then(async () => {
+                    try{
+                        _this.$message({
+                            message: 'Quá trình xuất dữ liệu đang diễn ra',
+                            type: 'warning',
+                            duration: 0,
+                        });
+                        const response = await _this.$axios.$post('/api/receipts/export', _this.searchQuery);
+                        if (response.success) {
+                            var base64 = response.data;
+                            var file = dataURLtoFile(base64, 'test.xlsx')
+                            var url = URL.createObjectURL(file)
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${_this.$nuxt.$route.path.split('/')[1]}_export_file_${Math.round(new Date().getTime() / 1000)}.xlsx`;
+                            document.body.appendChild(link);
+                            link.click();
+                            _this.$notify({
+                                title: 'Thành công',
+                                message: 'Xuất dữ liệu thành công',
+                                type: 'success',
+                            });
+                            _this.$message.closeAll();
+                        }
+                        else{
+                            _this.$message.error(data.error);
+                        }
+                    }
+                    catch(error){
+                        _this.$message.closeAll();
+                        _this.$notify({
+                            title: 'Thất bại',
+                            message: 'Xuất dữ liệu không thành công',
+                            type: 'error',
+                        });
+                    }
+                })
+                .catch(() => {});
         },
     }
 }

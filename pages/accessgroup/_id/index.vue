@@ -318,6 +318,10 @@ export default {
 											name: 'In phiếu thu',
 											value: 'printReceipts',
 										},
+                                        {
+											name: 'Xuất dữ liệu',
+											value: 'export',
+										},
                                     ],
                                     hideDefaultRights: true,
 								},
@@ -332,6 +336,14 @@ export default {
                                         {
 											name: 'In phiếu chi',
 											value: 'print',
+										},
+                                        {
+											name: 'Nhập dữ liệu',
+											value: 'import',
+										},
+                                        {
+											name: 'Xuất dữ liệu',
+											value: 'export',
 										},
                                     ],
                                     hideDefaultRights: false,
