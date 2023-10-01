@@ -582,30 +582,31 @@
                 </section>
             </vue-html2pdf>
             <!-- Dialog import phiếu chi -->
-            <el-dialog title="Nhập dữ liệu" :visible.sync="dialogImport.visible" :close-on-click-modal="false" width="40%">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="col-form-label">Chọn file excel *</div>
-                        <el-upload
-                            class="upload-demo"
-                            drag
-                            style="width: 100%"
-                            ref="importFile"
-                            action="#"
-                            :limit="2"
-                            :auto-upload="false"
-                            :show-file-list="true"
-                            list-type="text"
-                            :on-change="handleChange"
-                            :file-list="fileList"
-                        >
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">
-                                Kéo thả tệp vào đây hoặc <em>nhấn vào để tải lên</em>
-                            </div>
-                        </el-upload>
+            <el-dialog title="Nhập dữ liệu" :visible.sync="dialogImport.visible" :close-on-click-modal="false" :width="dialogImport.width">
+                <form v-on:submit.prevent="submitImportForm" v-loading="dialogImport.importing">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-form-label">Chọn file excel *</div>
+                            <el-upload
+                                class="import-file-upload"
+                                drag
+                                ref="importFile"
+                                action="#"
+                                :limit="2"
+                                :auto-upload="false"
+                                :show-file-list="true"
+                                list-type="text"
+                                :on-change="handleChange"
+                                :file-list="fileList"
+                            >
+                                <i class="el-icon-upload"></i>
+                                <div class="el-upload__text">
+                                    Kéo thả tệp vào đây hoặc <em>nhấn vào để tải lên</em>
+                                </div>
+                            </el-upload>
+                        </div>
                     </div>
-                </div>
+                </form>
                 <span slot="footer" class="dialog-footer">
                     <button type="button" class="control-btn gray" @click="dialogImport.visible = false">
                         <i class='bx bx-x'></i>
@@ -618,8 +619,9 @@
                     <button
                         type="button" 
                         class="control-btn green"
-                        @click="submitEditOriginalDocuments"
+                        @click="submitImportForm"
                         v-if="checkRight('import')"
+                        :loading="dialogImport.importing"
                     >
                         <i class='bx bx-save' ></i>
                         <span>Nhập dữ liệu</span>
@@ -641,6 +643,7 @@ import { columns } from '@/utils/filter/payment';
 import PaymentSlip from '@/models/tw_PaymentSlip';
 import VueAutonumeric from 'vue-autonumeric';
 import dataURLtoFile from '@/utils/functions/dataURLtoFile';
+import buildFormData from '@/utils/buildFormData';
 export default {
     components: {
         'vue-autonumeric': VueAutonumeric,
@@ -704,7 +707,9 @@ export default {
             },
             dialogImport: {
                 visible: false,
-                file: null
+                importFile: null,
+                width: '40%',
+                importing: false,
             },
             fileList: []
         }
@@ -1038,7 +1043,17 @@ export default {
             if (_this.$refs.importFile) {
                 _this.$refs.importFile.clearFiles();
             }
-            _this.dialogImport.file = null;
+            let width = window.innerWidth;
+            if(width < 768){
+                _this.dialogImport.width = '90%';
+            }
+            else if(width < 992){
+                _this.dialogImport.width = '60%';
+            }
+            else{
+                _this.dialogImport.width = '40%';
+            }
+            _this.dialogImport.importFile = null;
             _this.dialogImport.visible = true;
         },
         handleChange(file, fileList) {
@@ -1049,11 +1064,11 @@ export default {
                     _this.fileList = _this.$refs.importFile.uploadFiles;
                     if(_this.fileList.length === 2) _this.fileList.splice(0, 1);
                 }
-                _this.dialogImport.file = file.raw;
+                _this.dialogImport.importFile = file.raw;
             }
             else{
                 _this.fileList = [];
-                _this.dialogImport.file = null;
+                _this.dialogImport.importFile = null;
                 _this.$message.error('File không đúng định dạng!');
             } 
         },
@@ -1094,7 +1109,76 @@ export default {
                     type: 'error',
                 });
             }
-        }
+        },
+        submitImportForm: debounce(async function () {
+            const _this = this;
+            if (!_this.dialogImport.importFile) {
+                _this.$message({
+                    message: 'Vui lòng chọn file',
+                    type: 'warning',
+                });
+                return;
+            }
+            else{
+                _this.dialogImport.importing = true;
+                try{
+                    var oldData = cloneDeep(_this.dialogImport);
+                    var newData = new FormData();
+                    buildFormData(newData, oldData);
+                    _this.$message({
+                        message: 'Quá trình nhập liệu đang diễn ra',
+                        type: 'warning',
+                        duration: 0,
+                    });
+                    const response = await _this.$axios.$post('/api/paymentSlip/import', newData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                    if (response.success) {
+                        if (_this.$refs.importFile) _this.$refs.importFile.clearFiles();
+                        _this.dialogImport.importFile = null;
+                        _this.dialogImport.visible = false;
+                        await _this.getData(_this.searchQuery);
+                        _this.$message.closeAll();
+                        _this.$notify({
+                            title: 'Thành công',
+                            message: 'Nhập dữ liệu thành công. Hãy kiểm tra file kết quả.',
+                            type: 'success',
+                        });
+                        //Xuất file kết quả
+                        var base64 = response.data;
+                        var file = dataURLtoFile(base64, 'test.xlsx')
+                        var url = URL.createObjectURL(file)
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `${_this.$nuxt.$route.path.split('/')[1]}_export_result_file_${Math.round(new Date().getTime() / 1000)}.xlsx`;
+                        document.body.appendChild(link);
+                        link.click();
+                    }
+                    else{
+                        _this.$message.error(data.error);
+                    }
+                }
+                catch(error){
+                    _this.$message.closeAll();
+                    _this.$notify({
+                        title: 'Thất bại',
+                        message: 'Có lỗi xảy ra',
+                        type: 'error',
+                    });
+                }
+                _this.dialogImport.importing = false;
+                return;
+            }
+        }, 500)
     }
 }
 </script>
+
+<style>
+.import-file-upload .el-upload{
+    width: 100%;
+}
+.import-file-upload .el-upload-dragger{
+    width: 100%;
+}
+</style>
