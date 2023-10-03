@@ -242,6 +242,23 @@
                     </div>
                     <div class="col-md-12">
                         <div class="col-form-label">Số tiền chi *</div>
+                        <div class="inputTextRight">
+                            <InputNumber 
+                                style="width:100%;"
+                                inputClass="el-input__inner"
+                                v-model="dialogPayment.data.amount" 
+                                placeholder="0"
+                                :min="0"
+                                mode="decimal"
+                                locale="en-US"
+                                suffix=" VND"
+                                @input="()=>{
+                                    if(dialogPayment.data.amount == null || dialogPayment.data.amount == ''){
+                                        dialogPayment.data.amount = 0;
+                                    }
+                                }"
+                            />
+                        </div>
                         <!-- <vue-autonumeric
                             v-model="dialogPayment.data.amount"
                             class="el-input__inner"
@@ -344,6 +361,24 @@
                     </div>
                     <div class="col-md-6">
                         <div class="col-form-label">Số tiền chi</div>
+                        <div class="inputTextRight">
+                            <InputNumber 
+                                style="width:100%;pointer-events:none;"
+                                inputClass="el-input__inner"
+                                v-model="dialogEdit.data.amount" 
+                                placeholder="0"
+                                :min="0"
+                                mode="decimal"
+                                locale="en-US"
+                                suffix=" VND"
+                                readonly
+                                @input="()=>{
+                                    if(dialogEdit.data.amount == null || dialogEdit.data.amount == ''){
+                                        dialogEdit.data.amount = 0;
+                                    }
+                                }"
+                            />
+                        </div>
                         <!-- <vue-autonumeric
                             v-model="dialogEdit.data.amount"
                             class="el-input__inner"

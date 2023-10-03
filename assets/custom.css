@@ -316,3 +316,21 @@
 .el-input-number__decrease:hover:not(.is-disabled)~.el-input .el-input__inner:not(.is-disabled), .el-input-number__increase:hover:not(.is-disabled)~.el-input .el-input__inner:not(.is-disabled) {
     border-color: #7fc362;
 }
+
+.p-inputtext{
+    color: #606266;
+    font-size: 14px;
+    font-family: "Roboto", sans-serif;
+    line-height: 40px;
+    padding: 0 15px;
+    height: 40px;
+}
+
+.p-inputtext:enabled:hover {
+    border-color: #C0C4CC;
+}
+
+.p-inputtext:enabled:focus {
+    box-shadow: none;
+    border-color: rgba(82, 161, 157, 0.719) !important;
+}

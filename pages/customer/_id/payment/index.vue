@@ -193,6 +193,22 @@
                                         <div class="col-md-12">
                                             <div class="col-form-label">Số tiền còn lại</div>
                                             <div class="inputTextRight">
+                                                <InputNumber 
+                                                    style="width:100%;pointer-events:none;"
+                                                    inputClass="el-input__inner"
+                                                    v-model="paymentDialog.receiptData.remainAmount" 
+                                                    placeholder="0"
+                                                    :min="0"
+                                                    mode="decimal"
+                                                    locale="en-US"
+                                                    suffix=" VND"
+                                                    readonly
+                                                    @input="()=>{
+                                                        if(paymentDialog.receiptData.remainAmount == null || paymentDialog.receiptData.remainAmount == ''){
+                                                            paymentDialog.receiptData.remainAmount = 0;
+                                                        }
+                                                    }"
+                                                />
                                                 <!-- <vue-autonumeric
                                                     v-model="paymentDialog.receiptData.remainAmount"
                                                     class="el-input__inner"
@@ -215,6 +231,22 @@
                                         <div class="col-md-12">
                                             <div class="col-form-label">Số tiền thanh toán *</div>
                                             <div class="inputTextRight">
+                                                <InputNumber 
+                                                    style="width:100%;"
+                                                    inputClass="el-input__inner"
+                                                    v-model="paymentDialog.receiptData.paidAmount" 
+                                                    placeholder="0"
+                                                    :min="0"
+                                                    mode="decimal"
+                                                    locale="en-US"
+                                                    suffix=" VND"
+                                                    @input="()=>{
+                                                        if(paymentDialog.receiptData.paidAmount == null || paymentDialog.receiptData.paidAmount == ''){
+                                                            paymentDialog.receiptData.paidAmount = 0;
+                                                        }
+                                                        handleChangeReceiptAmount();
+                                                    }"
+                                                />
                                                 <!-- <vue-autonumeric
                                                     class="el-input__inner"
                                                     name="receiptAmount"

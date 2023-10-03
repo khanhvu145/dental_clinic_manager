@@ -63,9 +63,23 @@
                                                 </template>
                                             </el-table-column>
                                             <el-table-column label="Số lượng" width="100">
-                                                <!-- <template slot-scope="scope">
+                                                <template slot-scope="scope">
                                                     <div class="inputTextRight">
-                                                        <vue-autonumeric
+                                                        <InputNumber 
+                                                            style="width:100%;"
+                                                            inputClass="el-input__inner"
+                                                            v-model="scope.row.quantity" 
+                                                            placeholder="0"
+                                                            :min="0"
+                                                            mode="decimal"
+                                                            locale="en-US"
+                                                            @input="()=>{
+                                                                if(scope.row.quantity == null || scope.row.quantity == ''){
+                                                                    scope.row.quantity = 0;
+                                                                }
+                                                            }"
+                                                        />
+                                                        <!-- <vue-autonumeric
                                                             v-model="scope.row.quantity"
                                                             placeholder="0"
                                                             class="el-input__inner"
@@ -81,9 +95,9 @@
                                                                 emptyInputBehavior: '0'
                                                             }"
                                                         >
-                                                        </vue-autonumeric>
+                                                        </vue-autonumeric> -->
                                                     </div>
-                                                </template> -->
+                                                </template>
                                             </el-table-column>
                                             <el-table-column label="Ghi chú" min-width="150">
                                                 <template slot-scope="scope">

@@ -136,6 +136,22 @@
                     <div class="row mt-3">
                         <div class="col-md-3">Đơn giá:</div>
                         <div class="col-md-9 inputTextRight">
+                            <InputNumber 
+                                style="width:100%;pointer-events:none;"
+                                inputClass="el-input__inner"
+                                v-model="data.unitPrice" 
+                                placeholder="0"
+                                :min="0"
+                                mode="decimal"
+                                locale="en-US"
+                                suffix=" VND"
+                                readonly
+                                @input="()=>{
+                                    if(data.unitPrice == null || data.unitPrice == ''){
+                                        data.unitPrice = 0;
+                                    }
+                                }"
+                            />
                             <!-- <vue-autonumeric
                                 v-model="data.unitPrice"
                                 class="el-input__inner"
@@ -158,6 +174,22 @@
                     <div class="row mt-3">
                         <div class="col-md-3">Giảm giá:</div>
                         <div class="col-md-9 inputTextRight">
+                            <InputNumber 
+                                style="width:100%;"
+                                inputClass="el-input__inner"
+                                v-model="data.discount" 
+                                placeholder="0"
+                                :min="0"
+                                mode="decimal"
+                                locale="en-US"
+                                suffix=" VND"
+                                @input="()=>{
+                                    if(data.discount == null || data.discount == ''){
+                                        data.discount = 0;
+                                    }
+                                    handleChangeDiscount();
+                                }"
+                            />
                             <!-- <vue-autonumeric
                                 placeholder="Giảm giá" 
                                 v-model="data.discount" 
@@ -180,6 +212,22 @@
                     <div class="row mt-3">
                         <div class="col-md-3">Thành tiền:</div>
                         <div class="col-md-9 inputTextRight">
+                            <InputNumber 
+                                style="width:100%;pointer-events:none;"
+                                inputClass="el-input__inner"
+                                v-model="data.totalPrice" 
+                                placeholder="0"
+                                :min="0"
+                                mode="decimal"
+                                locale="en-US"
+                                suffix=" VND"
+                                readonly
+                                @input="()=>{
+                                    if(data.totalPrice == null || data.totalPrice == ''){
+                                        data.totalPrice = 0;
+                                    }
+                                }"
+                            />
                             <!-- <vue-autonumeric
                                 v-model="data.totalPrice"
                                 class="el-input__inner"

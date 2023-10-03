@@ -206,6 +206,23 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="col-form-label">Giá dịch vụ</div>
+                                <div class="inputTextRight">
+                                    <InputNumber 
+                                        style="width:100%;"
+                                        inputClass="el-input__inner"
+                                        v-model="createData.price" 
+                                        placeholder="0"
+                                        :min="0"
+                                        mode="decimal"
+                                        locale="en-US"
+                                        suffix=" VND"
+                                        @input="()=>{
+                                            if(createData.price == null || createData.price == ''){
+                                                createData.price = 0;
+                                            }
+                                        }"
+                                    />
+                                </div>
                                 <!-- <vue-autonumeric
                                     v-model="createData.price"
                                     class="el-input__inner"
@@ -316,6 +333,23 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="col-form-label">Giá dịch vụ *</div>
+                                <div class="inputTextRight">
+                                    <InputNumber 
+                                        style="width:100%;"
+                                        v-model="updateData.price" 
+                                        placeholder="0"
+                                        :min="0"
+                                        mode="decimal"
+                                        locale="en-US"
+                                        suffix=" VND"
+                                        inputClass="el-input__inner"
+                                        @input="()=>{
+                                            if(updateData.price == null || updateData.price == ''){
+                                                updateData.price = 0;
+                                            }
+                                        }"
+                                    />
+                                </div>
                                 <!-- <vue-autonumeric
                                     v-model="updateData.price"
                                     class="el-input__inner"
