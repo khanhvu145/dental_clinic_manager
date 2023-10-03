@@ -206,7 +206,7 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="col-form-label">Giá dịch vụ</div>
-                                <vue-autonumeric
+                                <!-- <vue-autonumeric
                                     v-model="createData.price"
                                     class="el-input__inner"
                                     placeholder="Giá dịch vụ"
@@ -220,7 +220,7 @@
                                         roundingMethod: 'U',
                                         minimumValue: '0',
                                     }"
-                                ></vue-autonumeric>
+                                ></vue-autonumeric> -->
                                 <!-- <el-input 
                                     name="price"
                                     placeholder="Giá dịch vụ"
@@ -316,7 +316,7 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="col-form-label">Giá dịch vụ *</div>
-                                <vue-autonumeric
+                                <!-- <vue-autonumeric
                                     v-model="updateData.price"
                                     class="el-input__inner"
                                     placeholder="Giá dịch vụ"
@@ -330,7 +330,7 @@
                                         roundingMethod: 'U',
                                         minimumValue: '0',
                                     }"
-                                ></vue-autonumeric>
+                                ></vue-autonumeric> -->
                                 <!-- <el-input 
                                     name="price"
                                     placeholder="Giá dịch vụ"
@@ -392,7 +392,7 @@ import { mapState } from 'vuex';
 import { statusData } from '@/utils/masterData';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import Service from '@/models/tw_Service';
-import VueAutonumeric from 'vue-autonumeric';
+// import VueAutonumeric from 'vue-autonumeric';
 import { columns } from '@/utils/filter/service';
 export default {
     computed: {
@@ -402,7 +402,7 @@ export default {
 		}),
 	},
     components: {
-        'vue-autonumeric': VueAutonumeric,
+        // 'vue-autonumeric': VueAutonumeric,
     },
     data() {
         return {

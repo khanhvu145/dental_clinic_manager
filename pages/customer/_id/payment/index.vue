@@ -193,7 +193,7 @@
                                         <div class="col-md-12">
                                             <div class="col-form-label">Số tiền còn lại</div>
                                             <div class="inputTextRight">
-                                                <vue-autonumeric
+                                                <!-- <vue-autonumeric
                                                     v-model="paymentDialog.receiptData.remainAmount"
                                                     class="el-input__inner"
                                                     placeholder="Số tiền còn lại"
@@ -209,13 +209,13 @@
                                                         minimumValue: '0',
                                                         emptyInputBehavior: '0'
                                                     }"
-                                                ></vue-autonumeric>
+                                                ></vue-autonumeric> -->
                                             </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="col-form-label">Số tiền thanh toán *</div>
                                             <div class="inputTextRight">
-                                                <vue-autonumeric
+                                                <!-- <vue-autonumeric
                                                     class="el-input__inner"
                                                     name="receiptAmount"
                                                     placeholder="Số tiền thanh toán"
@@ -232,7 +232,7 @@
                                                         minimumValue: '0',
                                                         emptyInputBehavior: '0'
                                                     }"
-                                                ></vue-autonumeric>
+                                                ></vue-autonumeric> -->
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -577,13 +577,13 @@ import LeftMenu from '@/components/customer/LeftMenu';
 import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import Customer from '@/models/tw_Customer';
 import Payment from '@/models/tw_Payment';
-import VueAutonumeric from 'vue-autonumeric';
+// import VueAutonumeric from 'vue-autonumeric';
 import buildFormData from '@/utils/buildFormData';
 import readAmountByWord from '@/utils/functions/readAmountByWord';
 export default {
     components: {
 		LeftMenu,
-        'vue-autonumeric': VueAutonumeric,
+        // 'vue-autonumeric': VueAutonumeric,
 	},
     computed: {
 		...mapState({

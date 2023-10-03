@@ -39,9 +39,10 @@
     "jspdf": "^2.5.1",
     "mongoose-delete": "^0.5.4",
     "nuxt": "^2.15.7",
+    "primeicons": "^6.0.1",
+    "primevue": "^2.10.2",
     "socket.io-client": "^4.6.1",
     "vue-async-computed": "^3.9.0",
-    "vue-autonumeric": "^1.2.6",
     "vue-html2pdf": "^1.8.0",
     "vue-lodash": "^2.1.2"
   },

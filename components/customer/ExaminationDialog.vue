@@ -142,7 +142,7 @@
                         <div class="row mt-3">
                             <div class="col-md-3">Đơn giá:</div>
                             <div class="col-md-9 inputTextRight">
-                                <vue-autonumeric
+                                <!-- <vue-autonumeric
                                     v-model="data.unitPrice"
                                     class="el-input__inner"
                                     placeholder="Đơn giá" 
@@ -157,7 +157,7 @@
                                         roundingMethod: 'U',
                                         minimumValue: '0',
                                     }"
-                                ></vue-autonumeric>
+                                ></vue-autonumeric> -->
                                 <!-- <el-input 
                                     name="quantity" 
                                     placeholder="Đơn giá" 
@@ -172,7 +172,7 @@
                         <div class="row mt-3">
                             <div class="col-md-3">Giảm giá:</div>
                             <div class="col-md-9 inputTextRight">
-                                <vue-autonumeric
+                                <!-- <vue-autonumeric
                                     placeholder="Giảm giá" 
                                     v-model="data.discount" 
                                     class="el-input__inner"
@@ -187,7 +187,7 @@
                                         roundingMethod: 'U',
                                         minimumValue: '0',
                                     }"
-                                ></vue-autonumeric>
+                                ></vue-autonumeric> -->
                                 <!-- <el-input 
                                     name="quantity" 
                                     placeholder="Giảm giá" 
@@ -201,7 +201,7 @@
                         <div class="row mt-3">
                             <div class="col-md-3">Thành tiền:</div>
                             <div class="col-md-9 inputTextRight">
-                                <vue-autonumeric
+                                <!-- <vue-autonumeric
                                     v-model="data.totalPrice"
                                     class="el-input__inner"
                                     placeholder="Thành tiền" 
@@ -215,7 +215,7 @@
                                         currencySymbolPlacement: 's',
                                         roundingMethod: 'U',
                                     }"
-                                ></vue-autonumeric>
+                                ></vue-autonumeric> -->
                                 <!-- <el-input 
                                     name="quantity" 
                                     placeholder="Thành tiền" 
@@ -258,7 +258,7 @@
 <script>
 import { mapState } from 'vuex';
 import { milkTooth, permanentTeeth } from '@/utils/masterData';
-import VueAutonumeric from 'vue-autonumeric';
+// import VueAutonumeric from 'vue-autonumeric';
 export default {
     name: 'AddExamination',
     props: {
@@ -286,7 +286,7 @@ export default {
         },
     },
     components: {
-        'vue-autonumeric': VueAutonumeric,
+        // 'vue-autonumeric': VueAutonumeric,
     },
      data() {
         return {

@@ -242,7 +242,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="col-form-label">Số tiền chi *</div>
-                        <vue-autonumeric
+                        <!-- <vue-autonumeric
                             v-model="dialogPayment.data.amount"
                             class="el-input__inner"
                             placeholder="Số tiền chi"
@@ -256,7 +256,7 @@
                                 roundingMethod: 'U',
                                 minimumValue: '0',
                             }"
-                        ></vue-autonumeric>
+                        ></vue-autonumeric> -->
                     </div>
                     <div class="col-md-12">
                         <div class="col-form-label">Chứng từ gốc</div>
@@ -344,7 +344,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="col-form-label">Số tiền chi</div>
-                        <vue-autonumeric
+                        <!-- <vue-autonumeric
                             v-model="dialogEdit.data.amount"
                             class="el-input__inner"
                             placeholder="Số tiền chi"
@@ -359,7 +359,7 @@
                                 roundingMethod: 'U',
                                 minimumValue: '0',
                             }"
-                        ></vue-autonumeric>
+                        ></vue-autonumeric> -->
                     </div>
                     <div class="col-md-6">
                         <div class="col-form-label">Ngày chi</div>
@@ -641,12 +641,12 @@ import { debounce, cloneDeep, intersection } from 'lodash';
 import readAmountByWord from '@/utils/functions/readAmountByWord';
 import { columns } from '@/utils/filter/payment';
 import PaymentSlip from '@/models/tw_PaymentSlip';
-import VueAutonumeric from 'vue-autonumeric';
+// import VueAutonumeric from 'vue-autonumeric';
 import dataURLtoFile from '@/utils/functions/dataURLtoFile';
 import buildFormData from '@/utils/buildFormData';
 export default {
     components: {
-        'vue-autonumeric': VueAutonumeric,
+        // 'vue-autonumeric': VueAutonumeric,
     },
     computed: {
 		...mapState({

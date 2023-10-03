@@ -924,14 +924,14 @@ import DiagnosisTreatment from '@/components/customer/DiagnosisTreatment.vue';
 import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import buildFormData from '@/utils/buildFormData';
 import moment from 'moment';
-import VueAutonumeric from 'vue-autonumeric';
+// import VueAutonumeric from 'vue-autonumeric';
 import TinyEditor from '@/components/common/TinyEditor';
 export default {
     components: {
 		LeftMenu,
         Designation,
         DiagnosisTreatment,
-        'vue-autonumeric': VueAutonumeric,
+        // 'vue-autonumeric': VueAutonumeric,
 		'tiny-editor': TinyEditor,
 	},
     computed: {

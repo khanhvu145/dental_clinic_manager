@@ -29,6 +29,9 @@ export default {
     '~/assets/reset.css',
     '~/assets/base.css',
     'boxicons/css/boxicons.min.css',
+    'primevue/resources/themes/saga-blue/theme.css',       //theme
+    'primevue/resources/primevue.min.css',              //core css
+    'primeicons/primeicons.css'                           //icons
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -38,7 +41,8 @@ export default {
     '@/plugins/lodash',
     '@/plugins/async-computed',
     '@/plugins/icons',
-    { src: '@/plugins/vue-html2pdf', mode: 'client' }
+    { src: '@/plugins/vue-html2pdf', mode: 'client' },
+    '@/plugins/primevue',
   ],
 
   router: {
@@ -64,7 +68,7 @@ export default {
     'bootstrap-vue/nuxt',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next',
+    '@nuxtjs/auth-next'
   ],
 
   bootstrapVue: {

@@ -63,7 +63,7 @@
                                                 </template>
                                             </el-table-column>
                                             <el-table-column label="Số lượng" width="100">
-                                                <template slot-scope="scope">
+                                                <!-- <template slot-scope="scope">
                                                     <div class="inputTextRight">
                                                         <vue-autonumeric
                                                             v-model="scope.row.quantity"
@@ -83,7 +83,7 @@
                                                         >
                                                         </vue-autonumeric>
                                                     </div>
-                                                </template>
+                                                </template> -->
                                             </el-table-column>
                                             <el-table-column label="Ghi chú" min-width="150">
                                                 <template slot-scope="scope">
@@ -373,13 +373,13 @@ import LeftMenu from '@/components/customer/LeftMenu';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import Prescription from '@/models/tw_Prescription';
 import buildFormData from '@/utils/buildFormData';
-import VueAutonumeric from 'vue-autonumeric';
+// import VueAutonumeric from 'vue-autonumeric';
 import TinyEditor from '@/components/common/TinyEditor';
 import Customer from '@/models/tw_Customer';
 export default {
     components: {
 		LeftMenu,
-        'vue-autonumeric': VueAutonumeric,
+        // 'vue-autonumeric': VueAutonumeric,
 		'tiny-editor': TinyEditor,
 	},
     computed: {
