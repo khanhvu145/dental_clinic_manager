@@ -2,39 +2,84 @@
     <div class="headerApp">
         <div class="container-fluid">
             <div class="navbar-custom">
-                    <ul class="navbar-list">
-                        <li class="navbar-item">
-                            <a class="navbar-link">
-                                <i class='bx bx-menu' @click="collapseSidebar"></i>
-                            </a>
-                            <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
-                                <el-radio-button :label="false">
-                                    <i class='bx bx-menu'></i>
-                                </el-radio-button>
-                                <el-radio-button :label="true">
-                                    <i class='bx bx-menu'></i>
-                                </el-radio-button>
-                            </el-radio-group> -->
-                        </li>
+                <ul class="navbar-list">
+                    <li class="navbar-item">
+                        <a class="navbar-link">
+                            <i class='bx bx-menu' @click="collapseSidebar"></i>
+                        </a>
+                        <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
+                            <el-radio-button :label="false">
+                                <i class='bx bx-menu'></i>
+                            </el-radio-button>
+                            <el-radio-button :label="true">
+                                <i class='bx bx-menu'></i>
+                            </el-radio-button>
+                        </el-radio-group> -->
+                    </li>
 
-                        <li class="navbar-item">
-                            <img src="/images/Logodental.png" alt="" class="logo">
-                            <img src="/images/chulogo.png" alt="" class="title-logo">
-                        </li>
-                    </ul>
+                    <li class="navbar-item">
+                        <img src="/images/Logodental.png" alt="" class="logo">
+                        <img src="/images/chulogo.png" alt="" class="title-logo">
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <el-badge :is-dot="notificationGet.some(e => e.status == 'new')" class="item">
+                        <el-dropdown trigger="click" @visible-change="handleDropdownChange" @command="handleCommandNotify">
+                            <el-button class="btn-custom" size="medium" icon="el-icon-message-solid" circle></el-button>
+                            <el-dropdown-menu slot="dropdown" v-loading="dataLoading">
+                                <div style="font-weight:bold;color:#606266;padding:10px 20px 14px 20px;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>Thông báo</span>
+                                        <el-link :underline="false" style="font-style:italic;font-size:13px;" @click="updateSeenStatusAll">
+                                            Xem tất cả
+                                            <i class="el-icon-view el-icon--right"></i> 
+                                        </el-link>
+                                    </div>
+                                </div>
+                                <hr style="margin:0">
+                                <div 
+                                    class="infinite-list-custom" 
+                                    v-infinite-scroll="loadNotifications" 
+                                    :infinite-scroll-disabled="isCheck && loading" 
+                                    infinite-scroll-distance="350"
+                                    style="max-height:350px;overflow-y:auto;width:400px;"
+                                >
+                                    <el-dropdown-item 
+                                        class="pt-2 pb-2 infinite-list-item"
+                                        style="font-size:14px;line-height:22px;max-width:400px;" 
+                                        :style="{ backgroundColor: notify.status == 'new' ? 'rgba(234,255,234)' : '' }"
+                                        v-for="notify in notifications" 
+                                        :key="notify._id"
+                                        :command="notify"
+                                    >
+                                        <el-badge :is-dot="notify.status == 'new'" class="item" style="width:100%">
+                                            <div style="font-weight:bold;">{{ notify.title }}</div>
+                                        </el-badge>
+                                        <div v-html="notify.content"></div>
+                                        <div style="font-style:italic;color:#98a6ad;font-size:12px;">{{ $moment(notify.createdAt).fromNow() }}</div>
+                                    </el-dropdown-item>
+                                    <el-dropdown-item class="mt-4" v-if="loading" v-loading="loading" element-loading-text="Loading..." element-loading-spinner="el-icon-loading" style="pointer-events:none;font-style:italic;font-size:14px;text-align:center;line-height:14px;"></el-dropdown-item>
+                                </div>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </el-badge>
                     <el-dropdown trigger="click" @command="handleCommand">
                         <span class="el-dropdown-link">
                             <div class="navbar__nav">
-                                <div class="navbar__name">{{ userInfo.data.name }}</div>
+                                <!-- <div class="navbar__name">{{ userInfo.data.name }}</div> -->
                                 <div class="navbar__img">
                                     <img :src="userInfo.data.img ? userInfo.data.img : '/images/user.png'" alt="">
                                 </div>
                             </div>
                         </span>
                         <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="info" style="pointer-events:none;">
+                                <div style="font-weight:bold;">{{ userInfo.data.name }}</div>
+                            </el-dropdown-item>
+                            <hr style="margin-top:4px;margin-bottom:10px;">
                             <el-dropdown-item command="account">
-                                <i class='bx bxs-user-account' ></i>
-                                Tài khoản
+                                <i class='bx bx-user-circle'></i>
+                                Thông tin người dùng
                             </el-dropdown-item>
                             <el-dropdown-item command="logout">
                                 <i class='bx bx-log-out'></i>
@@ -42,6 +87,7 @@
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
+                </div>
             </div>
         </div>
     </div>
@@ -49,7 +95,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import SocketioService from '../../services/socketio.service.js';
 export default {
     props: { 
         isCollapse: Boolean,
@@ -57,22 +102,46 @@ export default {
     computed: {
 		...mapState({
 			userInfo: (state) => state.auth.user,
-		}),
+		})
 	},
     data() {
-      return {
-          
-      };
+        return {
+            notificationGet: [],
+            notifications: [],
+            loading: false,
+            isCheck: false,
+            dataLoading: false,
+        };
+    },
+    async beforeMount () {
+        const _this = this;
+        if (_this.$socket) {
+            _this.$socket.on('notification', (notify) => {
+                // console.log(notify)
+                _this.$notify({
+                    type: 'info',
+                    title: 'Thông báo',
+                    message: notify,
+                    position: 'bottom-right'
+                });
+            })
+        }
     },
     async created() {
 		const _this = this;
 	},
+    async mounted() {
+        const _this = this;
+        await _this.getNotify();
+    },
     methods: {
         async handleCommand(command) {
             if(command == 'logout') {
                 await this.$auth.logout();
 			    await this.$router.push('/login');
-                await SocketioService.disconnect();
+                if (this.$socket) {
+                    this.$socket.disconnect();
+                }
             }
             if(command == 'account') {
 			    await this.$router.push('/account');
@@ -81,6 +150,103 @@ export default {
         collapseSidebar(){
             var keyChange = !this.isCollapse;
             this.$emit('changeSidebar', keyChange);
+        },
+        loadNotifications(){
+            const _this = this;
+            _this.loading = true;
+            if (_this.notifications.length < _this.notificationGet.length){
+                setTimeout(() => {
+                    var from = _this.notifications.length;
+                    var size = _this.notifications.length + 5;
+                    var notify = _this.notificationGet.slice(from, size);
+                    _this.notifications.push(
+                        ...notify
+                    );
+                    _this.loading = false;
+                }, 1000);
+            }
+            else{
+                _this.loading = false
+            }
+        },
+        async handleDropdownChange(){
+            const _this = this;
+            if(!_this.isCheck){
+                _this.notifications = [];
+                await _this.getNotify();
+            }
+            _this.isCheck = !_this.isCheck;
+        },
+        async getNotify(){
+            const _this = this;
+            _this.dataLoading = true;
+            await _this.$axios.$post('/api/user/getNotifyByQuery', { size: 30, from: 0 }).then(
+                (response) => {
+                    var from = _this.notifications.length;
+                    var size = _this.notifications.length + 5;
+					_this.notificationGet = response.data || [];
+                    var notify = _this.notificationGet.slice(from, size);
+                    _this.notifications.push(
+                        ...notify
+                    );
+				},
+				(error) => {
+					console.log('Error: ', error);
+				}
+            );
+            _this.dataLoading = false;
+        },
+        async handleCommandNotify(command){
+            const _this = this;
+            if(command.type == 'appointment'){
+                if(command.status == 'new'){
+                    await _this.$axios.$post('/api/user/updateSeenStatus', { id: command._id });
+                }
+                await _this.$router.push({
+                    path: `/workingCalendarV2`,
+                    query: { appointmentId: command.targetId }
+                });
+            }
+            else if(command.type == 'examination'){
+                await _this.$axios.$get(`/api/customer/getExaminationById/${_this.$route.query.examinationId}`).then(
+                    async (response) => {
+                        if(response.success && response.data && response.data.customerId){
+                            await _this.$router.push({
+                                path: `/customer/${response.data.customerId}/examinationV2/edit`,
+                                query: { examinationId: command.targetId }
+                            });
+                        }
+                        else{
+                            console.log('Error: ', response.error);
+                            return;
+                        }
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        return;
+                    }
+                );
+            }
+            else if(command.type == 'payment'){
+
+            }
+        },
+        async updateSeenStatusAll(){
+            const _this = this;
+            _this.dataLoading = true;
+            try{
+                const data = await _this.$axios.$post('/api/user/updateSeenStatusAll');
+                if(data.success){
+                    _this.notifications = [];
+                    await _this.getNotify();
+                }else {
+                    _this.$message.error('Hoàn thành lịch hẹn không thành công');
+                }
+            }
+            catch(error){
+                console.log('Error: ', error);
+            }
+            _this.dataLoading = false;
         }
     }
 }
@@ -179,7 +345,12 @@ export default {
     font-size: 16px;
 }
 
-.navbar__nav::after {
+/* .navbar__img:hover{
+    opacity: 0.8;
+    transition: all ease 0.5s;
+} */
+
+.navbar__img::after {
 	content: '';
 	position: absolute;
 	top: 50%;
@@ -192,10 +363,22 @@ export default {
 	transition: all ease 0.5s;
 }
 
-.navbar__nav:hover::after {
-    background-color: rgba(0, 0, 0, 0.1);
+.navbar__img:hover::after {
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
+.infinite-list-custom::-webkit-scrollbar-track{
+	background-color: #fff;
+}
+
+.infinite-list-custom::-webkit-scrollbar{
+	width: 4px;
+	background-color: #fff;
+}
+
+.infinite-list-custom::-webkit-scrollbar-thumb{
+	background-color: #bfbebe;
+}
 /* .nav-right > a {
 	display: flex;
     align-items: center;

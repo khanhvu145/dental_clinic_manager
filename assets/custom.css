@@ -334,3 +334,21 @@
     box-shadow: none;
     border-color: rgba(82, 161, 157, 0.719) !important;
 }
+
+.el-button.btn-custom:focus, .el-button.btn-custom:hover{
+    background: #e0dede;
+    border: 1px solid #DCDFE6;
+    color: #606266;
+}
+
+.el-link.el-link--default:hover{
+    color: #7fc362;
+}
+
+.el-loading-spinner .el-loading-text{
+    color: #7fc362;
+}
+
+.el-loading-spinner i {
+    color: #7fc362;
+}

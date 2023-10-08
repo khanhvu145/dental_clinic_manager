@@ -67,7 +67,7 @@
                 </div>
             </div>
             <!-- Dialog chi tiết lịch hẹn -->
-            <el-dialog :visible.sync="dialogDetail.visible" :close-on-click-modal="false" width="40%">
+            <el-dialog :visible.sync="dialogDetail.visible" :close-on-click-modal="false" :width="dialogDetail.width">
                 <span slot="title" class="dialog-title">
                     <span style="color: #FFF;">
                         Chi tiết lịch hẹn |
@@ -84,31 +84,31 @@
                             </div>
                             <div v-if="dialogDetail.data.mainCustomer" class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Mã khách hàng:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.code || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Họ tên:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.name || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         CMND/CCCD:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.physicalId || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Số điện thoại:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.phone || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-sm-6 mb-3">
                                         Ngày sinh:
                                         <span style="font-weight: bold;">{{ $moment(dialogDetail.data.mainCustomer.birthday).format('DD/MM/YYYY') || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Giới tính:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.gender == 'male' ? 'Nam' : dialogDetail.data.mainCustomer.gender == 'female' ? 'Nữ' : 'Khác' }}</span>
                                     </div>
-                                    <div class="col-md-12 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-12 mb-3" style="word-break: break-word;">
                                         Địa chỉ:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.mainCustomer.fullAddress || '' }}</span>
                                     </div>
@@ -123,37 +123,37 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Mã lịch hẹn:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.code || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Nha sĩ phụ trách:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.dentistName || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Ngày hẹn:
                                         <span style="font-weight: bold;">{{ $moment(dialogDetail.data.date).format('DD/MM/YYYY') || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Thời gian:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.timeFrom || '' }}</span>
                                         -
                                         <span style="font-weight: bold;">{{ dialogDetail.data.timeTo || '' }}</span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Loại lịch hẹn:
                                         <span style="font-weight: bold;">
                                             {{ getTypeName(dialogDetail.data.type) }}
                                         </span>
                                     </div>
-                                    <div class="col-md-6 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-6 mb-3" style="word-break: break-word;">
                                         Nội dung:
                                         <span style="font-weight: bold;">
                                             {{ getContentName(dialogDetail.data.content) }}
                                         </span>
                                     </div>
-                                    <div class="col-md-12 mb-3" style="word-break: break-word;">
+                                    <div class="col-sm-12 mb-3" style="word-break: break-word;">
                                         Ghi chú:
                                         <span style="font-weight: bold;">{{ dialogDetail.data.note || '' }}</span>
                                     </div>
@@ -212,7 +212,8 @@ export default {
             data: [],
             dialogDetail: {
                 visible: false,
-                data: new Appointment()
+                data: new Appointment(),
+                width: '40%'
             },
             appointmentType: [],
             appointmentContent: [],
@@ -224,7 +225,10 @@ export default {
         _this.appointmentType = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentType' })) || [];
         //Lấy danh sách nội dung lịch hẹn
         _this.appointmentContent = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigAppointmentContent' })) || [];
-        
+        //Lấy dữ liệu nếu có query
+        if (_this.$route.query.appointmentId){
+            await _this.openDialogDetail(_this.$route.query.appointmentId);
+        }
         //Lấy danh sách lịch hẹn
         await _this.getData();
     },
@@ -311,6 +315,20 @@ export default {
                 }).then(
                     (response) => {
                         if(response.success){
+                            if (_this.$route.query.appointmentId){
+                                _this.searchQuery.dateF = response.data ? response.data.date : new Date();
+                                _this.changeCurrentDate();
+                            }
+                            let width = window.innerWidth;
+                            if(width < 768){
+                                _this.dialogDetail.width = '90%';
+                            }
+                            else if(width < 1200){
+                                _this.dialogDetail.width = '60%';
+                            }
+                            else{
+                                _this.dialogDetail.width = '40%';
+                            }
                             _this.dialogDetail.data = response.data || new Appointment();
                             _this.dialogDetail.visible = true;
                         }

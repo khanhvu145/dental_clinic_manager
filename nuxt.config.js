@@ -43,6 +43,7 @@ export default {
     '@/plugins/icons',
     { src: '@/plugins/vue-html2pdf', mode: 'client' },
     '@/plugins/primevue',
+    '@/plugins/vue-infinite-scroll',
   ],
 
   router: {
@@ -99,6 +100,9 @@ export default {
 				},
 			},
 		},
+    plugins: [ 
+      '@/plugins/socket.io',
+    ]
 	},
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

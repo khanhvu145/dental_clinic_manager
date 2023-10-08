@@ -640,10 +640,13 @@ export default {
             const _this = this;
             return _.find(_this.statusData, item => item.value == type).label || '';
         },
-        createAppointment(){
+        async createAppointment(){
             const _this = this;
             let route = _this.$router.resolve({path: '/appointmentBooking'});
             window.open(route.href, '_blank');
+            // if (_this.$socket) {
+            //     _this.$socket.emit('handleUpdateAppointment');
+            // }
         },
         async openDialogLogs(id){
             const _this = this;

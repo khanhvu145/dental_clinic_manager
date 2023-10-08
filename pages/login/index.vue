@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import SocketioService from '../../services/socketio.service.js';
 export default {
     layout: 'blank',
     name: 'Login',
@@ -61,13 +60,13 @@ export default {
 			try {
 				const response = await this.$auth.loginWith('local', { data: _this.login });
 				if (response.data.success) {
-                    await SocketioService.setupSocketConnection(_this.$store, _this.login.username);
                     _this.$message({
 						showClose: true,
 						message: response.data.message,
 						type: 'success',
 					});
-                    _this.$router.push('/');
+                    _this.$router.go();
+                    // _this.$router.push('/');
 				}
                 else {
                     _this.$message({
