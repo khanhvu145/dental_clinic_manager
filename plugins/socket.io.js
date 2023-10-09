@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import { io } from 'socket.io-client'
+import dotenv from 'dotenv';
+dotenv.config();
 
 export default ({ app }, inject) => {
     if (!app.$auth.loggedIn) {
@@ -10,7 +12,7 @@ export default ({ app }, inject) => {
     var path = '/socket.io/';
 
     //Kết nối
-    const socket = io('https://dental-clinic-manager-api.onrender.com', {
+    const socket = io(process.env.API_ENDPOINT, {
         path: '/socket.io/',
         transports: ['websocket', 'polling', 'flashsocket'],
         auth: {

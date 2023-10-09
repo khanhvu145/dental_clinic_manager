@@ -45,7 +45,8 @@
     "vue-async-computed": "^3.9.0",
     "vue-html2pdf": "^1.8.0",
     "vue-infinite-scroll": "^2.0.2",
-    "vue-lodash": "^2.1.2"
+    "vue-lodash": "^2.1.2",
+    "dotenv": "^16.0.1"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
