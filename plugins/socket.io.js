@@ -10,7 +10,7 @@ export default ({ app }, inject) => {
     var path = '/socket.io/';
 
     //Kết nối
-    const socket = io(process.env.API_ENDPOINT, {
+    const socket = io('https://dental-clinic-manager-api.onrender.com', {
         path: '/socket.io/',
         transports: ['websocket', 'polling', 'flashsocket'],
         auth: {
