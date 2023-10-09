@@ -1,18 +1,14 @@
 import Vue from 'vue'
 import { io } from 'socket.io-client'
-import dotenv from 'dotenv';
-dotenv.config();
 
-export default ({ app }, inject) => {
+export default ({ app, $config: { API_SOCKET } }, inject) => {
     if (!app.$auth.loggedIn) {
         return
     }
 
     const token = app.$auth.strategy.token.get();
-    var path = '/socket.io/';
-
     //Kết nối
-    const socket = io(process.env.API_ENDPOINT, {
+    const socket = io(API_SOCKET, {
         path: '/socket.io/',
         transports: ['websocket', 'polling', 'flashsocket'],
         auth: {
