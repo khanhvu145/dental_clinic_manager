@@ -116,15 +116,20 @@ export default {
     async beforeMount () {
         const _this = this;
         if (_this.$socket) {
-            _this.$socket.on('notification', (notify) => {
-                // console.log(notify)
-                _this.$notify({
-                    type: 'info',
-                    title: 'Thông báo',
-                    message: notify,
-                    position: 'bottom-right'
-                });
-            })
+            _this.$socket.on('notification', async(notify) => {
+                if(notify){
+                    _this.$notify.closeAll(); 
+                    _this.$notify({
+                        type: 'info',
+                        title: 'Thông báo',
+                        dangerouslyUseHTMLString: true,
+                        message: notify.content,
+                        position: 'bottom-right'
+                    });
+                    _this.notificationGet.unshift(notify);
+                    _this.notifications.unshift(notify);
+                }
+            });
         }
     },
     async created() {
