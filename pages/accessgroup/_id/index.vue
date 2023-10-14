@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper" v-if="!dataLoading">
+    <div class="wrapper">
         <div class="content">
             <div class="container-fluid">
                 <div class="row mt-3">
@@ -10,7 +10,7 @@
                         </div>
                     </div>
                 </div>
-                <form class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
+                <form class="row mt-4 mb-5" v-loading="dataLoading" v-on:submit.prevent="submitForm">
                     <div class="col-md-12" style="text-align: right;">
                         <button type="button" class="control-btn gray" @click="$router.push('/accessgroup')">
                             <i class='bx bx-arrow-back'></i>
@@ -357,6 +357,12 @@ export default {
                                 {
 									name: 'Loại hình dịch vụ',
 									value: 'service',
+									customRights: [],
+                                    hideDefaultRights: false,
+								},
+                                {
+									name: 'Đơn thuốc',
+									value: 'prescriptionConfig',
 									customRights: [],
                                     hideDefaultRights: false,
 								}

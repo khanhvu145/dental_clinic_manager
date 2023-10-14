@@ -47,82 +47,107 @@
                                 </div>
                                 <div class="col-md-12 mt-3">
                                     <div class="col-form-label" style="font-weight:bold;">Đơn thuốc *</div>
-                                    <template>
-                                        <el-table :data="data.medicines" style="width: 100%" border stripe>
-                                            <el-table-column prop="order" label="#" width="50" align="center"></el-table-column>
-                                            <el-table-column label="Tên thuốc" min-width="120">
-                                                <template slot-scope="scope">
-                                                    <el-select v-model="scope.row.medicine" placeholder="Chọn thuốc">
-                                                        <el-option
-                                                            v-for="item in medicineData"
-                                                            :key="item.value"
-                                                            :label="item.label"
-                                                            :value="item.value"
-                                                        ></el-option>
-                                                    </el-select>
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column label="Số lượng" width="100">
-                                                <template slot-scope="scope">
-                                                    <div class="inputTextRight">
-                                                        <InputNumber 
-                                                            style="width:100%;"
-                                                            inputClass="el-input__inner"
-                                                            v-model="scope.row.quantity" 
-                                                            placeholder="0"
-                                                            :min="0"
-                                                            mode="decimal"
-                                                            locale="en-US"
-                                                            @input="()=>{
-                                                                if(scope.row.quantity == null || scope.row.quantity == ''){
-                                                                    scope.row.quantity = 0;
-                                                                }
-                                                            }"
-                                                        />
-                                                        <!-- <vue-autonumeric
-                                                            v-model="scope.row.quantity"
-                                                            placeholder="0"
-                                                            class="el-input__inner"
-                                                            :options="{
-                                                                decimalPlaces: 0,
-                                                                digitGroupSeparator: ',',
-                                                                decimalCharacter: '.',
-                                                                decimalCharacterAlternative: '.',
-                                                                currencySymbolPlacement: 's',
-                                                                roundingMethod: 'U',
-                                                                minimumValue: '0',
-                                                                maximumValue: '1000',
-                                                                emptyInputBehavior: '0'
-                                                            }"
-                                                        >
-                                                        </vue-autonumeric> -->
-                                                    </div>
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column label="Ghi chú" min-width="150">
-                                                <template slot-scope="scope">
-                                                    <el-input
-                                                        type="textarea"
-                                                        placeholder="Nhập ghi chú"
-                                                        v-model="scope.row.note"
-                                                        :rows="2"
-                                                    ></el-input>
-                                                </template>
-                                            </el-table-column>
-                                            <el-table-column width="50">
-                                                <template slot="header">
-                                                    <span @click="addPrescription()" style="cursor:pointer;">
-                                                        <i class="el-icon-circle-plus font-20"></i>
-                                                    </span>
-                                                </template>
-                                                <template slot-scope="scope">
-                                                    <span @click="removePrescription(scope.row.idForEdit, scope.row.order)" style="cursor:pointer;">
-                                                        <i class="el-icon-remove font-20"></i>
-                                                    </span>
-                                                </template>
-                                            </el-table-column>
-                                        </el-table>
-                                    </template>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <el-select 
+                                                v-model="prescriptionSelected" 
+                                                placeholder="Chọn đơn thuốc" 
+                                                name="prescriptionSelected" 
+                                                style="width: 100%"
+                                                clearable 
+                                                filterable
+                                                remote
+                                                :remote-method="(text) => filterPrescription(text)"
+                                                @focus="filterPrescription('')"
+                                                @change="handleChangePrescription($event)"
+                                            >
+                                                <el-option
+                                                    v-for="item in prescriptionConfig"
+                                                    :key="item._id"
+                                                    :label="`${item.title}`"
+                                                    :value="item._id"
+                                                ></el-option>
+                                            </el-select>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <template>
+                                                <el-table :data="data.medicines" style="width: 100%" border stripe>
+                                                    <el-table-column prop="order" label="#" width="50" align="center"></el-table-column>
+                                                    <el-table-column label="Tên thuốc" min-width="120">
+                                                        <template slot-scope="scope">
+                                                            <el-select v-model="scope.row.medicine" placeholder="Chọn thuốc">
+                                                                <el-option
+                                                                    v-for="item in medicineData"
+                                                                    :key="item.value"
+                                                                    :label="item.label"
+                                                                    :value="item.value"
+                                                                ></el-option>
+                                                            </el-select>
+                                                        </template>
+                                                    </el-table-column>
+                                                    <el-table-column label="Số lượng" width="100">
+                                                        <template slot-scope="scope">
+                                                            <div class="inputTextRight">
+                                                                <InputNumber 
+                                                                    style="width:100%;"
+                                                                    inputClass="el-input__inner"
+                                                                    v-model="scope.row.quantity" 
+                                                                    placeholder="0"
+                                                                    :min="0"
+                                                                    mode="decimal"
+                                                                    locale="en-US"
+                                                                    @input="()=>{
+                                                                        if(scope.row.quantity == null || scope.row.quantity == ''){
+                                                                            scope.row.quantity = 0;
+                                                                        }
+                                                                    }"
+                                                                />
+                                                                <!-- <vue-autonumeric
+                                                                    v-model="scope.row.quantity"
+                                                                    placeholder="0"
+                                                                    class="el-input__inner"
+                                                                    :options="{
+                                                                        decimalPlaces: 0,
+                                                                        digitGroupSeparator: ',',
+                                                                        decimalCharacter: '.',
+                                                                        decimalCharacterAlternative: '.',
+                                                                        currencySymbolPlacement: 's',
+                                                                        roundingMethod: 'U',
+                                                                        minimumValue: '0',
+                                                                        maximumValue: '1000',
+                                                                        emptyInputBehavior: '0'
+                                                                    }"
+                                                                >
+                                                                </vue-autonumeric> -->
+                                                            </div>
+                                                        </template>
+                                                    </el-table-column>
+                                                    <el-table-column label="Ghi chú" min-width="150">
+                                                        <template slot-scope="scope">
+                                                            <el-input
+                                                                type="textarea"
+                                                                placeholder="Nhập ghi chú"
+                                                                v-model="scope.row.note"
+                                                                :rows="2"
+                                                            ></el-input>
+                                                        </template>
+                                                    </el-table-column>
+                                                    <el-table-column width="50">
+                                                        <template slot="header">
+                                                            <span @click="addPrescription()" style="cursor:pointer;">
+                                                                <i class="el-icon-circle-plus font-20"></i>
+                                                            </span>
+                                                        </template>
+                                                        <template slot-scope="scope">
+                                                            <span @click="removePrescription(scope.row.idForEdit, scope.row.order)" style="cursor:pointer;">
+                                                                <i class="el-icon-remove font-20"></i>
+                                                            </span>
+                                                        </template>
+                                                    </el-table-column>
+                                                </el-table>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-12 mt-3">
                                     <div class="col-form-label" style="font-weight:bold;">Lời dặn của nha sĩ</div>
@@ -424,7 +449,9 @@ export default {
             medicineData: [],
             customerInfo: new Customer(),
             datas: {},
-            prescriptionData: new Prescription()
+            prescriptionData: new Prescription(),
+            prescriptionConfig: [],
+            prescriptionSelected: new Prescription(),
         }
     },
     async created(){
@@ -627,6 +654,41 @@ export default {
                         });
                     }
                 );
+            }
+        },
+        filterPrescription: debounce(async function (text) {
+            const _this = this;
+            let query = {
+                filters: {
+                    textSearch: text
+                },
+                sorts: 'createdAt&&-1',
+                pages:{
+                    from: 0,
+                    size: 10
+                }
+            };
+            let customers = await _this.$axios.$post('/api/prescriptionConfig/getByTextSearch', query);
+            _this.prescriptionConfig = customers && customers.data;
+        }, 200),
+        handleChangePrescription: async function (value) {
+            const _this = this;
+            if(value){
+                var config = _.find(_this.prescriptionConfig, f => {
+                    return f._id == value;
+                });
+                if(config){
+                    _this.data.medicines = config.medicines;
+                    if(_this.data.medicines && _this.data.medicines.length > 0){
+                        _this.data.medicines = _.map(_this.data.medicines, (e) => {
+                            return {
+                                ...e,
+                                idForEdit: e._id
+                            };
+                        });
+                    }
+                    _this.data.advice = config.advice;
+                }
             }
         },
     }

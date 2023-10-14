@@ -100,7 +100,8 @@
             </el-submenu>
             <el-submenu 
                 v-if="
-                    checkAccessRight('service')
+                    checkAccessRight('service') ||
+                    checkAccessRight('prescriptionConfig')
                 "
                 index="5"
             >
@@ -112,6 +113,12 @@
                     <el-menu-item index="service">
                         <i class='bx bxs-category-alt'></i>
                         <span slot="title">Loại hình dịch vụ</span>
+                    </el-menu-item>
+                </nuxt-link>
+                <nuxt-link v-if="checkAccessRight('prescriptionConfig')" to="/prescriptionConfig" class="sidebar-nav-link">
+                    <el-menu-item index="prescriptionConfig">
+                        <i class='bx bxs-category-alt'></i>
+                        <span slot="title">Đơn thuốc</span>
                     </el-menu-item>
                 </nuxt-link>
                 <!-- <nuxt-link v-if="checkAccessRight('medicine')" to="/medicine" class="sidebar-nav-link">
