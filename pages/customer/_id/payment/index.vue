@@ -673,6 +673,24 @@ export default {
 				}
 			);
         }
+        //Lấy dữ liệu nếu có query
+        if (_this.$route.query.examinationId){
+            await _this.$axios.$get(`/api/customer/getExaminationById/${_this.$route.query.examinationId}`).then(
+                async (response) => {
+                    if(response.success && response.data && response.data.code){
+                        _this.searchQuery.filters.examinationCodeF = response.data.code;
+                        _this.searchQuery.filters.statusF = [];
+                        _this.searchQuery.filters.dateF = [];
+                    }
+                    else{
+                        console.log('Error: ', response.error);
+                    }
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                }
+            );
+        }
         //Lấy danh sách dữ liệu
         await _this.getData(_this.searchQuery);
     },

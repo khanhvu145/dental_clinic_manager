@@ -34,7 +34,7 @@
                     </div>
                     <div class="col-md-9 mt-4">
                         <div class="row">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="col-form-label">Mã nhân viên</div>
@@ -223,16 +223,26 @@
                                             ></el-option>
                                         </el-select>
                                     </div>
-                                    <div class="col-md-3" style="display: flex; align-items: center;">
-                                        <div class="mt-4">
-                                            <el-switch v-model="formData.isDentist" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-                                            Nha sĩ
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" style="display: flex; align-items: center;">
-                                        <div class="mt-4">
-                                            <el-switch v-model="formData.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-                                            Hoạt động
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mt-5">
+                                                    <el-switch v-model="formData.isDentist" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                                    Nha sĩ
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mt-5">
+                                                    <el-switch v-model="formData.isAccountant" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                                    Lễ tân
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mt-5">
+                                                    <el-switch v-model="formData.isActive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                                    Hoạt động
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

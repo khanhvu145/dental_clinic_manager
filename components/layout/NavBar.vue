@@ -213,12 +213,35 @@ export default {
                 });
             }
             else if(command.type == 'examination'){
-                await _this.$axios.$get(`/api/customer/getExaminationById/${_this.$route.query.examinationId}`).then(
+                // await _this.$axios.$get(`/api/customer/getExaminationById/${_this.$route.query.examinationId}`).then(
+                //     async (response) => {
+                //         if(response.success && response.data && response.data.customerId){
+                //             await _this.$router.push({
+                //                 path: `/customer/${response.data.customerId}/examinationV2/edit`,
+                //                 query: { examinationId: command.targetId }
+                //             });
+                //         }
+                //         else{
+                //             console.log('Error: ', response.error);
+                //             return;
+                //         }
+                //     },
+                //     (error) => {
+                //         console.log('Error: ', error);
+                //         return;
+                //     }
+                // );
+            }
+            else if(command.type == 'payment'){
+                if(command.status == 'new'){
+                    await _this.$axios.$post('/api/user/updateSeenStatus', { id: command._id });
+                }
+                await _this.$axios.$get(`/api/payment/getById/${command.targetId}`).then(
                     async (response) => {
-                        if(response.success && response.data && response.data.customerId){
+                        if(response.success && response.data && response.data.customerId && response.data.examinationId){
                             await _this.$router.push({
-                                path: `/customer/${response.data.customerId}/examinationV2/edit`,
-                                query: { examinationId: command.targetId }
+                                path: `/customer/${response.data.customerId}/payment`,
+                                query: { examinationId: response.data.examinationId }
                             });
                         }
                         else{
@@ -231,9 +254,6 @@ export default {
                         return;
                     }
                 );
-            }
-            else if(command.type == 'payment'){
-
             }
         },
         async updateSeenStatusAll(){

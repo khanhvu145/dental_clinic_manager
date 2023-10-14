@@ -22,4 +22,5 @@ export default function() {
     this.accessId = '';
     // this.position = '';
 	this.isDentist = false;
+	this.isAccountant = false;
 }
