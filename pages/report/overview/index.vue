@@ -160,6 +160,7 @@
 										:options="revenueReport.options"
 										:labels="revenueReport.labels"
 										:datasets="revenueReport.datasets"
+                                        ref="revenueReportChart"
 									/>
                                 </div>
                             </div>
@@ -537,6 +538,21 @@ export default {
                             },
                         },
                     },
+                    // onClick: (e) => {
+                    //     const chart = this.$refs.revenueReportChart.chart;
+                    //     var bar = chart.getElementsAtEvent(e)[0];
+                    //     var index = bar._index;
+                    //     var datasetIndex = bar._datasetIndex;
+                    //     var label = chart.data.labels[index];
+                    //     var dataset = chart.data.datasets;
+                    //     // console.log(this.$refs.revenueReportChart.chart.getElementsAtEvent(e))
+                    //     console.log(chart.getElementsAtEvent(e))
+                    //     console.log(bar)
+                    //     console.log(index)
+                    //     console.log(datasetIndex)
+                    //     console.log(label)
+                    //     console.log(dataset)
+                    // }
                 },
                 labels: [],
                 datasets: []
