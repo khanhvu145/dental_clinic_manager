@@ -396,22 +396,6 @@ export default {
 </script>
 
 <style>
-.custom-fieldset {
-    border: 1px solid #dcdfe6;
-    border-radius: 5px;
-    padding: 0 16px 16px;
-}
-.custom-legend {
-    font-size: 12px;
-    font-weight: bold;
-    line-height: 1.5;
-    margin: 0;
-    padding: 0 8px;
-    text-align: left;
-    text-transform: uppercase;
-    width: auto;
-    color: #DC3545;
-}
 .toothDiagramItem{
     border: 1px solid #dcdfe6;
 }

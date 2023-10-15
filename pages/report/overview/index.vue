@@ -166,6 +166,96 @@
                             </div>
                         </el-card>
                     </div>
+                    <el-dialog :title="revenueReportDetail.title" :visible.sync="revenueReportDetail.visible" :close-on-click-modal="false" width="95%">
+                        <div class="row">
+                            <div v-if="revenueReportDetail.data && revenueReportDetail.data.revenue" class="col-md-12">
+                                <fieldset class="custom-fieldset">
+                                    <legend class="custom-legend">Chi tiết doanh thu</legend>
+                                    <el-table class="mt-3" :data="revenueReportDetail.data.revenue" style="width: 100%" max-height="400" stripe border show-summary :summary-method="getSummariesRevenue">
+                                        <el-table-column label="Ngày thanh toán" min-width="150">
+                                            <template slot-scope="scope">
+                                                <div>
+                                                    {{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}
+                                                </div>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Số tiền" min-width="150" prop="amount" align="right">
+                                            <template slot-scope="scope">
+                                                {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Hình thức thanh toán" min-width="180">
+                                            <template slot-scope="scope">
+                                                <div style="text-align:center;">
+                                                    <el-tag v-if="scope.row.methodFee == 'transfer'" type="danger">Chuyển khoản</el-tag>
+                                                    <el-tag v-if="scope.row.methodFee == 'cash'" type="warning">Tiền mặt</el-tag>
+                                                </div>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Khách hàng" min-width="150">
+                                            <template slot-scope="scope">
+                                                {{ `(${scope.row.customerCode})` || 'N/A' }}
+                                                {{ scope.row.customerName || 'N/A' }}
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Ghi chú" min-width="150">
+                                            <template slot-scope="scope">
+                                                {{ scope.row.note || '' }}
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </fieldset>
+                            </div>
+                            <div v-if="revenueReportDetail.data && revenueReportDetail.data.expenditure" class="col-md-12 mt-3">
+                                <fieldset class="custom-fieldset">
+                                    <legend class="custom-legend">Chi tiết chi phí</legend>
+                                    <el-table class="mt-3" :data="revenueReportDetail.data.expenditure" style="width: 100%" max-height="400" stripe border show-summary :summary-method="getSummariesExpenditure">
+                                        <el-table-column label="Ngày chi" min-width="150">
+                                            <template slot-scope="scope">
+                                                {{ scope.row.date ? $moment(scope.row.date).format('DD/MM/YYYY') : '' }}
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Số tiền" min-width="150" prop="amount" align="right">
+                                            <template slot-scope="scope">
+                                                {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Chứng từ gốc" min-width="180">
+                                            <template slot-scope="scope">
+                                                <div v-for="(item, index) in scope.row.originalDocuments" :key="index">
+                                                    <span style="font-family:Wingdings">&#118;</span>
+                                                    {{ item }}
+                                                </div>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Đơn vị nhận tiền" min-width="150">
+                                            <template slot-scope="scope">
+                                                <div>
+                                                    <i class='bx bx-user'></i>
+                                                    {{ scope.row.receivingUnit || '' }}
+                                                </div>
+                                                <div>
+                                                    <i class='bx bx-location-plus' ></i>
+                                                    {{ scope.row.addressUnit || '' }}
+                                                </div>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column label="Nội dung" min-width="150">
+                                            <template slot-scope="scope">
+                                                {{ scope.row.content || '' }}
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <span slot="footer" class="dialog-footer">
+                            <button type="button" class="control-btn gray" @click="revenueReportDetail.visible = false">
+                                <i class='bx bx-x'></i>
+                                <span>Đóng</span>
+                            </button>
+                        </span>
+                    </el-dialog>
                 </div>
                 <div class="row mt-3">
                     <!-- Công nợ -->
@@ -538,21 +628,35 @@ export default {
                             },
                         },
                     },
-                    // onClick: (e) => {
-                    //     const chart = this.$refs.revenueReportChart.chart;
-                    //     var bar = chart.getElementsAtEvent(e)[0];
-                    //     var index = bar._index;
-                    //     var datasetIndex = bar._datasetIndex;
-                    //     var label = chart.data.labels[index];
-                    //     var dataset = chart.data.datasets;
-                    //     // console.log(this.$refs.revenueReportChart.chart.getElementsAtEvent(e))
-                    //     console.log(chart.getElementsAtEvent(e))
-                    //     console.log(bar)
-                    //     console.log(index)
-                    //     console.log(datasetIndex)
-                    //     console.log(label)
-                    //     console.log(dataset)
-                    // }
+                    onClick: async(e) => {
+                        const _this = this;
+                        if(e){
+                            const chart = _this.$refs.revenueReportChart.chart;
+                            var bar = chart.getElementsAtEvent(e)[0];
+                            if(bar){
+                                var index = bar._index;
+                                var label = chart.data.labels[index];
+                                await _this.$axios.$post('/api/report/getRevenueExpenditureReportDetail', {
+                                    typeF: _this.searchQuery.typeF,
+                                    label: label
+                                }).then(
+                                    (response) => {
+                                        if(response.success){
+                                            _this.revenueReportDetail.title = `Chi tiết thu chi - ${label}`;
+                                            _this.revenueReportDetail.data = response;
+                                            _this.revenueReportDetail.visible = true;
+                                        }
+                                        else{
+                                            console.log('Error (Chi tiết thu chi): ', error);
+                                        }
+                                    },
+                                    (error) => {
+                                        console.log('Error (Chi tiết thu chi): ', error);
+                                    }
+                                );
+                            }
+                        }
+                    }
                 },
                 labels: [],
                 datasets: []
@@ -926,12 +1030,18 @@ export default {
                 loading: true,
             },
             serviceGroupId: '',
-            serviceGroupData: []
+            serviceGroupData: [],
+            revenueReportDetail: {
+                title: '',
+                visible: false,
+                data: {}
+            }
         }
     },
     async created(){
         const _this = this;
         await _this.getData();
+        console.log(new Date(new Date(moment('01/10/2023', 'DD MM YYYY').format('YYYY/MM/DD')).setHours(0,0,0,0)))
     },
     methods: {
         checkRight(right) {
@@ -1339,6 +1449,44 @@ export default {
             }
 
             return coloR;
+        },
+        getSummariesRevenue(param){
+            const { columns, data } = param;
+			const _this = this;
+            let sums = [];
+            columns.forEach((column, index) => {
+                if (index === 0) {
+                    sums[index] = 'Tổng';
+                    return;
+                }
+                if (index === 1) {
+                    const values = data.map(item => Number(item[column.property]));
+                    var total = values.reduce((partialSum, a) => partialSum + a, 0);
+                    var totalString = (total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0';
+                    sums[index] = totalString;
+                    return;
+                }
+            });
+            return sums;
+        },
+        getSummariesExpenditure(param){
+            const { columns, data } = param;
+			const _this = this;
+            let sums = [];
+            columns.forEach((column, index) => {
+                if (index === 0) {
+                    sums[index] = 'Tổng';
+                    return;
+                }
+                if (index === 1) {
+                    const values = data.map(item => Number(item[column.property]));
+                    var total = values.reduce((partialSum, a) => partialSum + a, 0);
+                    var totalString = (total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0';
+                    sums[index] = totalString;
+                    return;
+                }
+            });
+            return sums;
         },
     }
 }
