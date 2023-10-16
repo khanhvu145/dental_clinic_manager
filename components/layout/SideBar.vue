@@ -111,13 +111,13 @@
                 </template>
                 <nuxt-link v-if="checkAccessRight('service')" to="/service" class="sidebar-nav-link">
                     <el-menu-item index="service">
-                        <i class='bx bxs-category-alt'></i>
+                        <i class='bx bx-category'></i>
                         <span slot="title">Loại hình dịch vụ</span>
                     </el-menu-item>
                 </nuxt-link>
                 <nuxt-link v-if="checkAccessRight('prescriptionConfig')" to="/prescriptionConfig" class="sidebar-nav-link">
                     <el-menu-item index="prescriptionConfig">
-                        <i class='bx bxs-category-alt'></i>
+                        <i class='bx bxs-capsule'></i>
                         <span slot="title">Đơn thuốc</span>
                     </el-menu-item>
                 </nuxt-link>
