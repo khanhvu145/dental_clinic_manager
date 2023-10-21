@@ -80,20 +80,20 @@
                         <el-table-column label="Thao tác" min-width="60">
                             <template slot-scope="scope">
                                 <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
-                                    <div v-if="checkRight('confirmPayment') && scope.row.status != 'paid'">
+                                    <div v-if="checkRight('confirmPayment')">
                                         <el-tooltip class="item" effect="dark" content="Thanh toán" placement="top">
                                             <a class="btn control-btn red" style="padding: 4px 6px;" @click="viewPayment(scope.row)">
                                                 <i class='bx bxl-paypal'></i>
                                             </a>
                                         </el-tooltip>
                                     </div>
-                                    <div>
+                                    <!-- <div>
                                         <el-tooltip class="item" effect="dark" content="Chi tiết thanh toán" placement="top">
                                             <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="viewDetailPayment(scope.row)">
                                             <i class='bx bxs-detail'></i>
                                             </a>
                                         </el-tooltip>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </template>
                         </el-table-column>
@@ -118,65 +118,66 @@
                 :visible.sync='paymentDialog.visible'
                 title="Ghi nhận thanh toán"
                 :close-on-click-modal="false"
-                width="70%"
+                width="85%"
             >
-                <form v-if="paymentDialog.data" class="container" v-on:submit.prevent="confirmPayment" v-loading="dataLoading">
+                <form v-if="paymentDialog.data" class="container-fluid" v-on:submit.prevent="confirmPayment" v-loading="dataLoading">
                     <div class="row">
-                        <div style="font-weight:bold;font-size:16px;">Thông tin chung</div>
-                        <div class="col-md-12 mt-3" style="background-color: #f8f8f8;">
+                        <div class="mb-3" style="font-weight:bold;font-size:16px;width:100%;">Thông tin chung</div>
+                        <br>
+                        <div class="col-md-12" style="background-color: #f8f8f8;">
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
+                                <div class="col-4 pt-2 pb-2">
                                     Mã phiếu khám
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     {{paymentDialog.data.examinationCode}}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
+                                <div class="col-4 pt-2 pb-2">
                                     Khách hàng
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     {{'(' + paymentDialog.data.customerCode + ') ' + paymentDialog.data.customerName}}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
-                                    Ngày lập phiếu thu
+                                <div class="col-4 pt-2 pb-2">
+                                    Ngày lập thanh toán
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     {{ paymentDialog.data.createdAt ? $moment(paymentDialog.data.createdAt).format('DD/MM/YYYY') : '' }}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
+                                <div class="col-4 pt-2 pb-2">
                                     Số tiền
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     {{ (paymentDialog.data.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
+                                <div class="col-4 pt-2 pb-2">
                                     Đã thanh toán
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     {{ (paymentDialog.data.paidAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
+                                <div class="col-4 pt-2 pb-2">
                                     Còn lại
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     {{ (paymentDialog.data.remainAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '0' }}
                                 </div>
                             </div>
                             <div class="row" style="border-bottom: dotted 1px #ddd;">
-                                <div class="col-md-4 pt-2 pb-2">
+                                <div class="col-4 pt-2 pb-2">
                                     Trạng thái thanh toán
                                 </div>
-                                <div class="col-md-8 pt-2 pb-2" style="font-weight:bold;">
+                                <div class="col-8 pt-2 pb-2" style="font-weight:bold;">
                                     <div v-if="paymentDialog.data.status == 'unpaid'">Chưa thanh toán</div>
                                     <div v-if="paymentDialog.data.status == 'partialPaid'">Thanh toán một phần</div>
                                     <div v-if="paymentDialog.data.status == 'paid'">Đã thanh toán</div>
@@ -185,126 +186,189 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div style="font-weight:bold;font-size:16px;">Thông tin thanh toán</div>
-                        <div class="col-md-12">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="col-form-label">Số tiền còn lại</div>
-                                            <div class="inputTextRight">
-                                                <InputNumber 
-                                                    style="width:100%;pointer-events:none;"
-                                                    inputClass="el-input__inner"
-                                                    v-model="paymentDialog.receiptData.remainAmount" 
-                                                    placeholder="0"
-                                                    :min="0"
-                                                    mode="decimal"
-                                                    locale="en-US"
-                                                    suffix=" VND"
-                                                    readonly
-                                                    @input="()=>{
-                                                        if(paymentDialog.receiptData.remainAmount == null || paymentDialog.receiptData.remainAmount == ''){
-                                                            paymentDialog.receiptData.remainAmount = 0;
-                                                        }
-                                                    }"
-                                                />
-                                                <!-- <vue-autonumeric
-                                                    v-model="paymentDialog.receiptData.remainAmount"
-                                                    class="el-input__inner"
-                                                    placeholder="Số tiền còn lại"
-                                                    readonly
-                                                    :options="{
-                                                        decimalPlaces: 0,
-                                                        digitGroupSeparator: ',',
-                                                        decimalCharacter: '.',
-                                                        decimalCharacterAlternative: '.',
-                                                        currencySymbol: '\u00a0VND',
-                                                        currencySymbolPlacement: 's',
-                                                        roundingMethod: 'U',
-                                                        minimumValue: '0',
-                                                        emptyInputBehavior: '0'
-                                                    }"
-                                                ></vue-autonumeric> -->
+                        <div class="mb-3" style="font-weight:bold;font-size:16px;width:100%;">Thông tin thanh toán</div>
+                        <div class="col-md-12 pl-0 pr-0">
+                            <el-card class="box-card">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <!-- <div class="col-md-12">
+                                                        <div class="col-form-label">Số tiền còn lại</div>
+                                                        <div class="inputTextRight">
+                                                            <InputNumber 
+                                                                style="width:100%;pointer-events:none;"
+                                                                inputClass="el-input__inner"
+                                                                v-model="paymentDialog.receiptData.remainAmount" 
+                                                                placeholder="0"
+                                                                :min="0"
+                                                                mode="decimal"
+                                                                locale="en-US"
+                                                                suffix=" VND"
+                                                                readonly
+                                                                @input="()=>{
+                                                                    if(paymentDialog.receiptData.remainAmount == null || paymentDialog.receiptData.remainAmount == ''){
+                                                                        paymentDialog.receiptData.remainAmount = 0;
+                                                                    }
+                                                                }"
+                                                            />
+                                                        </div>
+                                                    </div> -->
+                                                    <div class="col-md-12">
+                                                        <div class="col-form-label">Số tiền thanh toán *</div>
+                                                        <div class="inputTextRight">
+                                                            <InputNumber 
+                                                                style="width:100%;"
+                                                                inputClass="el-input__inner"
+                                                                v-model="paymentDialog.receiptData.paidAmount" 
+                                                                placeholder="0"
+                                                                :min="0"
+                                                                mode="decimal"
+                                                                locale="en-US"
+                                                                suffix=" VND"
+                                                                @input="()=>{
+                                                                    if(paymentDialog.receiptData.paidAmount == null || paymentDialog.receiptData.paidAmount == ''){
+                                                                        paymentDialog.receiptData.paidAmount = 0;
+                                                                    }
+                                                                    handleChangeReceiptAmount();
+                                                                }"
+                                                            />
+                                                            <!-- <vue-autonumeric
+                                                                class="el-input__inner"
+                                                                name="receiptAmount"
+                                                                placeholder="Số tiền thanh toán"
+                                                                v-model="paymentDialog.receiptData.paidAmount"
+                                                                @change.native="handleChangeReceiptAmount"
+                                                                :options="{
+                                                                    decimalPlaces: 0,
+                                                                    digitGroupSeparator: ',',
+                                                                    decimalCharacter: '.',
+                                                                    decimalCharacterAlternative: '.',
+                                                                    currencySymbol: '\u00a0VND',
+                                                                    currencySymbolPlacement: 's',
+                                                                    roundingMethod: 'U',
+                                                                    minimumValue: '0',
+                                                                    emptyInputBehavior: '0'
+                                                                }"
+                                                            ></vue-autonumeric> -->
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="col-form-label">Hình thức thanh toán *</div>
+                                                        <el-select v-model="paymentDialog.receiptData.methodFee" placeholder="Hình thức thanh toán" name="methodFee">
+                                                            <el-option label="Tiền mặt" value="cash"></el-option>
+                                                            <el-option label="Chuyển khoản" value="transfer"></el-option>
+                                                        </el-select>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="col-form-label">Ghi chú</div>
+                                                        <el-input type="textarea" :rows="4" placeholder="Ghi chú" v-model="paymentDialog.receiptData.note"></el-input>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="col-form-label">Số tiền thanh toán *</div>
-                                            <div class="inputTextRight">
-                                                <InputNumber 
-                                                    style="width:100%;"
-                                                    inputClass="el-input__inner"
-                                                    v-model="paymentDialog.receiptData.paidAmount" 
-                                                    placeholder="0"
-                                                    :min="0"
-                                                    mode="decimal"
-                                                    locale="en-US"
-                                                    suffix=" VND"
-                                                    @input="()=>{
-                                                        if(paymentDialog.receiptData.paidAmount == null || paymentDialog.receiptData.paidAmount == ''){
-                                                            paymentDialog.receiptData.paidAmount = 0;
-                                                        }
-                                                        handleChangeReceiptAmount();
-                                                    }"
-                                                />
-                                                <!-- <vue-autonumeric
-                                                    class="el-input__inner"
-                                                    name="receiptAmount"
-                                                    placeholder="Số tiền thanh toán"
-                                                    v-model="paymentDialog.receiptData.paidAmount"
-                                                    @change.native="handleChangeReceiptAmount"
-                                                    :options="{
-                                                        decimalPlaces: 0,
-                                                        digitGroupSeparator: ',',
-                                                        decimalCharacter: '.',
-                                                        decimalCharacterAlternative: '.',
-                                                        currencySymbol: '\u00a0VND',
-                                                        currencySymbolPlacement: 's',
-                                                        roundingMethod: 'U',
-                                                        minimumValue: '0',
-                                                        emptyInputBehavior: '0'
-                                                    }"
-                                                ></vue-autonumeric> -->
+                                            <div class="col-lg-6">
+                                                <div class="col-form-label">Tệp đính kèm</div>
+                                                <div>
+                                                    <el-upload
+                                                        class="upload-demo"
+                                                        drag
+                                                        multiple
+                                                        style="width: 100%"
+                                                        :limit="10"
+                                                        :on-preview="handlePreview"
+                                                        :on-remove="handleRemove"
+                                                        ref="uploadFiles"
+                                                        action="#"
+                                                        :auto-upload="false"
+                                                        :show-file-list="true"
+                                                        list-type="text"
+                                                    >
+                                                        <i class="el-icon-upload"></i>
+                                                        <div class="el-upload__text">
+                                                            Kéo thả file vào đây hoặc <em>nhấn vào để tải lên</em>
+                                                        </div>
+                                                    </el-upload>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="col-form-label">Hình thức thanh toán *</div>
-                                            <el-select v-model="paymentDialog.receiptData.methodFee" placeholder="Hình thức thanh toán" name="methodFee">
-                                                <el-option label="Tiền mặt" value="cash"></el-option>
-                                                <el-option label="Chuyển khoản" value="transfer"></el-option>
-                                            </el-select>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="col-form-label">Ghi chú</div>
-                                            <el-input type="textarea" :rows="4" placeholder="Ghi chú" v-model="paymentDialog.receiptData.note"></el-input>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="col-form-label">Tệp đính kèm</div>
-                                    <div>
-                                        <el-upload
-                                            class="upload-demo"
-                                            drag
-                                            multiple
-                                            style="width: 100%"
-                                            :limit="10"
-                                            :on-preview="handlePreview"
-                                            :on-remove="handleRemove"
-                                            ref="uploadFiles"
-                                            action="#"
-                                            :auto-upload="false"
-                                            :show-file-list="true"
-                                            list-type="text"
+                                    <div class="col-md-12 mt-3" style="text-align:right;">
+                                        <button
+                                            v-if="checkRight('confirmPayment') && paymentDialog.data.status != 'paid'"
+                                            type="button" 
+                                            class="control-btn green"
+                                            @click="confirmPayment()"
                                         >
-                                            <i class="el-icon-upload"></i>
-                                            <div class="el-upload__text">
-                                                Kéo thả file vào đây hoặc <em>nhấn vào để tải lên</em>
-                                            </div>
-                                        </el-upload>
+                                            <i class='bx bxs-save' ></i>
+                                            <span>Thanh toán</span>
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
+                            </el-card>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="mb-3" style="font-weight:bold;font-size:16px;width:100%;">Danh sách thanh toán</div>
+                        <div class="col-md-12 pl-0 pr-0">
+                            <el-table :data="paymentDialog.receiptDataDetail.data.data" style="width: 100%" stripe>
+                                <el-table-column label="Mã phiếu thu" min-width="100">
+                                    <template slot-scope="scope">
+                                        <div>{{ scope.row.code || '' }}</div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Ngày thanh toán" min-width="100">
+                                    <template slot-scope="scope">
+                                        <div>{{ scope.row.createdAt ? $moment(scope.row.createdAt).format('DD/MM/YYYY') : '' }}</div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Số tiền thanh toán" min-width="100" prop="amount" align="right">
+                                    <template slot-scope="scope">
+                                        {{ (scope.row.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || '' }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Hình thức thanh toán" min-width="100">
+                                    <template slot-scope="scope">
+                                        <div style="pointer-events:none;">
+                                            <el-link type="danger" v-if="scope.row.methodFee == 'transfer'">Chuyển khoản</el-link>
+                                            <el-link type="warning" v-if="scope.row.methodFee == 'cash'">Tiền mặt</el-link>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Tệp đính kèm" min-width="100">
+                                    <template slot-scope="scope">
+                                        <div v-for="(item, index) in scope.row.attachFiles" :key="index">
+                                            <a :href="item" target="_blank" style="font-style:italic;text-decoration:underline!important;">{{ 'Tệp đính kèm ' + (index + 1) }}</a> 
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Ghi chú" min-width="100">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.note || '' }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column v-if="checkRight('confirmPayment')" label="Thao tác" min-width="50">
+                                    <template slot-scope="scope">
+                                        <el-tooltip class="item" effect="dark" content="In phiếu thu" placement="top">
+                                            <a class="btn control-btn yellow" style="padding: 4px 6px;" @click="printReceipts(scope.row)">
+                                                <i class='bx bxs-printer'></i>
+                                            </a>
+                                        </el-tooltip>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <el-pagination
+                                @size-change="handleSizeChange2"
+                                @current-change="handleCurrentChange2"
+                                :current-page.sync="paymentDialog.receiptDataDetail.currentPage"
+                                :page-sizes="[1, 5, 10, 50, 100]"
+                                :page-size="paymentDialog.receiptDataDetail.pages.size"
+                                background
+                                layout="total, sizes, prev, pager, next"
+                                :total="paymentDialog.receiptDataDetail.data.total">
+                            </el-pagination>
                         </div>
                     </div>
                 </form>
@@ -312,15 +376,6 @@
                     <button type="button" class="control-btn gray" @click="paymentDialog.visible = false">
                         <i class='bx bx-x'></i>
                         <span>Đóng</span>
-                    </button>
-                    <button
-                        v-if="checkRight('confirmPayment') && data.status != 'paid'"
-                        type="button" 
-                        class="control-btn blue"
-                        @click="confirmPayment()"
-                    >
-                        <i class='bx bxs-save' ></i>
-                        <span>Xác nhận thanh toán</span>
                     </button>
                 </span>
             </el-dialog>
@@ -443,10 +498,14 @@
                     </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
-                    <button type="button" class="control-btn gray" @click="detailPaymentDialog.visible = false">
-                        <i class='bx bx-x'></i>
-                        <span>Đóng</span>
-                    </button>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="control-btn gray" @click="detailPaymentDialog.visible = false">
+                                <i class='bx bx-x'></i>
+                                <span>Đóng</span>
+                            </button>
+                        </div>
+                    </div>
                 </span>
             </el-dialog>
 
@@ -646,6 +705,15 @@ export default {
                 visible: false,
                 data: null,
                 receiptData: null,
+                receiptDataDetail: {
+                    data: {},
+                    currentPage: 1,
+                    sorts: -1,
+                    pages:{
+                        from: 0,
+                        size: 5
+                    }
+                },
             },
             receiptsData: {},
             detailPaymentDialog: {
@@ -748,20 +816,30 @@ export default {
             _this.searchQuery.pages.from = (_this.currentPage - 1) * _this.searchQuery.pages.size;
             _this.getData(_this.searchQuery);
         },
-        viewPayment(data){
+        async viewPayment(data){
             const _this = this;
             if (_this.$refs.uploadFiles) {
                 _this.$refs.uploadFiles.clearFiles();
             }
             _this.paymentDialog.data = data;
             _this.paymentDialog.receiptData = {
-                paidAmount: 0,
+                paidAmount: data.remainAmount,
                 remainAmount: data.remainAmount,
-                methodFee: '',
+                methodFee: 'cash',
                 note: '',
                 files: [],
             };
+            _this.paymentDialog.receiptDataDetail = {
+                data: {},
+                currentPage: 1,
+                sorts: -1,
+                pages:{
+                    from: 0,
+                    size: 5
+                }
+            };
             _this.paymentDialog.visible = true;
+            await _this.viewReceiptDataDetail(data._id, _this.paymentDialog.receiptDataDetail.pages, _this.paymentDialog.receiptDataDetail.sorts);
         },
         async confirmPayment(){
             const _this = this;
@@ -781,11 +859,31 @@ export default {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             if (data.success) {
-                _this.paymentDialog.visible = false;
-                if (_this.$refs.uploadFiles) {
-                    _this.$refs.uploadFiles.clearFiles();
-                }
-                await _this.getData(_this.searchQuery);
+                // _this.paymentDialog.visible = false;
+                // if (_this.$refs.uploadFiles) {
+                //     _this.$refs.uploadFiles.clearFiles();
+                // }
+                data.paymentData.examinationCode = _this.paymentDialog.data.examinationCode;
+                data.paymentData.customerCode = _this.paymentDialog.data.customerCode;
+                data.paymentData.customerName = _this.paymentDialog.data.customerName;
+                await _this.viewPayment(data.paymentData)
+                // _this.paymentDialog.receiptData = {
+                //     paidAmount: data.paymentData.remainAmount,
+                //     remainAmount: data.paymentData.remainAmount,
+                //     methodFee: 'cash',
+                //     note: '',
+                //     files: [],
+                // };
+                // _this.paymentDialog.receiptDataDetail = {
+                //     data: {},
+                //     currentPage: 1,
+                //     sorts: -1,
+                //     pages:{
+                //         from: 0,
+                //         size: 5
+                //     }
+                // };
+                // await _this.viewReceiptDataDetail(data.paymentData._id, _this.paymentDialog.receiptDataDetail.pages, _this.paymentDialog.receiptDataDetail.sorts);
                 _this.$message({
                     message: data.message,
                     type: 'success',
@@ -795,6 +893,7 @@ export default {
                         await _this.printReceipts(data.receiptsData);
                     }
                 }, 200);
+                await _this.getData(_this.searchQuery);
             } else {
                 _this.$message.error(data.error);
             }
@@ -853,22 +952,22 @@ export default {
         },
         async viewDetailPayment(data){
             const _this = this;
-            if(data && data._id){
-                await _this.$axios.$get(`/api/receipts/getReceiptsByPaymentId/${data._id}`).then(
-                    async (response) => {
-                        _this.detailPaymentDialog.receiptsData = response.data || [];
-                        _this.detailPaymentDialog.data = data;
-                        _this.detailPaymentDialog.visible = true;
-                    },
-                    (error) => {
-                        console.log('Error: ', error);
-                        _this.$message({
-                            type: 'error',
-                            message: 'Có lỗi xảy ra',
-                        });
-                    }
-                );
-            }
+            // if(data && data._id){
+            //     await _this.$axios.$get(`/api/receipts/getReceiptsByPaymentId/${data._id}`).then(
+            //         async (response) => {
+            //             _this.detailPaymentDialog.receiptsData = response.data || [];
+            //             _this.detailPaymentDialog.data = data;
+            //             _this.detailPaymentDialog.visible = true;
+            //         },
+            //         (error) => {
+            //             console.log('Error: ', error);
+            //             _this.$message({
+            //                 type: 'error',
+            //                 message: 'Có lỗi xảy ra',
+            //             });
+            //         }
+            //     );
+            // }
         },
         getSummariesForDetail(param){
             const { columns, data } = param;
@@ -891,7 +990,38 @@ export default {
         },
         convertAmountToWord(number){
             return readAmountByWord(number);
-        }
+        },
+        async viewReceiptDataDetail(id, pages, sorts){
+            const _this = this;
+            if(id){
+                await _this.$axios.$post(`/api/receipts/getReceiptsByPaymentId`, {
+                    id: id,
+                    pages: pages,
+                    sorts: sorts
+                }).then(
+                    async (response) => {
+                        _this.paymentDialog.receiptDataDetail.data = response;
+                    },
+                    (error) => {
+                        console.log('Error: ', error);
+                        _this.$message({
+                            type: 'error',
+                            message: 'Có lỗi xảy ra',
+                        });
+                    }
+                );
+            }
+        },
+        handleSizeChange2(val) {
+            const _this = this;
+            _this.paymentDialog.receiptDataDetail.pages.size = val;
+            _this.viewReceiptDataDetail(_this.paymentDialog.data._id, _this.paymentDialog.receiptDataDetail.pages, _this.paymentDialog.receiptDataDetail.sorts);
+        },
+        handleCurrentChange2(val) {
+            const _this = this;
+            _this.paymentDialog.receiptDataDetail.pages.from = (_this.paymentDialog.receiptDataDetail.currentPage - 1) * _this.paymentDialog.receiptDataDetail.pages.size;
+            _this.viewReceiptDataDetail(_this.paymentDialog.data._id, _this.paymentDialog.receiptDataDetail.pages, _this.paymentDialog.receiptDataDetail.sorts);
+        },
     }
 }
 </script>

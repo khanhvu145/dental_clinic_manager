@@ -358,10 +358,11 @@ import { columns } from '@/utils/filter/appointment';
 import moment from 'moment';
 import { debounce, map, cloneDeep, intersection, filter, find, forEach } from 'lodash';
 import Appointment from '@/models/tw_Appointment_Booking';
+import QrcodeVue from 'qrcode.vue';
 export default {
     components: {
-		
-	},
+        QrcodeVue,
+    },
     computed: {
 		...mapState({
 			accesses: (state) => state.accesses,
