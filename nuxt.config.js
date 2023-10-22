@@ -112,4 +112,8 @@ export default {
   publicRuntimeConfig: {
     API_SOCKET: process.env.API_ENDPOINT,
   },
+
+  generate: {
+    fallback: true
+  }
 }
