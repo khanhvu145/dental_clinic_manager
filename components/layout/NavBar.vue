@@ -1,7 +1,7 @@
 <template>
     <div class="headerApp">
         <div class="container-fluid">
-            <div class="navbar-custom">
+            <div class="navbar-custom" style="min-height:63px;">
                 <ul class="navbar-list">
                     <li class="navbar-item">
                         <a class="navbar-link">
@@ -17,7 +17,7 @@
                         </el-radio-group> -->
                     </li>
 
-                    <li class="navbar-item">
+                    <li v-if="windowWidth > 500" class="navbar-item">
                         <img src="/images/Logodental.png" alt="" class="logo">
                         <img src="/images/chulogo.png" alt="" class="title-logo">
                     </li>
@@ -111,6 +111,7 @@ export default {
             loading: false,
             isCheck: false,
             dataLoading: false,
+            windowWidth: window.innerWidth
         };
     },
     async beforeMount () {
@@ -137,6 +138,10 @@ export default {
 	},
     async mounted() {
         const _this = this;
+        window.addEventListener('resize', () => {
+            _this.windowWidth = window.innerWidth;
+        })
+        console.log(_this.windowWidth)
         await _this.getNotify();
     },
     methods: {

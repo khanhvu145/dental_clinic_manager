@@ -13,11 +13,11 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
 		    </el-upload>
         </div>
-        <div class="col-md-12" style="display: flex; justify-content: center;" v-if="isImage">
+        <!-- <div class="col-md-12" style="display: flex; justify-content: center;" v-if="isImage">
             <button type="button" class="control-btn red" style="padding: 6px 8px;" @click="clearImage()">
                 <i class='bx bx-x'></i>
             </button>
-        </div>
+        </div> -->
 	</div>
 </template>
 

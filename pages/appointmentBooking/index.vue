@@ -250,7 +250,7 @@
                             <!-- Đăng ký online -->
                             <el-tab-pane label="Đặt hẹn online" name="online">
                                 <div style="text-align:center;height:70vh;font-weight:bold;font-size:16px;margin-top:32px;">
-                                    COMMING SOON
+                                    <el-empty description="COMING SOON"></el-empty>
                                 </div>
                             </el-tab-pane>
                         </el-tabs>
