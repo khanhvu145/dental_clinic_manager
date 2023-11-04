@@ -121,12 +121,6 @@
                         <span slot="title">Đơn thuốc</span>
                     </el-menu-item>
                 </nuxt-link>
-                <!-- <nuxt-link v-if="checkAccessRight('medicine')" to="/medicine" class="sidebar-nav-link">
-                    <el-menu-item index="medicine">
-                        <i class='bx bxs-capsule'></i>
-                        <span slot="title">Thuốc men</span>
-                    </el-menu-item>
-                </nuxt-link> -->
             </el-submenu>
             <el-submenu 
                 v-if="

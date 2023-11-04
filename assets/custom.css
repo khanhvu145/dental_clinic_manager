@@ -352,3 +352,7 @@
 .el-loading-spinner i {
     color: #7fc362;
 }
+
+.el-drawer__header .el-dialog__close{
+    color: #72767b !important;
+}
