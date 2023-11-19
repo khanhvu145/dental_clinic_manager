@@ -1,37 +1,43 @@
 <template>
-    <div class="login__body">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6 col-xl-5">
-                    <form @submit.prevent="forgotPassword" class="login-form">
-                        <div class="logo">
-                            <img src="/images/logoclinic.png" alt="">
-                        </div>
-                        <div v-if="!done" class="mt-4" style="opacity:0.6; font-size:14px; text-align:center;">
-                            Nhập tài khoản để lấy lại mật khẩu
-                        </div>
-                        <div v-else class="mt-4" style="opacity:0.6; font-size:14px; text-align:center;">
-                            Vui lòng kiếm tra email phục hồi mật khẩu được gửi từ hệ thống
-                        </div>
-                        <div v-if="!done" class="input-box">
-                            <div class="usename_box">
-                                <el-input placeholder="Tài khoản" v-model="username">
-                                    <i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
-                                </el-input>
+    <div class='auth-fluid'>
+        <!-- Auth fluid right content -->
+        <div class='auth-fluid-right'>
+        </div>
+        <!--Auth fluid left content -->
+        <div class='auth-fluid-form-box'>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <form @submit.prevent="forgotPassword" class="login-form-v2">
+                            <div class="logo-v2">
+                                <img src="/images/logoclinic.png" alt="">
                             </div>
-                        </div>
-                        <!-- <button v-if="!done" :loading="true" type="submit" class="login-button mt-4">Lấy lại mật khẩu</button> -->
-                        <el-button v-if="!done" native-type="submit" :loading="loading" class="login-button mt-4">
-                            Lấy lại mật khẩu
-                        </el-button>
-                        <div class="text-center mt-4" style="opacity:0.8; font-size:14px;">
-                            <nuxt-link to="/login" class="sidebar-nav-link">
-                                <a href="javascript:void(0)">
-                                    <span>Về trang đăng nhập</span>
-                                </a>
-                            </nuxt-link>
-                        </div>
-                    </form>
+                            <div v-if="!done" class="mt-4" style="opacity:0.6; font-size:14px; text-align:center;">
+                                Nhập tài khoản để lấy lại mật khẩu
+                            </div>
+                            <div v-else class="mt-4 ml-auto mr-auto" style="opacity:0.6; font-size:14px; text-align:center;width:70%;">
+                                Vui lòng kiếm tra email phục hồi mật khẩu được gửi từ hệ thống
+                            </div>
+                            <div v-if="!done" class="input-box mt-3 pt-3" style="color:#a09898;">
+                                <div class="usename_box">
+                                    <div class="col-form-label">Tài khoản</div>
+                                    <el-input placeholder="Tài khoản" v-model="username">
+                                        <i slot="prefix" class="el-input__icon el-icon-user-solid"></i>
+                                    </el-input>
+                                </div>
+                            </div>
+                            <el-button v-if="!done" native-type="submit" :loading="loading" class="login-button mt-4">
+                                Lấy lại mật khẩu
+                            </el-button>
+                            <div class="text-center mt-4" style="opacity:0.8; font-size:14px;">
+                                <nuxt-link to="/login" class="sidebar-nav-link">
+                                    <a href="javascript:void(0)">
+                                        <span>Về trang đăng nhập</span>
+                                    </a>
+                                </nuxt-link>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,90 +85,68 @@ export default {
 </script>
 
 <style scoped>
-.login__body{
-    margin: 0;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    font-family: "Lato", sans-serif;
-    font-weight: 700;
+.auth-fluid {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
-    justify-content: center;
-    color: #555;
-    /* background-color: #f0f2f5; */
-    background: url('/images/login_bg.jpg');
-    background-repeat: no-repeat;
+    min-height: 100vh;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    background: url('/images/login_bg_3.jpg') center;
     background-size: cover;
 }
-
-.login-form{
-    width: 90%;
-    margin: 0 auto;
-    /* height: 520px; */
-    padding: 45px 35px 35px 35px;
-    border-radius: 12px;
+.auth-fluid .auth-fluid-right {
+    padding: 6rem 3rem;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    position: relative;
+    color: #fff;
+    background-color: rgba(0,0,0,.5);
+}
+.auth-fluid .auth-fluid-form-box {
+    max-width: 480px;
+    border-radius: 0;
+    z-index: 2;
+    padding: 2rem 2rem;
     background-color: #fff;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%);
-    border: none;
-}
-
-.logo {
-    width: 228px;
-    height: 166px;
-    margin: 0 auto;
-    margin-top: -15px;
-}
-
-.logo img{
-    height: 166px;
-}
-
-.errAlert{
-    display: block;
-    margin: 16px 0;
-    text-align: center;
-    color: #fc0202;
-}
-
-.title{
-    text-align: center;
-    font-size: 28px;
-    padding-top: 24px;
-    letter-spacing: 0.5px;
-}
-
-.input-box{
+    position: relative;
     width: 100%;
-    padding: 30px 0 0 0;
+}
+@media (max-width: 700px){
+    .auth-fluid .auth-fluid-form-box {
+        max-width: 100%;
+        min-height: 100vh;
+    }
+    .auth-fluid .auth-fluid-right {
+        display: none;
+    }
+}
+.logo-v2{
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
 }
 
-.input-box input{
-    border: none;
-    outline: none;
-    background: none;
-    font-size: 18px;
-    color: #555;
-    padding: 20px 10px 20px 5px;
-}
-
-.username, .password {
-    border-radius: 20px;
-    box-shadow: inset 8px 8px 8px #cbced1, 
-    inset -8px -8px 8px #fff;
-}
-
-.username {
-    margin-bottom: 30px;
-}
-
-.password {
-    margin-bottom: 10px;
-}
-
-.input-box svg{
-    height: 22px;
-    margin: 0 10px -3px 25px;
+.logo-v2 > img{
+    height: 100%;
+    width: auto;
+    -o-object-fit: cover;
+    object-fit: cover;
+    position: absolute;
+    top: 50%;
+    left: 51%;
+    transform: translate(-51% , -50%);
 }
 .login-button {
     outline: none;
