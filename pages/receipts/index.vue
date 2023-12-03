@@ -387,7 +387,7 @@ export default {
                     examinationCodeF: '',
                     customerF: '',
                     dateF: [],
-                    statusF: 'paid'
+                    statusF: 'all'
                 },
                 sorts: -1,
                 pages:{
@@ -450,6 +450,7 @@ export default {
                 examinationCodeF: '',
                 customerF: '',
                 dateF: [],
+                statusF: 'all'
             }
             _this.searchQuery.pages.from = 0;
             _this.currentPage = 1;

@@ -73,7 +73,7 @@ export default {
 						type: 'success',
 					});
                     _this.$router.go();
-                    // _this.$router.push('/');
+                    // _this.$router.push('/account');
 				}
                 else {
                     _this.$message({

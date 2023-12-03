@@ -11,7 +11,7 @@
                 </div>
                 <form v-loading="dataLoading" class="row mt-4 mb-5" v-on:submit.prevent="submitForm">
                     <div class="col-md-12" style="text-align: right;">
-                        <button type="button" class="control-btn gray" @click="$router.push('/')">
+                        <button type="button" class="control-btn gray" @click="getData">
                             <i class='bx bx-x'></i>
                             <span>Hủy</span>
                         </button>
@@ -314,23 +314,7 @@ export default {
         _this.districtMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'districtMasterData' })) || [];
         _this.wardMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'wardMasterData' })) || [];
         // _this.accessMasterData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'accessMasterData' })) || [];
-
-        await _this.$axios.$get(`/api/user/getById/${_this.userInfo.data._id}`).then(
-            async (response) => {
-                _this.formData = response.data || new User();
-                await _this.onSelectProvince(_this.formData.address.provinceId, false);
-                await _this.onSelectDistrict(_this.formData.address.districtId, false);
-            },
-            (error) => {
-                console.log('Error: ', error);
-                _this.$message({
-                    type: 'error',
-                    message: 'Có lỗi xảy ra',
-                });
-                    _this.formData = new User();
-            }
-        );
-
+        await _this.getData();
         _this.dataLoading = false;
     },
     methods: {
@@ -396,6 +380,24 @@ export default {
                 confirmPassword: ''
             };
             _this.dialogResetPassword = value;
+        },
+        async getData(){
+            const _this = this;
+            await _this.$axios.$get(`/api/user/getById/${_this.userInfo.data._id}`).then(
+                async (response) => {
+                    _this.formData = response.data || new User();
+                    await _this.onSelectProvince(_this.formData.address.provinceId, false);
+                    await _this.onSelectDistrict(_this.formData.address.districtId, false);
+                },
+                (error) => {
+                    console.log('Error: ', error);
+                    _this.$message({
+                        type: 'error',
+                        message: 'Có lỗi xảy ra',
+                    });
+                    _this.formData = new User();
+                }
+            );
         }
     }
 }

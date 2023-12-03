@@ -141,14 +141,13 @@ export default {
         window.addEventListener('resize', () => {
             _this.windowWidth = window.innerWidth;
         })
-        console.log(_this.windowWidth)
         await _this.getNotify();
     },
     methods: {
         async handleCommand(command) {
             if(command == 'logout') {
-                await this.$auth.logout();
 			    await this.$router.push('/login');
+                await this.$auth.logout();
                 if (this.$socket) {
                     this.$socket.disconnect();
                 }

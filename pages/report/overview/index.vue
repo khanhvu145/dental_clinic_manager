@@ -8,14 +8,14 @@
                     </div>
                 </div>
                 <div class="row mt-4">
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-select v-model="searchQuery.typeF" filterable name="typeF" @change="getData()">
                             <el-option label="Theo ngày" value="day"></el-option>
                             <el-option label="Theo tháng" value="month"></el-option>
                             <el-option label="Theo năm" value="year"></el-option>
                         </el-select>
                     </div>
-                    <div v-if="searchQuery.typeF == 'day'" class="col-md-4">
+                    <div v-if="searchQuery.typeF == 'day'" class="col-md-4 mb-2">
                         <el-date-picker
                             v-model="searchQuery.dateF"
                             type="daterange"
@@ -30,7 +30,7 @@
                             :clearable="false"
                         ></el-date-picker>
                     </div>
-                    <div v-if="searchQuery.typeF == 'month'" class="col-md-4">
+                    <div v-if="searchQuery.typeF == 'month'" class="col-md-4 mb-2">
                         <el-date-picker
                             v-model="searchQuery.monthF"
                             type="monthrange"
@@ -45,7 +45,7 @@
                             :clearable="false"
                         ></el-date-picker>
                     </div>
-                    <div v-if="searchQuery.typeF == 'year'" class="col-md-4">
+                    <div v-if="searchQuery.typeF == 'year'" class="col-md-4 mb-2">
                         <div class="row">
                             <div class="col-6">
                                 <el-date-picker
@@ -70,9 +70,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-5 mb-2 text-right text-md-left">
                         <button type="button" class="control-btn green" @click="getData()">
                             Xem báo cáo
+                        </button>
+                        <button type="button" v-loading="exportReportLoading" class="control-btn yellow" @click="exportReport()">
+                            Xuất báo cáo
                         </button>
                     </div>
                 </div>
@@ -147,7 +150,7 @@
                 <div class="row mt-3">
                     <!-- Thu/chi -->
                     <div class="col-md-12">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="revenueReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Thu/chi phòng khám</span>
                             </div>
@@ -260,7 +263,7 @@
                 <div class="row mt-3">
                     <!-- Công nợ -->
                     <div class="col-md-6">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="debtReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Công nợ phòng khám</span>
                             </div>
@@ -280,7 +283,7 @@
                     </div>
                     <!-- Lịch hẹn -->
                     <div class="col-md-6">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="appointmentReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Thống kê lịch hẹn</span>
                             </div>
@@ -303,22 +306,22 @@
                 <div class="row mt-3">
                     <!-- Thời gian điều trị -->
                     <div class="col-md-12">
-                        <el-card class="box-card" style="height:100%;">
-                        <div slot="header" class="clearfix">
-                            <span style="font-weight:bold;color:rgb(104 102 102);">Khám và điều trị</span>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <line-chart
-                                    v-if="!dataLoading"
-                                    :options="examinationReport.options"
-                                    :labels="examinationReport.labels"
-                                    :datasets="examinationReport.datasets"
-                                    :width="500"
-                                    :height="200"
-                                />
+                        <el-card id="examinationReport" class="box-card" style="height:100%;">
+                            <div slot="header" class="clearfix">
+                                <span style="font-weight:bold;color:rgb(104 102 102);">Khám và điều trị</span>
                             </div>
-                        </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <line-chart
+                                        v-if="!dataLoading"
+                                        :options="examinationReport.options"
+                                        :labels="examinationReport.labels"
+                                        :datasets="examinationReport.datasets"
+                                        :width="500"
+                                        :height="200"
+                                    />
+                                </div>
+                            </div>
                         </el-card>
                     </div>
                 </div>
@@ -326,7 +329,7 @@
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <!-- Nhóm dịch vụ -->
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="serviceGroupReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix" style="padding: 12px 0;">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nhóm dịch vụ</span>
                             </div>
@@ -344,7 +347,7 @@
                         </el-card>
                     </div>
                     <div class="col-md-6">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="serviceReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <div class="row" style="align-items:center;">
                                     <div class="col-md-4">
@@ -376,8 +379,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <bar-chart
-                                        v-if="!dataLoading"
-                                        v-loading="serviceReport.loading"
+                                        v-if="!dataLoading && !serviceReport.loading"
 										:options="serviceReport.options"
 										:labels="serviceReport.labels"
 										:datasets="serviceReport.datasets"
@@ -407,6 +409,183 @@
                     </div> -->
                 </div>
             </div>
+            <!-- Report template pdf -->
+            <vue-html2pdf
+				class="export-report-template"
+				id="export-report-template"
+				:show-layout="false"
+				:float-layout="true"
+				:preview-modal="true"
+				:enable-download="false"
+				:paginate-elements-by-height="1000"
+				filename="reportFile"
+				:pdf-quality="2"
+				:manual-pagination="true"
+				pdf-format="A4"
+				pdf-content-width="100%"
+				ref="exportReportTemplate"
+				pdf-orientation="landscape"
+			>
+                <section class="col-12 px-0" slot="pdf-content">
+                    <div id="export-report-template-content" class="content-print px-3 py-3" style="height:100%;background-color:white;">
+                        <div class="row mt-3">
+                            <div class="col-3 mb-2">
+                                <el-select v-model="searchQuery.typeF" filterable name="typeF">
+                                    <el-option label="Theo ngày" value="day"></el-option>
+                                    <el-option label="Theo tháng" value="month"></el-option>
+                                    <el-option label="Theo năm" value="year"></el-option>
+                                </el-select>
+                            </div>
+                            <div v-if="searchQuery.typeF == 'day'" class="col-4 mb-2">
+                                <el-date-picker
+                                    v-model="searchQuery.dateF"
+                                    type="daterange"
+                                    align="right"
+                                    unlink-panels
+                                    range-separator="-"
+                                    start-placeholder="Từ ngày"
+                                    end-placeholder="Đến ngày"
+                                    :picker-options="pickerOptions_Day"
+                                    format="dd/MM/yyyy"
+                                    style="width: 100%"
+                                    :clearable="false"
+                                ></el-date-picker>
+                            </div>
+                            <div v-if="searchQuery.typeF == 'month'" class="col-4 mb-2">
+                                <el-date-picker
+                                    v-model="searchQuery.monthF"
+                                    type="monthrange"
+                                    align="right"
+                                    unlink-panels
+                                    range-separator="-"
+                                    start-placeholder="Từ tháng"
+                                    end-placeholder="Đến tháng"
+                                    :picker-options="pickerOptions_Month"
+                                    format="MM/yyyy"
+                                    style="width: 100%"
+                                    :clearable="false"
+                                ></el-date-picker>
+                            </div>
+                            <div v-if="searchQuery.typeF == 'year'" class="col-4 mb-2">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <el-date-picker
+                                            v-model="searchQuery.yearF[0]"
+                                            type="year"
+                                            placeholder="Từ năm"
+                                            align="right"
+                                            style="width: 100%"
+                                            :clearable="false"
+                                            required
+                                        ></el-date-picker>
+                                    </div>
+                                    <div class="col-6">
+                                        <el-date-picker
+                                            v-model="searchQuery.yearF[1]"
+                                            type="year"
+                                            placeholder="Đến năm"
+                                            align="right"
+                                            style="width: 100%"
+                                            :clearable="false"
+                                        ></el-date-picker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 text-center" style="font-weight:bold;font-size:24px;">
+                                BÁO CÁO TỔNG QUAN
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+							<div class="col-12">
+                                <div class="row">
+                                    <div class="col-8" style="margin: 0 auto;">
+                                        <el-card class="box-card">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <div class="avatar-lg rounded-circle" style="background-color:#278664;">
+                                                        <i class='bx bx-dollar font-26 avatar-title'></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-8">
+                                                    <div class="text-right d-flex flex-column" style="height:100%;">
+                                                        <div style="font-weight:bold;color:rgb(104 102 102);">Tổng doanh thu (VND)</div>
+                                                        <div class="mt-2" style="font-weight:bold;color:#278664;font-size:24px;">{{ replaceNumber(overviewData.revenue) }}</div>
+                                                        <div class="mt-2" style="font-style:italic;color:rgb(152, 166, 173);font-size:14px;">{{ `${convertAmountToWord(overviewData.revenue)}` }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </el-card>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-8" style="margin: 0 auto;">
+                                        <el-card class="box-card">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <div class="avatar-lg rounded-circle" style="background-color:#f0bc68;">
+                                                        <i class='bx bx-calendar-plus font-26 avatar-title'></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-8">
+                                                    <div class="text-right d-flex flex-column" style="height:100%;">
+                                                        <div style="font-weight:bold;color:rgb(104 102 102);">Tổng số cuộc hẹn (Lịch hẹn)</div>
+                                                        <div class="mt-2" style="font-weight:bold;color:#f0bc68;font-size:24px;">{{ replaceNumber(overviewData.appointment) }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </el-card>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-8" style="margin: 0 auto;">
+                                        <el-card class="box-card">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <div class="avatar-lg rounded-circle" style="background-color:#55cbcd;">
+                                                        <i class='bx bx-user font-26 avatar-title'></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-8">
+                                                    <div class="text-right d-flex flex-column" style="height:100%;">
+                                                        <div style="font-weight:bold;color:rgb(104 102 102);">Khách hàng mới (Khách hàng)</div>
+                                                        <div class="mt-2" style="font-weight:bold;color:#55cbcd;font-size:24px;">{{ replaceNumber(overviewData.customer) }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </el-card>
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item revenueReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item debtReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item appointmentReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item examinationReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item serviceGroupReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item serviceReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                    </div>
+                </section>
+            </vue-html2pdf>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -845,36 +1024,34 @@ export default {
                                 stacked: true,
                                 barThickness: 30, // number (pixels) or 'flex'
                                 maxBarThickness: 30, // number (pixels)
-                                // autoSkip: false,
-                                // maxRotation: 90,
-                                // ticks: {
-                                //     minRotation: 35
-                                // }
                             },
                         ],
                     },
                     plugins: {
                         datalabels: {
-                            // display: false,
-                            // align: 'end',
-                            // anchor: 'end',
-                            // offset: 2,
-                            // color: '#aaaaaa',
-                            formatter: function (value) {
-                                return Number(value).toLocaleString();
+                            formatter: function (value, index, values) {
+                                if (value > 0) {
+                                    return Number(value).toLocaleString();
+                                } else {
+                                    return '';
+                                }
                             },
                         },
                     },
                     tooltips: {
                         callbacks: {
                             label: function (tooltipItem, data) {
-                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
-
-                                if (label) {
-                                    label += ': ';
+                                if(tooltipItem.xLabel){
+                                    var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += Number(tooltipItem.xLabel).toLocaleString();
+                                    return label;
                                 }
-                                label += Number(tooltipItem.xLabel).toLocaleString();
-                                return label;
+                                else{
+                                    return '';
+                                }
                             },
                         },
                     },
@@ -991,43 +1168,41 @@ export default {
                                 stacked: true,
                                 barThickness: 30, // number (pixels) or 'flex'
                                 maxBarThickness: 30, // number (pixels)
-                                // autoSkip: false,
-                                // maxRotation: 90,
-                                // ticks: {
-                                //     minRotation: 35
-                                // }
                             },
                         ],
                     },
                     plugins: {
                         datalabels: {
-                            // display: false,
-                            // align: 'end',
-                            // anchor: 'end',
-                            // offset: 2,
-                            // color: '#aaaaaa',
-                            formatter: function (value) {
-                                return Number(value).toLocaleString();
+                            formatter: function (value, index, values) {
+                                if (value > 0) {
+                                    return Number(value).toLocaleString();
+                                } else {
+                                    return '';
+                                }
                             },
                         },
                     },
                     tooltips: {
                         callbacks: {
                             label: function (tooltipItem, data) {
-                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
-
-                                if (label) {
-                                    label += ': ';
+                                if(tooltipItem.xLabel){
+                                    var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += Number(tooltipItem.xLabel).toLocaleString();
+                                    return label;
                                 }
-                                label += Number(tooltipItem.xLabel).toLocaleString();
-                                return label;
+                                else{
+                                    return '';
+                                }
                             },
                         },
                     },
                 },
                 labels: [],
                 datasets: [],
-                loading: true,
+                loading: false,
             },
             serviceGroupId: '',
             serviceGroupData: [],
@@ -1035,7 +1210,8 @@ export default {
                 title: '',
                 visible: false,
                 data: {}
-            }
+            },
+            exportReportLoading: false,
         }
     },
     async created(){
@@ -1488,6 +1664,133 @@ export default {
             });
             return sums;
         },
+        async exportReport(){
+            const _this = this;
+            window.scrollTo(0, 0);
+            _this.exportReportLoading = true;
+            _this.$message({
+                type: "warning",
+                message: "Quá trình xuất dữ liệu đang diễn ra, xin đợi trong giây lát",
+                duration: 0
+            });
+            _this.getReportTemplateContent().then(() => {
+                _this.$refs.exportReportTemplate.generatePdf();
+                _this.exportReportLoading = false;
+                _this.$message.closeAll();
+                _this.$notify({
+                    title: "Thành công",
+                    message: "Xuất báo cáo thành công",
+                    type: 'success',
+                });
+            }).catch(() => {
+                _this.exportReportLoading = false;
+                _this.$message.closeAll();
+                _this.$notify({
+                    title: "Thất bại",
+                    message: "Xuất báo cáo không thành công",
+                    type: 'error',
+                });
+            });;
+        },
+        async getReportTemplateContent(){
+            const _this = this;
+            //#region Thu/chi
+            const printElerevenueReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .revenueReportChart .export-report-template-img");
+            if (printElerevenueReport) {
+                printElerevenueReport.remove();
+            }
+            var revenueReportCanvas = await this.$html2canvas(document.getElementById("revenueReport"), { type: 'dataURL' });
+            var revenueReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .revenueReportChart .export-report-template-chart");
+            if(revenueReportElement && revenueReportCanvas){
+                let revenueReportImg = document.createElement('img');
+                revenueReportImg.classList.add('export-report-template-img');
+                revenueReportImg.src = revenueReportCanvas;
+                revenueReportImg.style.height = "100%";
+                revenueReportImg.style.width = "100%";
+                revenueReportElement.appendChild(revenueReportImg);
+            }
+            //#endregion
+            //#region Công nợ
+            const printEledebtReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .debtReportChart .export-report-template-img");
+            if (printEledebtReport) {
+                printEledebtReport.remove();
+            }
+            var debtReportCanvas = await this.$html2canvas(document.getElementById("debtReport"), { type: 'dataURL' });
+            var debtReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .debtReportChart .export-report-template-chart");
+            if(debtReportElement && debtReportCanvas){
+                let debtReportImg = document.createElement('img');
+                debtReportImg.classList.add('export-report-template-img');
+                debtReportImg.src = debtReportCanvas;
+                debtReportImg.style.height = "100%";
+                debtReportImg.style.width = "100%";
+                debtReportElement.appendChild(debtReportImg);
+            }
+            //#endregion
+            //#region Lịch hẹn
+            const printEleappointmentReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .appointmentReportChart .export-report-template-img");
+            if (printEleappointmentReport) {
+                printEleappointmentReport.remove();
+            }
+            var appointmentReportCanvas = await this.$html2canvas(document.getElementById("appointmentReport"), { type: 'dataURL' });
+            var appointmentReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .appointmentReportChart .export-report-template-chart");
+            if(appointmentReportElement && appointmentReportCanvas){
+                let appointmentReportImg = document.createElement('img');
+                appointmentReportImg.classList.add('export-report-template-img');
+                appointmentReportImg.src = appointmentReportCanvas;
+                appointmentReportImg.style.height = "100%";
+                appointmentReportImg.style.width = "100%";
+                appointmentReportElement.appendChild(appointmentReportImg);
+            }
+            //#endregion
+            //#region Khám và điều trị
+            const printEleexaminationReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .examinationReportChart .export-report-template-img");
+            if (printEleexaminationReport) {
+                printEleexaminationReport.remove();
+            }
+            var examinationReportCanvas = await this.$html2canvas(document.getElementById("examinationReport"), { type: 'dataURL' });
+            var examinationReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .examinationReportChart .export-report-template-chart");
+            if(examinationReportElement && examinationReportCanvas){
+                let examinationReportImg = document.createElement('img');
+                examinationReportImg.classList.add('export-report-template-img');
+                examinationReportImg.src = examinationReportCanvas;
+                examinationReportImg.style.height = "100%";
+                examinationReportImg.style.width = "100%";
+                examinationReportElement.appendChild(examinationReportImg);
+            }
+            //#endregion
+            //#region Nhóm dịch vụ
+            const printEleserviceGroupReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .serviceGroupReportChart .export-report-template-img");
+            if (printEleserviceGroupReport) {
+                printEleserviceGroupReport.remove();
+            }
+            var serviceGroupReportCanvas = await this.$html2canvas(document.getElementById("serviceGroupReport"), { type: 'dataURL' });
+            var serviceGroupReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .serviceGroupReportChart .export-report-template-chart");
+            if(serviceGroupReportElement && serviceGroupReportCanvas){
+                let serviceGroupReportImg = document.createElement('img');
+                serviceGroupReportImg.classList.add('export-report-template-img');
+                serviceGroupReportImg.src = serviceGroupReportCanvas;
+                serviceGroupReportImg.style.height = "100%";
+                serviceGroupReportImg.style.width = "100%";
+                serviceGroupReportElement.appendChild(serviceGroupReportImg);
+            }
+            //#endregion
+            //#region Dịch vụ
+            const printEleserviceReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .serviceReportChart .export-report-template-img");
+            if (printEleserviceReport) {
+                printEleserviceReport.remove();
+            }
+            var serviceReportCanvas = await this.$html2canvas(document.getElementById("serviceReport"), { type: 'dataURL' });
+            var serviceReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .serviceReportChart .export-report-template-chart");
+            if(serviceReportElement && serviceReportCanvas){
+                let serviceReportImg = document.createElement('img');
+                serviceReportImg.classList.add('export-report-template-img');
+                serviceReportImg.src = serviceReportCanvas;
+                serviceReportImg.style.height = "100%";
+                serviceReportImg.style.width = "100%";
+                serviceReportElement.appendChild(serviceReportImg);
+            }
+            //#endregion
+        }
     }
 }
 </script>

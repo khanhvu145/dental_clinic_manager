@@ -44,6 +44,7 @@ export default {
     { src: '@/plugins/vue-html2pdf', mode: 'client' },
     '@/plugins/primevue',
     '@/plugins/vue-infinite-scroll',
+    "@/plugins/vue-html2canvas"
   ],
 
   router: {

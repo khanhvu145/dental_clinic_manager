@@ -8,14 +8,14 @@
                     </div>
                 </div>
                 <div class="row mt-4">
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-2">
                         <el-select v-model="searchQuery.typeF" filterable name="typeF" @change="getData()">
                             <el-option label="Theo ngày" value="day"></el-option>
                             <el-option label="Theo tháng" value="month"></el-option>
                             <el-option label="Theo năm" value="year"></el-option>
                         </el-select>
                     </div>
-                    <div v-if="searchQuery.typeF == 'day'" class="col-md-4">
+                    <div v-if="searchQuery.typeF == 'day'" class="col-md-4 mb-2">
                         <el-date-picker
                             v-model="searchQuery.dateF"
                             type="daterange"
@@ -30,7 +30,7 @@
                             :clearable="false"
                         ></el-date-picker>
                     </div>
-                    <div v-if="searchQuery.typeF == 'month'" class="col-md-4">
+                    <div v-if="searchQuery.typeF == 'month'" class="col-md-4 mb-2">
                         <el-date-picker
                             v-model="searchQuery.monthF"
                             type="monthrange"
@@ -45,7 +45,7 @@
                             :clearable="false"
                         ></el-date-picker>
                     </div>
-                    <div v-if="searchQuery.typeF == 'year'" class="col-md-4">
+                    <div v-if="searchQuery.typeF == 'year'" class="col-md-4 mb-2">
                         <div class="row">
                             <div class="col-6">
                                 <el-date-picker
@@ -70,9 +70,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-5 mb-2 text-right text-md-left">
                         <button type="button" class="control-btn green" @click="getData()">
                             Xem báo cáo
+                        </button>
+                        <button type="button" v-loading="exportReportLoading" class="control-btn yellow" @click="exportReport()">
+                            Xuất báo cáo
                         </button>
                     </div>
                 </div>
@@ -81,7 +84,7 @@
                 <div class="row mt-3">
                     <!-- Độ tuổi -->
                     <div class="col-xl-6 mb-3">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="ageGroupReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Độ tuổi</span>
                             </div>
@@ -101,7 +104,7 @@
                     </div>
                     <!-- Giới tính -->
                     <div class="col-xl-6 mb-3">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="genderReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Giới tính</span>
                             </div>
@@ -123,7 +126,7 @@
                 <!-- Tỉnh/Thành phố -->
                 <div class="row">
                     <div class="col-md-12">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="cityReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Tỉnh, thành phố</span>
                             </div>
@@ -160,7 +163,7 @@
                 <div class="row mt-3">
                     <!-- Nhóm KH -->
                     <div class="col-md-6 mb-3">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="groupReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nhóm khách hàng</span>
                             </div>
@@ -180,7 +183,7 @@
                     </div>
                     <!-- Nguồn KH -->
                     <div class="col-md-6 mb-3">
-                        <el-card class="box-card" style="height:100%;">
+                        <el-card id="sourceReport" class="box-card" style="height:100%;">
                             <div slot="header" class="clearfix">
                                 <span style="font-weight:bold;color:rgb(104 102 102);">Nguồn khách hàng</span>
                             </div>
@@ -200,6 +203,115 @@
                     </div>
                 </div>
             </div>
+            <!-- Report template pdf -->
+            <vue-html2pdf
+				class="export-report-template"
+				id="export-report-template"
+				:show-layout="false"
+				:float-layout="true"
+				:preview-modal="true"
+				:enable-download="false"
+				:paginate-elements-by-height="1000"
+				filename="reportFile"
+				:pdf-quality="2"
+				:manual-pagination="true"
+				pdf-format="A4"
+				pdf-content-width="100%"
+				ref="exportReportTemplate"
+				pdf-orientation="landscape"
+			>
+                <section class="col-12 px-0" slot="pdf-content">
+                    <div id="export-report-template-content" class="content-print px-3 py-3" style="height:100%;background-color:white;">
+                        <div class="row mt-3">
+                            <div class="col-3 mb-2">
+                                <el-select v-model="searchQuery.typeF" filterable name="typeF">
+                                    <el-option label="Theo ngày" value="day"></el-option>
+                                    <el-option label="Theo tháng" value="month"></el-option>
+                                    <el-option label="Theo năm" value="year"></el-option>
+                                </el-select>
+                            </div>
+                            <div v-if="searchQuery.typeF == 'day'" class="col-4 mb-2">
+                                <el-date-picker
+                                    v-model="searchQuery.dateF"
+                                    type="daterange"
+                                    align="right"
+                                    unlink-panels
+                                    range-separator="-"
+                                    start-placeholder="Từ ngày"
+                                    end-placeholder="Đến ngày"
+                                    :picker-options="pickerOptions_Day"
+                                    format="dd/MM/yyyy"
+                                    style="width: 100%"
+                                    :clearable="false"
+                                ></el-date-picker>
+                            </div>
+                            <div v-if="searchQuery.typeF == 'month'" class="col-4 mb-2">
+                                <el-date-picker
+                                    v-model="searchQuery.monthF"
+                                    type="monthrange"
+                                    align="right"
+                                    unlink-panels
+                                    range-separator="-"
+                                    start-placeholder="Từ tháng"
+                                    end-placeholder="Đến tháng"
+                                    :picker-options="pickerOptions_Month"
+                                    format="MM/yyyy"
+                                    style="width: 100%"
+                                    :clearable="false"
+                                ></el-date-picker>
+                            </div>
+                            <div v-if="searchQuery.typeF == 'year'" class="col-4 mb-2">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <el-date-picker
+                                            v-model="searchQuery.yearF[0]"
+                                            type="year"
+                                            placeholder="Từ năm"
+                                            align="right"
+                                            style="width: 100%"
+                                            :clearable="false"
+                                            required
+                                        ></el-date-picker>
+                                    </div>
+                                    <div class="col-6">
+                                        <el-date-picker
+                                            v-model="searchQuery.yearF[1]"
+                                            type="year"
+                                            placeholder="Đến năm"
+                                            align="right"
+                                            style="width: 100%"
+                                            :clearable="false"
+                                        ></el-date-picker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 text-center" style="font-weight:bold;font-size:24px;">
+                                BÁO CÁO KHÁCH HÀNG
+                            </div>
+                        </div>
+                        <div class="row export-report-template-item ageGroupReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="row export-report-template-item genderReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item cityReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item groupReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                        <div class="html2pdf__page-break"/>
+                        <div class="row export-report-template-item sourceReportChart mt-3">
+							<div class="col-md-12 export-report-template-chart"></div>
+						</div>
+                    </div>
+                </section>
+            </vue-html2pdf>
         </div>
         <div v-else>
             <el-empty description="Bạn không có quyền !!"></el-empty>
@@ -658,6 +770,7 @@ export default {
                 labels: [],
                 datasets: []
             },
+            exportReportLoading: false,
         }
     },
     async created(){
@@ -935,6 +1048,117 @@ export default {
             );
             _this.dataLoading = false;
         },
+        async exportReport(){
+            const _this = this;
+            window.scrollTo(0, 0);
+            _this.exportReportLoading = true;
+            _this.$message({
+                type: "warning",
+                message: "Quá trình xuất dữ liệu đang diễn ra, xin đợi trong giây lát",
+                duration: 0
+            });
+            _this.getReportTemplateContent().then(() => {
+                _this.$refs.exportReportTemplate.generatePdf();
+                _this.exportReportLoading = false;
+                _this.$message.closeAll();
+                _this.$notify({
+                    title: "Thành công",
+                    message: "Xuất báo cáo thành công",
+                    type: 'success',
+                });
+            }).catch(() => {
+                _this.exportReportLoading = false;
+                _this.$message.closeAll();
+                _this.$notify({
+                    title: "Thất bại",
+                    message: "Xuất báo cáo không thành công",
+                    type: 'error',
+                });
+            });;
+        },
+        async getReportTemplateContent(){
+            const _this = this;
+            //#region Tuổi
+            const printEleageGroupReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .ageGroupReportChart .export-report-template-img");
+            if (printEleageGroupReport) {
+                printEleageGroupReport.remove();
+            }
+            var ageGroupReportCanvas = await this.$html2canvas(document.getElementById("ageGroupReport"), { type: 'dataURL' });
+            var ageGroupReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .ageGroupReportChart .export-report-template-chart");
+            if(ageGroupReportElement && ageGroupReportCanvas){
+                let ageGroupReportImg = document.createElement('img');
+                ageGroupReportImg.classList.add('export-report-template-img');
+                ageGroupReportImg.src = ageGroupReportCanvas;
+                ageGroupReportImg.style.height = "100%";
+                ageGroupReportImg.style.width = "100%";
+                ageGroupReportElement.appendChild(ageGroupReportImg);
+            }
+            //#endregion
+            //#region Giới tính
+            const printElegenderReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .genderReportChart .export-report-template-img");
+            if (printElegenderReport) {
+                printElegenderReport.remove();
+            }
+            var genderReportCanvas = await this.$html2canvas(document.getElementById("genderReport"), { type: 'dataURL' });
+            var genderReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .genderReportChart .export-report-template-chart");
+            if(genderReportElement && genderReportCanvas){
+                let genderReportImg = document.createElement('img');
+                genderReportImg.classList.add('export-report-template-img');
+                genderReportImg.src = genderReportCanvas;
+                genderReportImg.style.height = "100%";
+                genderReportImg.style.width = "100%";
+                genderReportElement.appendChild(genderReportImg);
+            }
+            //#endregion
+            //#region Thành phố
+            const printElecityReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .cityReportChart .export-report-template-img");
+            if (printElecityReport) {
+                printElecityReport.remove();
+            }
+            var cityReportCanvas = await this.$html2canvas(document.getElementById("cityReport"), { type: 'dataURL' });
+            var cityReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .cityReportChart .export-report-template-chart");
+            if(cityReportElement && cityReportCanvas){
+                let cityReportImg = document.createElement('img');
+                cityReportImg.classList.add('export-report-template-img');
+                cityReportImg.src = cityReportCanvas;
+                cityReportImg.style.height = "100%";
+                cityReportImg.style.width = "100%";
+                cityReportElement.appendChild(cityReportImg);
+            }
+            //#endregion
+            //#region Nhóm
+            const printElegroupReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .groupReportChart .export-report-template-img");
+            if (printElegroupReport) {
+                printElegroupReport.remove();
+            }
+            var groupReportCanvas = await this.$html2canvas(document.getElementById("groupReport"), { type: 'dataURL' });
+            var groupReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .groupReportChart .export-report-template-chart");
+            if(groupReportElement && groupReportCanvas){
+                let groupReportImg = document.createElement('img');
+                groupReportImg.classList.add('export-report-template-img');
+                groupReportImg.src = groupReportCanvas;
+                groupReportImg.style.height = "100%";
+                groupReportImg.style.width = "100%";
+                groupReportElement.appendChild(groupReportImg);
+            }
+            //#endregion
+            //#region Nguồn
+            const printElesourceReport = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .sourceReportChart .export-report-template-img");
+            if (printElesourceReport) {
+                printElesourceReport.remove();
+            }
+            var sourceReportCanvas = await this.$html2canvas(document.getElementById("sourceReport"), { type: 'dataURL' });
+            var sourceReportElement = _this.$refs.exportReportTemplate.$el.querySelector("#export-report-template-content .sourceReportChart .export-report-template-chart");
+            if(sourceReportElement && sourceReportCanvas){
+                let sourceReportImg = document.createElement('img');
+                sourceReportImg.classList.add('export-report-template-img');
+                sourceReportImg.src = sourceReportCanvas;
+                sourceReportImg.style.height = "100%";
+                sourceReportImg.style.width = "100%";
+                sourceReportElement.appendChild(sourceReportImg);
+            }
+            //#endregion
+        }
     }
 }
 </script>
