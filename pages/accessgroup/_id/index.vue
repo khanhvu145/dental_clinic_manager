@@ -56,7 +56,7 @@
                                     v-model="formData.note"
                                 ></el-input>
                             </div>
-                            <div class="col-md-12 mt-3">
+                            <div class="col-md-12 mt-3" v-if="!dataLoading">
                                 <div class="col-form-label" style="font-size:20px;font-weight:bold;">Phân quyền</div>
                                 <div v-for="page in pages" :key="page.app">
                                     <div class="mb-2" v-for="pageGroup in page['group']" :key="pageGroup.value">
@@ -421,6 +421,7 @@ export default {
     },
     async created() {
         const _this = this;
+        _this.dataLoading = true;
         if (_this.$route.params.id && _this.$route.params.id != 'create') {
             await _this.$axios.$get(`/api/accessgroup/getById/${_this.$route.params.id}`).then(
 				(response) => {
@@ -436,7 +437,6 @@ export default {
 				}
 			);
         }
-
         _this.dataLoading = false;
     },
     methods: {
