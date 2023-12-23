@@ -153,14 +153,40 @@ export default {
                                 {
 									name: 'Tổng quan',
 									value: 'overview',
-									customRights: [],
-                                    hideDefaultRights: false,
+									customRights: [
+                                        {
+                                            name: 'Tất cả',
+                                            value: 'all',
+                                        },
+                                        {
+                                            name: 'Xem',
+                                            value: 'view',
+                                        },
+                                        {
+                                            name: 'Xuất báo cáo',
+                                            value: 'export',
+                                        },
+                                    ],
+                                    hideDefaultRights: true,
 								},
                                 {
 									name: 'Khách hàng',
 									value: 'customerProfile',
-									customRights: [],
-                                    hideDefaultRights: false,
+									customRights: [
+                                        {
+                                            name: 'Tất cả',
+                                            value: 'all',
+                                        },
+                                        {
+                                            name: 'Xem',
+                                            value: 'view',
+                                        },
+                                        {
+                                            name: 'Xuất báo cáo',
+                                            value: 'export',
+                                        },
+                                    ],
+                                    hideDefaultRights: true,
 								}
                             ]
                         },

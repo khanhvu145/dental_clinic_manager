@@ -162,7 +162,7 @@
                                     <el-table-column prop="order" label="#" width="50" align="center"></el-table-column>
                                     <el-table-column label="Tên thuốc" min-width="120">
                                         <template slot-scope="scope">
-                                            <el-select v-model="scope.row.medicine" placeholder="Chọn thuốc">
+                                            <el-select v-model="scope.row.medicine" placeholder="Chọn thuốc" filterable>
                                                 <el-option
                                                     v-for="item in medicineData"
                                                     :key="item.value"

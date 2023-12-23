@@ -74,7 +74,7 @@
                         <button type="button" class="control-btn green" @click="getData()">
                             Xem báo cáo
                         </button>
-                        <button type="button" v-loading="exportReportLoading" class="control-btn yellow" @click="exportReport()">
+                        <button type="button" v-if="checkRight('export')" v-loading="exportReportLoading" class="control-btn yellow" @click="exportReport()">
                             Xuất báo cáo
                         </button>
                     </div>
