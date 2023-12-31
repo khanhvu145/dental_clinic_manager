@@ -439,6 +439,7 @@ export default {
             _this.dataLoading = true;
             setTimeout(() => {
                 _this.data = new Appointment();
+                _this.customerSelected = '';
                 _this.dataLoading = false;
             }, 250);
         },
