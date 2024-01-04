@@ -228,6 +228,17 @@ async function getDataForFilter({ commit, rootState, state }, filters) {
                     isActive: item.isActive,
                 };
             })
+        case 'generalConfigPrescriptionUnit': // Medicine
+            const PrescriptionUnitData = await this.$axios.$post('/api/generalconfig/getByQuery', { type: 'prescription_unit', isActive: true });
+            var PrescriptionUnit = PrescriptionUnitData.data['prescription_unit'];
+            return PrescriptionUnit.map((item) => {
+                return {
+                    value: item._id,
+                    label: item.value,
+                    color: item.color,
+                    isActive: item.isActive,
+                };
+            })
     }
     return [];
 }

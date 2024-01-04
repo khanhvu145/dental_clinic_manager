@@ -122,6 +122,18 @@
                                                             </div>
                                                         </template>
                                                     </el-table-column>
+                                                    <el-table-column label="Đơn vị" width="100">
+                                                        <template slot-scope="scope">
+                                                            <el-select v-model="scope.row.unit" filterable>
+                                                                <el-option
+                                                                    v-for="item in unitData"
+                                                                    :key="item.value"
+                                                                    :label="item.label"
+                                                                    :value="item.value"
+                                                                ></el-option>
+                                                            </el-select>
+                                                        </template>
+                                                    </el-table-column>
                                                     <el-table-column label="Ghi chú" min-width="150">
                                                         <template slot-scope="scope">
                                                             <el-input
@@ -367,7 +379,7 @@
                                     {{ item.order }}. {{ getMedicineName(item.medicine) }}
                                 </div>
                                 <div class="col-md-4">
-                                    Số lượng: {{ item.quantity }}
+                                    Số lượng: {{ item.quantity }} {{ getUnitName(item.unit) }}
                                 </div>
                             </div>
                             <div class="row mt-1">
@@ -452,6 +464,7 @@ export default {
             prescriptionData: new Prescription(),
             prescriptionConfig: [],
             prescriptionSelected: new Prescription(),
+            unitData: [],
         }
     },
     async created(){
@@ -474,6 +487,7 @@ export default {
         }
         //Lấy danh sách thuốc
         _this.medicineData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamMedicine' })) || [];
+        _this.unitData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigPrescriptionUnit' })) || [];
         //Lấy danh sách dữ liệu
         await _this.getData(_this.searchQuery);
     },
@@ -548,6 +562,11 @@ export default {
         getMedicineName(value){
             const _this = this;
             let data = _.find(_this.medicineData, { value: value });
+			return data ? data.label : '';
+        },
+        getUnitName(value){
+            const _this = this;
+            let data = _.find(_this.unitData, { value: value });
 			return data ? data.label : '';
         },
         addPrescription(){

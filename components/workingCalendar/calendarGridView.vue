@@ -129,7 +129,7 @@ export default {
                 droppable:false,
                 scrollTime: moment().format('HH:mm:ss'),
                 events: [],
-                slotDuration: "00:15:00",
+                slotDuration: "00:30:00",
                 slotMinTime: "00:00:00",
                 slotMaxTime: "12:00:00",
 				slotLabelInterval: "00:30:00",

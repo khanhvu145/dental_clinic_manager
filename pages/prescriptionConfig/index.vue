@@ -4,7 +4,7 @@
             <div class="container-fluid">
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <div class="title titleAfter mb-0">Quản lý đơn thuốc</div>
+                        <div class="title titleAfter mb-0">Quản lý danh mục thuốc</div>
                     </div>
                 </div>
                 <div class="row" style="margin-top: 9px;">
@@ -83,7 +83,9 @@
                             </el-table-column>
                             <el-table-column v-if="columns[1].isShow" label="Thuốc" min-width="150">
                                 <template slot-scope="scope">
-                                    {{ getMedicinesString(scope.row.medicines) }}
+                                    <div v-for="(item, index) in scope.row.medicines" :key="index">
+                                        {{ `${index + 1}/ ` }} {{ getMedicinesString(item) }}
+                                    </div>
 								</template>
                             </el-table-column>
                             <el-table-column v-if="columns[2].isShow" label="Trạng thái" min-width="100">
@@ -139,7 +141,7 @@
                     </div>
                 </div>
                 <!-- Dialog -->
-                <el-dialog :title="dialogCreate.type == 'create' ? 'Thêm mới đơn thuốc' : 'Chỉnh sửa đơn thuốc'" :visible.sync="dialogCreate.visible" :close-on-click-modal="false" width="60%">
+                <el-dialog :title="dialogCreate.type == 'create' ? 'Thêm mới' : 'Chỉnh sửa'" :visible.sync="dialogCreate.visible" :close-on-click-modal="false" width="70%">
                     <form class="row" v-on:submit.prevent="dialogCreate.type == 'create' ? submitCreate : submitUpdate">
                         <div class="col-md-6">
                             <div class="col-form-label">Tiêu đề *</div>
@@ -190,6 +192,18 @@
                                                     }"
                                                 />
                                             </div>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="Đơn vị" width="100">
+                                        <template slot-scope="scope">
+                                            <el-select v-model="scope.row.unit" filterable>
+                                                <el-option
+                                                    v-for="item in unitData"
+                                                    :key="item.value"
+                                                    :label="item.label"
+                                                    :value="item.value"
+                                                ></el-option>
+                                            </el-select>
                                         </template>
                                     </el-table-column>
                                     <el-table-column label="Ghi chú" min-width="150">
@@ -312,6 +326,7 @@ export default {
             currentPage: 1,
             statusData: statusData,
             medicineData: [],
+            unitData: [],
             dialogCreate: {
                 visible: false,
                 data: new Prescription(),
@@ -323,6 +338,8 @@ export default {
         const _this = this;
         //Lấy danh sách thuốc
         _this.medicineData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigExamMedicine' })) || [];
+
+        _this.unitData = (await _this.$store.dispatch('common/getDataForFilter', { actionName: 'generalConfigPrescriptionUnit' })) || [];
 
         await _this.getData(_this.searchQuery);
     },
@@ -482,18 +499,23 @@ export default {
             }
             _this.dialogCreate.data.medicines = arr;
         },
-        getMedicinesString(data){
+        getMedicinesString(item){
             const _this = this;
             var result = '';
+            let medicineItem = _.find(_this.medicineData, { value: item.medicine });
+            let unitItem = _.find(_this.unitData, { value: item.unit });
 
-            if(data && data.length > 0){
-                var arr = [];
-                data.forEach(item => {
-                    let data = _.find(_this.medicineData, { value: item.medicine });
-                    arr.push(data ? data.label : '');
-                })
-                result = arr.join(", ");
-            }
+            var name = medicineItem ? medicineItem.label : '';
+            var unit = unitItem ? unitItem.label : '';
+            result = `${name} - ${item.quantity} ${unit}`;
+            // if(data && data.length > 0){
+            //     var arr = [];
+            //     data.forEach(item => {
+            //         let data = _.find(_this.medicineData, { value: item.medicine });
+            //         arr.push(data ? data.label : '');
+            //     })
+            //     result = arr.join(", ");
+            // }
 
             return result;
         }

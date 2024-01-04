@@ -336,10 +336,10 @@ export default {
                                             name: 'Xem',
                                             value: 'view',
                                         },
-                                        {
-											name: 'Hủy phiếu thu',
-											value: 'cancelReceipts',
-										},
+                                        // {
+										// 	name: 'Hủy phiếu thu',
+										// 	value: 'cancelReceipts',
+										// },
                                         {
 											name: 'In phiếu thu',
 											value: 'printReceipts',

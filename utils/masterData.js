@@ -154,6 +154,19 @@ export const generalCategory = [
         active: true,
       },
     ]
+  },
+  {
+    key: 'prescriptionGeneral',
+    label: 'Danh mục thuốc',
+    group: [
+      {
+        key: 'prescription_unit',
+        label: 'Đơn vị',
+        pickColor: false,
+        planHolder: 'Đơn vị',
+        active: true,
+      },
+    ]
   }
 ];
 

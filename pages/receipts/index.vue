@@ -168,13 +168,13 @@
                                                 </a>
                                             </el-tooltip>
                                         </div>
-                                        <div v-if="checkRight('cancelReceipts')">
+                                        <!-- <div v-if="checkRight('cancelReceipts')">
                                             <el-tooltip class="item" effect="dark" content="Hủy phiếu thu" placement="top">
                                                 <a class="btn control-btn red" style="padding: 4px 6px;" @click="cancelReceipts(scope.row._id)">
                                                     <i class='bx bx-x'></i>
                                                 </a>
                                             </el-tooltip>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </template>
                             </el-table-column>
