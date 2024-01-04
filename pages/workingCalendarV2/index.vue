@@ -163,7 +163,7 @@
                     </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
-                    <a v-if="dialogDetail.data.mainCustomer" :href="`/customer/${dialogDetail.data.mainCustomer._id}/profile`" target="_blank" class="control-btn green">
+                    <a v-if="dialogDetail.data.mainCustomer" :href="`/customer/${dialogDetail.data.mainCustomer._id}/examinationV2`" target="_blank" class="control-btn green">
                         Xem hồ sơ
                     </a>
                     <a v-if="dialogDetail.data.status == 'arrived'" href='javascript:void(0)' @click="completeBooking(dialogDetail.data._id)" class="control-btn yellow">

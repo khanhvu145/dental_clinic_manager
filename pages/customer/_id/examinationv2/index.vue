@@ -157,6 +157,7 @@ import LeftMenu from '@/components/customer/LeftMenu';
 import { cloneDeep, debounce, intersection, remove } from 'lodash';
 import Examination from '@/models/tw_Examination';
 import buildFormData from '@/utils/buildFormData';
+import moment from 'moment';
 export default {
     components: {
 		LeftMenu,
@@ -173,7 +174,7 @@ export default {
                 filters: {
                     codeF: '',
                     dentistsF: [],
-                    dateF: [new Date(), new Date()],
+                    dateF: [moment().subtract(1, 'months'), moment()],
                     statusF: ['new', 'completed'],
                 },
                 sorts: -1,

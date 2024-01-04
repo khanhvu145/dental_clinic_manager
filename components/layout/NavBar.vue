@@ -22,8 +22,8 @@
                         <img src="/images/chulogo.png" alt="" class="title-logo">
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <el-badge :is-dot="notificationGet.some(e => e.status == 'new')" class="item">
+                <div class="d-flex align-items-center" style="gap: 6px;">
+                    <el-badge :value="notificationGet.filter(e => e.status == 'new').length" class="item">
                         <el-dropdown trigger="click" @visible-change="handleDropdownChange" @command="handleCommandNotify">
                             <el-button class="btn-custom" size="medium" icon="el-icon-message-solid" circle></el-button>
                             <el-dropdown-menu slot="dropdown" v-loading="dataLoading">
