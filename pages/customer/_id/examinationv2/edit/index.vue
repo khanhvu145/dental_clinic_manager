@@ -193,7 +193,7 @@
                                                         <div class="col-md-10">
                                                             <el-checkbox-group v-model="formData.preclinicalExam.xquang">
                                                                 <div class="row">
-                                                                    <div class="col-sm-5 col-md-4 col-lg-3 col-xl-2" v-for="(item, index) in xquangData" :key="index">
+                                                                    <div class="col-sm-5 col-lg-4 col-xl-3" v-for="(item, index) in xquangData" :key="index">
                                                                         <el-checkbox :label="item.value">{{item.label}}</el-checkbox>
                                                                     </div>
                                                                 </div>
@@ -205,7 +205,7 @@
                                                         <div class="col-md-10">
                                                             <el-checkbox-group v-model="formData.preclinicalExam.test">
                                                                 <div class="row">
-                                                                    <div class="col-sm-5 col-md-4 col-lg-3 col-xl-2" v-for="(item, index) in testData" :key="index">
+                                                                    <div class="col-sm-5 col-lg-4 col-xl-3" v-for="(item, index) in testData" :key="index">
                                                                         <el-checkbox :label="item.value">{{item.label}}</el-checkbox>
                                                                     </div>
                                                                 </div>
