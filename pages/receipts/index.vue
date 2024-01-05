@@ -301,8 +301,14 @@
                                 NỘI DUNG
                             </div>
                             <div class="col-md-12 mt-2">
-                                <ul class="ml-3">
-                                    <li>- Thu phí khám & điều trị theo phiếu khám <span style="font-weight:bold;">{{ receiptsData.examinationCode || 'N/A' }}</span></li>
+                                <div class="ml-3">
+                                    - Thu phí khám & điều trị theo phiếu khám <span style="font-weight:bold;">{{ receiptsData.examinationCode || 'N/A' }}</span>
+                                </div>
+                                <ul class="ml-5">
+                                    <li class="mt-2" v-for="item in receiptsData.diagnosisTreatment" :key="item.key">
+                                        + {{ getServiceName(item.serviceId) }}: 
+                                        {{ getToothName(item.isJaw, item.toothList, item.jaw ? item.jaw[0] : '') }}
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -405,11 +411,27 @@ export default {
                     value: 1,
                 },
             ],
-            receiptsData: {}
+            receiptsData: {},
+            serviceData: [],
         }
     },
     async created() {
         const _this = this;
+        //Lấy danh sách dịch vụ
+        const services = await _this.$axios.$post('/api/service/getByQuery', {
+            filters: {
+                nameF: '',
+                codeF: '',
+                groupF: '',
+                statusF: true
+            },
+            sorts: 'name&&1',
+            pages:{
+                from: 0,
+                size: 1000
+            }
+        });
+        _this.serviceData = services.data;
         //Lấy danh sách dữ liệu
         await _this.getData(_this.searchQuery);
     },
@@ -593,6 +615,40 @@ export default {
                     }
                 })
                 .catch(() => {});
+        },
+        getToothName(isJaw, toothList, jaw){
+            const _this = this;
+            if(isJaw){
+                if(jaw == 'twoJaw'){
+                    return 'Hai hàm';
+                }
+                else if(jaw == 'upperJaw'){
+                    return 'Hàm trên';
+                }
+                else if(jaw == 'lowerJaw'){
+                    return 'Hàm dưới';
+                }
+                else{
+                    return '';
+                }
+            }
+            else{
+                if(toothList != null && toothList.length > 0){
+                    var newArr = _.map(toothList, item => {
+                        return `R${item}`;
+                    })
+                    var text = newArr.join(", ");
+                    return text;
+                }
+                else{
+                    return '';
+                }
+            }
+        },
+        getServiceName(serviceId){
+            const _this = this;
+            let data = _.find(_this.serviceData, { _id: serviceId });
+			return data ? data.name : '';
         },
     }
 }
