@@ -23,7 +23,7 @@
                     </li>
                 </ul>
                 <div class="d-flex align-items-center" style="gap: 6px;">
-                    <el-badge :value="notificationGet.filter(e => e.status == 'new').length" class="item">
+                    <el-badge :hidden="notificationGet.filter(e => e.status == 'new').length <= 0" :value="notificationGet.filter(e => e.status == 'new').length" class="item">
                         <el-dropdown trigger="click" @visible-change="handleDropdownChange" @command="handleCommandNotify">
                             <el-button class="btn-custom" size="medium" icon="el-icon-message-solid" circle></el-button>
                             <el-dropdown-menu slot="dropdown" v-loading="dataLoading">
