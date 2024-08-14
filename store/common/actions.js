@@ -4,34 +4,49 @@ import axios from 'axios';
 async function getDataForFilter({ commit, rootState, state }, filters) {
     switch (filters.actionName) {
         case 'provinceMasterData':
-            const provinceData = await axios.get('https://provinces.open-api.vn/api/p/');
-            var provinces = provinceData.data;
-            return provinces.map(item => {
-                return {
-                    value: item.code,
-                    label: item.name
-                }
-            })
+            try{
+                const provinceData = await axios.get('https://provinces.open-api.vn/api/p/');
+                var provinces = provinceData.data;
+                return provinces.map(item => {
+                    return {
+                        value: item.code,
+                        label: item.name
+                    }
+                })
+            }
+            catch(err){
+                return [];
+            }
         case 'districtMasterData':
-            const districtData = await axios.get('https://provinces.open-api.vn/api/d/');
-            var districts = districtData.data;
-            return districts.map(item => {
-            return {
-                value: item.code,
-                label: item.name,
-                province_code: item.province_code
+            try{
+                const districtData = await axios.get('https://provinces.open-api.vn/api/d/');
+                var districts = districtData.data;
+                return districts.map(item => {
+                    return {
+                        value: item.code,
+                        label: item.name,
+                        province_code: item.province_code
+                    }
+                })
             }
-            })
+            catch(err){
+                return [];
+            }
         case 'wardMasterData':
-            const wardData = await axios.get('https://provinces.open-api.vn/api/w/');
-            var wards = wardData.data;
-            return wards.map(item => {
-            return {
-                value: item.code,
-                label: item.name,
-                district_code: item.district_code
+            try{
+                const wardData = await axios.get('https://provinces.open-api.vn/api/w/');
+                var wards = wardData.data;
+                return wards.map(item => {
+                    return {
+                        value: item.code,
+                        label: item.name,
+                        district_code: item.district_code
+                    }
+                })
             }
-            })
+            catch(err){
+                return [];
+            }
         case 'accessMasterData':
             var searchQuery = {
                 filters: {
